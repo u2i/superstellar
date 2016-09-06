@@ -8,7 +8,6 @@ import (
 	"golang.org/x/net/websocket"
 )
 
-// Chat server.
 type Server struct {
 	pattern   string
 	positions map[int]*Position
