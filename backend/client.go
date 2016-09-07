@@ -17,7 +17,7 @@ type Client struct {
 	id     int
 	ws     *websocket.Conn
 	server *Server
-	ch     chan *GameState
+	ch     chan *Space
 	doneCh chan bool
 }
 
@@ -43,9 +43,9 @@ func (c *Client) Conn() *websocket.Conn {
 	return c.ws
 }
 
-func (c *Client) SendPositions(gameState *GameState) {
+func (c *Client) SendSpace(space *Space) {
 	select {
-	case c.ch <- gameState:
+	case c.ch <- space:
 	default:
 		c.server.Del(c)
 		err := fmt.Errorf("client %d is disconnected.", c.id)

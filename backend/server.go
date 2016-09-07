@@ -9,20 +9,20 @@ import (
 )
 
 type Server struct {
-	pattern   string
-	positions map[int]*Position
-	clients   map[int]*Client
-	addCh     chan *Client
-	delCh     chan *Client
-	moveCh    chan *Move
-	doneCh    chan bool
-	errCh     chan error
-	updateCh  chan bool
+	pattern      string
+	space        *Space
+	clients      map[int]*Client
+	addCh        chan *Client
+	delCh        chan *Client
+	moveCh       chan *Move
+	doneCh       chan bool
+	errCh        chan error
+	updateCh     chan bool
+	nextClientId int
 }
 
-// Create new chat server.
 func NewServer(pattern string) *Server {
-	positions := make(map[int]*Position)
+	space := NewSpace()
 	clients := make(map[int]*Client)
 	addCh := make(chan *Client)
 	delCh := make(chan *Client)
@@ -30,10 +30,11 @@ func NewServer(pattern string) *Server {
 	doneCh := make(chan bool)
 	errCh := make(chan error)
 	updateCh := make(chan bool)
+	nextClientId := 0
 
 	return &Server{
 		pattern,
-		positions,
+		space,
 		clients,
 		addCh,
 		delCh,
@@ -41,6 +42,7 @@ func NewServer(pattern string) *Server {
 		doneCh,
 		errCh,
 		updateCh,
+		nextClientId
 	}
 }
 
@@ -64,20 +66,18 @@ func (s *Server) Err(err error) {
 	s.errCh <- err
 }
 
-func (s *Server) sendGameState() {
-	positions := make([]Position, 0, len(s.positions))
-
-	for _, value := range s.positions {
-		positions = append(positions, *value)
-	}
-
+func (s *Server) sendSpace() {
 	for _, c := range s.clients {
-		c.SendPositions(&GameState{Positions: positions})
+		c.SendSpace(s.space)
 	}
 }
 
-// Listen and serve.
-// It serves client connection and broadcast request.
+func (s *Server) nextClientId() int {
+	clientId := s.nextClientId
+	s.nextClientId += 1
+	return clientId
+}
+
 func (s *Server) Listen() {
 	log.Println("Listening server...")
 
@@ -97,28 +97,35 @@ func (s *Server) Listen() {
 	http.Handle(s.pattern, websocket.Handler(onConnected))
 	log.Println("Created handler")
 
-	ticker := time.NewTicker(30 * time.Millisecond)
+	ticker := time.NewTicker(20 * time.Millisecond)
 	go func() {
 		for _ = range ticker.C {
 			s.updateCh <- true
 		}
 	}()
 
+	s.mainGameLoop()
+}
+
+func (s *Server) mainGameLoop() {
 	for {
 		select {
 
 		// Add new a client
 		case c := <-s.addCh:
 			log.Println("Added new client")
-			s.clients[c.id] = c
-			s.positions[c.id] = &Position{X: 400, Y: 300}
+			clientId := s.nextClientId()
+			s.clients[clientId] = c
+			spaceship := NewSpaceship(NewVector(400.0, 300.0))
+			c.id = clientId
+			s.space.AddSpaceship(clientId, spaceship)
 			log.Println("Now", len(s.clients), "clients connected.")
 
 		// del a client
 		case c := <-s.delCh:
 			log.Println("Delete client")
+			s.space.RemoveSpaceship(c.id)
 			delete(s.clients, c.id)
-			delete(s.positions, c.id)
 
 			// broadcast message for all clients
 		case move := <-s.moveCh:
@@ -141,7 +148,7 @@ func (s *Server) Listen() {
 			}
 
 		case <-s.updateCh:
-			s.sendGameState()
+			s.sendSpace()
 
 		case err := <-s.errCh:
 			log.Println("Error:", err.Error())
