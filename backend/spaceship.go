@@ -3,18 +3,18 @@ package backend
 import "fmt"
 
 type Spaceship struct {
-	position Vector
-	velocity Vector
-	facing   Vector
+	Position *Vector	`json:"position"`
+	Velocity *Vector	`json:"veloctiy"`
+	Facing   *Vector	`json:"facing"`
 }
 
 func (self *Spaceship) String() string {
-	return fmt.Sprintf("(%v, %v, %v)", self.position, self.velocity, self.facing)
+	return fmt.Sprintf("(%v, %v, %v)", self.Position, self.Velocity, self.Facing)
 }
 
 func NewSpaceship(position *Vector) *Spaceship {
 	return &Spaceship{
-		position: position,
-		velocity: ZeroVector(),
-		facing:   NewVector(1.0, 0.0)}
+		Position: position,
+		Velocity: ZeroVector(),
+		Facing:   NewVector(1.0, 0.0)}
 }

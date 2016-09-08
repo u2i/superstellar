@@ -1,27 +1,39 @@
 package backend
 
-import "fmt"
+import (
+	"fmt"
+	"math"
+)
 
 type Vector struct {
-	x, y float64
+	X float64	`json:"x"`
+	Y float64	`json:"y"`
 }
 
 func ZeroVector() *Vector {
-	return &Vector{x: 0.0, y: 0.0}
+	return &Vector{X: 0.0, Y: 0.0}
 }
 
 func NewVector(x, y float64) *Vector {
-	return &Vector{x: x, y: y}
+	return &Vector{X: x, Y: y}
 }
 
 func (self *Vector) String() string {
-	return fmt.Sprintf("(%f, %f)", self.x, self.y)
+	return fmt.Sprintf("(%f, %f)", self.X, self.Y)
 }
 
 func (self *Vector) Add(other *Vector) *Vector {
-	return &Vector{x: self.x + other.x, y: self.y + other.y}
+	return &Vector{X: self.X + other.X, Y: self.Y + other.Y}
 }
 
 func (self *Vector) Multiply(scalar float64) *Vector {
-	return &Vector{x: self.x * scalar, y: self.y * scalar}
+	return &Vector{X: self.X * scalar, Y: self.Y * scalar}
+}
+
+func (self *Vector) Length() float64 {
+	return math.Sqrt(self.X * self.X + self.Y * self.Y)
+}
+
+func (self *Vector) Normalize() *Vector {
+	return &Vector{X: self.X/self.Length(), Y: self.Y/self.Length()}
 }

@@ -3,8 +3,8 @@ package backend
 import "fmt"
 
 type Move struct {
-	ClientID  int    `json:"client_id"`
-	Direction string `json:"direction"`
+	ClientID  string	`json:"client_id"`
+	Direction string	`json:"direction"`
 }
 
 func (self *Move) String() string {

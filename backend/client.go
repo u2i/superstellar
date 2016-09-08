@@ -10,11 +10,9 @@ import (
 
 const channelBufSize = 100
 
-var maxId int = 0
-
 // Chat client.
 type Client struct {
-	id     int
+	id     string
 	ws     *websocket.Conn
 	server *Server
 	ch     chan *Space
@@ -32,11 +30,10 @@ func NewClient(ws *websocket.Conn, server *Server) *Client {
 		panic("server cannot be nil")
 	}
 
-	maxId++
-	ch := make(chan *GameState, channelBufSize)
+	ch := make(chan *Space, channelBufSize)
 	doneCh := make(chan bool)
 
-	return &Client{maxId, ws, server, ch, doneCh}
+	return &Client{server.getNextClientId(), ws, server, ch, doneCh}
 }
 
 func (c *Client) Conn() *websocket.Conn {
@@ -45,11 +42,11 @@ func (c *Client) Conn() *websocket.Conn {
 
 func (c *Client) SendSpace(space *Space) {
 	select {
-	case c.ch <- space:
-	default:
-		c.server.Del(c)
-		err := fmt.Errorf("client %d is disconnected.", c.id)
-		c.server.Err(err)
+		case c.ch <- space:
+		default:
+			c.server.Del(c)
+			err := fmt.Errorf("client %d is disconnected.", c.id)
+			c.server.Err(err)
 	}
 }
 
@@ -71,7 +68,8 @@ func (c *Client) listenWrite() {
 
 		// send message to the client
 		case gameState := <-c.ch:
-			websocket.JSON.Send(c.ws, gameState)
+			err := websocket.JSON.Send(c.ws, gameState)
+			if (err != nil) { log.Println(err) }
 
 		// receive done request
 		case <-c.doneCh:

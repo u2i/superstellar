@@ -14,12 +14,12 @@ shipImage.onload = function () {
 };
 shipImage.src = "images/ship.png";
 
-var ships = []
+var ships = {};
 
 var ws = new WebSocket("ws://" + window.location.host + "/superstellar");
 
 ws.onmessage = function(e) {
-	ships = $.evalJSON(e.data).positions;
+	ships = $.evalJSON(e.data).spaceships;
 };
 
 // Handle keyboard controls
@@ -52,15 +52,19 @@ var render = function () {
 	ctx.fillStyle = "black";
 	ctx.fill();
 
-	if (shipReady) {
-		for (i = 0; i < ships.length; i++) {
-			ship = ships[i]
+    var shipsArray = Object.keys(ships).map(function(val) { return ships[val] });
 
-			ctx.translate(ship.x, ship.y);
-			ctx.rotate(ship.angle);
+	if (shipReady) {
+		for (i = 0; i < shipsArray.length; i++) {
+			ship = shipsArray[i]
+
+			ctx.translate(ship.position.x, ship.position.y);
+			var angle = Math.atan(ship.facing.y, ship.facing.x);
+
+			ctx.rotate(angle);
 			ctx.drawImage(shipImage, -30, -15);
-			ctx.rotate(-ship.angle);
-			ctx.translate(-ship.x, -ship.y);
+			ctx.rotate(-angle);
+			ctx.translate(-ship.position.x, -ship.position.y);
 		}
 	}
 
@@ -69,7 +73,7 @@ var render = function () {
 	ctx.font = "24px Helvetica";
 	ctx.textAlign = "left";
 	ctx.textBaseline = "top";
-	ctx.fillText("Ships: " + ships.length, 680, 10);
+	ctx.fillText("Ships: " + shipsArray.length, 680, 10);
 };
 
 // The main game loop

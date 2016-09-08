@@ -6,12 +6,13 @@ import (
 	"time"
 
 	"golang.org/x/net/websocket"
+	"strconv"
 )
 
 type Server struct {
 	pattern      string
 	space        *Space
-	clients      map[int]*Client
+	clients      map[string]*Client
 	addCh        chan *Client
 	delCh        chan *Client
 	moveCh       chan *Move
@@ -23,7 +24,7 @@ type Server struct {
 
 func NewServer(pattern string) *Server {
 	space := NewSpace()
-	clients := make(map[int]*Client)
+	clients := make(map[string]*Client)
 	addCh := make(chan *Client)
 	delCh := make(chan *Client)
 	moveCh := make(chan *Move)
@@ -42,7 +43,7 @@ func NewServer(pattern string) *Server {
 		doneCh,
 		errCh,
 		updateCh,
-		nextClientId
+		nextClientId,
 	}
 }
 
@@ -72,10 +73,10 @@ func (s *Server) sendSpace() {
 	}
 }
 
-func (s *Server) nextClientId() int {
+func (s *Server) getNextClientId() string {
 	clientId := s.nextClientId
 	s.nextClientId += 1
-	return clientId
+	return strconv.Itoa(clientId)
 }
 
 func (s *Server) Listen() {
@@ -114,7 +115,7 @@ func (s *Server) mainGameLoop() {
 		// Add new a client
 		case c := <-s.addCh:
 			log.Println("Added new client")
-			clientId := s.nextClientId()
+			clientId := s.getNextClientId()
 			s.clients[clientId] = c
 			spaceship := NewSpaceship(NewVector(400.0, 300.0))
 			c.id = clientId
@@ -131,23 +132,24 @@ func (s *Server) mainGameLoop() {
 		case move := <-s.moveCh:
 			log.Println("New move:", move)
 
-			clientPosition := s.positions[move.ClientID]
-			switch move.Direction {
-			case "up":
-				clientPosition.Y -= 20
-				clientPosition.Angle = 3.14 * 1.5
-			case "down":
-				clientPosition.Y += 20
-				clientPosition.Angle = 3.14 * 0.5
-			case "left":
-				clientPosition.X -= 20
-				clientPosition.Angle = 3.14
-			case "right":
-				clientPosition.X += 20
-				clientPosition.Angle = 0.0
-			}
+			//clientPosition := s.positions[move.ClientID]
+			//switch move.Direction {
+			//case "up":
+			//	clientPosition.Y -= 20
+			//	clientPosition.Angle = 3.14 * 1.5
+			//case "down":
+			//	clientPosition.Y += 20
+			//	clientPosition.Angle = 3.14 * 0.5
+			//case "left":
+			//	clientPosition.X -= 20
+			//	clientPosition.Angle = 3.14
+			//case "right":
+			//	clientPosition.X += 20
+			//	clientPosition.Angle = 0.0
+			//}
 
 		case <-s.updateCh:
+			s.space.randomUpdate();
 			s.sendSpace()
 
 		case err := <-s.errCh:
