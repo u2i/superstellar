@@ -2,20 +2,24 @@ package backend
 
 import "math/rand"
 
+// Space struct holds entire game state.
 type Space struct {
 	Spaceships map[string]*Spaceship `json:"spaceships"`
 }
 
+// NewSpace initializes new Space.
 func NewSpace() *Space {
 	return &Space{Spaceships: make(map[string]*Spaceship)}
 }
 
-func (space *Space) AddSpaceship(clientId string, spaceship *Spaceship) {
-	space.Spaceships[clientId] = spaceship
+// AddSpaceship adds new spaceship to the space.
+func (space *Space) AddSpaceship(clientID string, spaceship *Spaceship) {
+	space.Spaceships[clientID] = spaceship
 }
 
-func (space *Space) RemoveSpaceship(clientId string) {
-	delete(space.Spaceships, clientId)
+// RemoveSpaceship removes spaceship from the space.
+func (space *Space) RemoveSpaceship(clientID string) {
+	delete(space.Spaceships, clientID)
 }
 
 func (space *Space) randomUpdate() {

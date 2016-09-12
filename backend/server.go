@@ -6,22 +6,22 @@ import (
 	"time"
 
 	"golang.org/x/net/websocket"
-	"strconv"
 )
 
+// Server struct holds server variables.
 type Server struct {
-	pattern      string
-	space        *Space
-	clients      map[string]*Client
-	addCh        chan *Client
-	delCh        chan *Client
-	moveCh       chan *Move
-	doneCh       chan bool
-	errCh        chan error
-	updateCh     chan bool
-	nextClientId int
+	pattern  string
+	space    *Space
+	clients  map[string]*Client
+	addCh    chan *Client
+	delCh    chan *Client
+	moveCh   chan *Move
+	doneCh   chan bool
+	errCh    chan error
+	updateCh chan bool
 }
 
+// NewServer initializes a new server.
 func NewServer(pattern string) *Server {
 	space := NewSpace()
 	clients := make(map[string]*Client)
@@ -31,7 +31,6 @@ func NewServer(pattern string) *Server {
 	doneCh := make(chan bool)
 	errCh := make(chan error)
 	updateCh := make(chan bool)
-	nextClientId := 0
 
 	return &Server{
 		pattern,
@@ -43,28 +42,41 @@ func NewServer(pattern string) *Server {
 		doneCh,
 		errCh,
 		updateCh,
-		nextClientId,
 	}
 }
 
+// Add sends client add command to the server.
 func (s *Server) Add(c *Client) {
 	s.addCh <- c
 }
 
+// Del sends client delete command to the server.
 func (s *Server) Del(c *Client) {
 	s.delCh <- c
 }
 
+// Move sends new move command to the server.
 func (s *Server) Move(move *Move) {
 	s.moveCh <- move
 }
 
+// Done sends done command to the server.
 func (s *Server) Done() {
 	s.doneCh <- true
 }
 
+// Err sends error to the server.
 func (s *Server) Err(err error) {
 	s.errCh <- err
+}
+
+// Listen runs puts server into listening mode.
+func (s *Server) Listen() {
+	log.Println("Listening server...")
+
+	s.addNewClientHandler()
+	s.runTicker()
+	s.mainGameLoop()
 }
 
 func (s *Server) sendSpace() {
@@ -73,16 +85,7 @@ func (s *Server) sendSpace() {
 	}
 }
 
-func (s *Server) getNextClientId() string {
-	clientId := s.nextClientId
-	s.nextClientId += 1
-	return strconv.Itoa(clientId)
-}
-
-func (s *Server) Listen() {
-	log.Println("Listening server...")
-
-	// websocket handler
+func (s *Server) addNewClientHandler() {
 	onConnected := func(ws *websocket.Conn) {
 		defer func() {
 			err := ws.Close()
@@ -95,62 +98,34 @@ func (s *Server) Listen() {
 		s.Add(client)
 		client.Listen()
 	}
-	http.Handle(s.pattern, websocket.Handler(onConnected))
-	log.Println("Created handler")
 
+	http.Handle(s.pattern, websocket.Handler(onConnected))
+}
+
+func (s *Server) runTicker() {
 	ticker := time.NewTicker(20 * time.Millisecond)
 	go func() {
 		for _ = range ticker.C {
 			s.updateCh <- true
 		}
 	}()
-
-	s.mainGameLoop()
 }
 
 func (s *Server) mainGameLoop() {
 	for {
 		select {
 
-		// Add new a client
 		case c := <-s.addCh:
-			log.Println("Added new client")
-			clientId := s.getNextClientId()
-			s.clients[clientId] = c
-			spaceship := NewSpaceship(NewVector(400.0, 300.0))
-			c.id = clientId
-			s.space.AddSpaceship(clientId, spaceship)
-			log.Println("Now", len(s.clients), "clients connected.")
+			s.handleAddNewClient(c)
 
-		// del a client
 		case c := <-s.delCh:
-			log.Println("Delete client")
-			s.space.RemoveSpaceship(c.id)
-			delete(s.clients, c.id)
+			s.handleDelClient(c)
 
-			// broadcast message for all clients
-		case move := <-s.moveCh:
-			log.Println("New move:", move)
-
-			//clientPosition := s.positions[move.ClientID]
-			//switch move.Direction {
-			//case "up":
-			//	clientPosition.Y -= 20
-			//	clientPosition.Angle = 3.14 * 1.5
-			//case "down":
-			//	clientPosition.Y += 20
-			//	clientPosition.Angle = 3.14 * 0.5
-			//case "left":
-			//	clientPosition.X -= 20
-			//	clientPosition.Angle = 3.14
-			//case "right":
-			//	clientPosition.X += 20
-			//	clientPosition.Angle = 0.0
-			//}
+		case <-s.moveCh:
+			s.handleMoveCommand()
 
 		case <-s.updateCh:
-			s.space.randomUpdate();
-			s.sendSpace()
+			s.handleUpdate()
 
 		case err := <-s.errCh:
 			log.Println("Error:", err.Error())
@@ -159,4 +134,30 @@ func (s *Server) mainGameLoop() {
 			return
 		}
 	}
+}
+
+func (s *Server) handleAddNewClient(c *Client) {
+	log.Println("Added new client")
+
+	s.clients[c.id] = c
+	spaceship := NewSpaceship(NewVector(400.0, 300.0))
+	s.space.AddSpaceship(c.id, spaceship)
+
+	log.Println("Now", len(s.clients), "clients connected.")
+}
+
+func (s *Server) handleDelClient(c *Client) {
+	log.Println("Delete client")
+
+	s.space.RemoveSpaceship(c.id)
+	delete(s.clients, c.id)
+}
+
+func (s *Server) handleMoveCommand() {
+
+}
+
+func (s *Server) handleUpdate() {
+	s.space.randomUpdate()
+	s.sendSpace()
 }

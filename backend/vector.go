@@ -5,35 +5,44 @@ import (
 	"math"
 )
 
+// Vector structs holds 2D vector.
 type Vector struct {
-	X float64	`json:"x"`
-	Y float64	`json:"y"`
+	X float64 `json:"x"`
+	Y float64 `json:"y"`
 }
 
+// ZeroVector initializes new zero vector.
 func ZeroVector() *Vector {
 	return &Vector{X: 0.0, Y: 0.0}
 }
 
+// NewVector initlizes new vector with given parameters.
 func NewVector(x, y float64) *Vector {
 	return &Vector{X: x, Y: y}
 }
 
-func (self *Vector) String() string {
-	return fmt.Sprintf("(%f, %f)", self.X, self.Y)
+// String returns string representation.
+func (v *Vector) String() string {
+	return fmt.Sprintf("(%f, %f)", v.X, v.Y)
 }
 
-func (self *Vector) Add(other *Vector) *Vector {
-	return &Vector{X: self.X + other.X, Y: self.Y + other.Y}
+// Add returns new Vector that is a sum of the two given.
+func (v *Vector) Add(other *Vector) *Vector {
+	return &Vector{X: v.X + other.X, Y: v.Y + other.Y}
 }
 
-func (self *Vector) Multiply(scalar float64) *Vector {
-	return &Vector{X: self.X * scalar, Y: self.Y * scalar}
+// Multiply returns new Vector that is a product of the the vector and
+// given scalar.
+func (v *Vector) Multiply(scalar float64) *Vector {
+	return &Vector{X: v.X * scalar, Y: v.Y * scalar}
 }
 
-func (self *Vector) Length() float64 {
-	return math.Sqrt(self.X * self.X + self.Y * self.Y)
+// Length returns length of the vector.
+func (v *Vector) Length() float64 {
+	return math.Sqrt(v.X*v.X + v.Y*v.Y)
 }
 
-func (self *Vector) Normalize() *Vector {
-	return &Vector{X: self.X/self.Length(), Y: self.Y/self.Length()}
+// Normalize returns a new normalized vector.
+func (v *Vector) Normalize() *Vector {
+	return &Vector{X: v.X / v.Length(), Y: v.Y / v.Length()}
 }

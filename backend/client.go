@@ -5,12 +5,13 @@ import (
 	"io"
 	"log"
 
+	"github.com/satori/go.uuid"
 	"golang.org/x/net/websocket"
 )
 
 const channelBufSize = 100
 
-// Chat client.
+// Client struct holds client-specific variables.
 type Client struct {
 	id     string
 	ws     *websocket.Conn
@@ -19,9 +20,8 @@ type Client struct {
 	doneCh chan bool
 }
 
-// Create new chat client.
+// NewClient initializes a new Client struct with given websocket and Server.
 func NewClient(ws *websocket.Conn, server *Server) *Client {
-
 	if ws == nil {
 		panic("ws cannot be nil")
 	}
@@ -32,24 +32,28 @@ func NewClient(ws *websocket.Conn, server *Server) *Client {
 
 	ch := make(chan *Space, channelBufSize)
 	doneCh := make(chan bool)
+	id := uuid.NewV4().String()
 
-	return &Client{server.getNextClientId(), ws, server, ch, doneCh}
+	return &Client{id, ws, server, ch, doneCh}
 }
 
+// Conn returns client's websocket.Conn struct.
 func (c *Client) Conn() *websocket.Conn {
 	return c.ws
 }
 
+// SendSpace sends game state to the client.
 func (c *Client) SendSpace(space *Space) {
 	select {
-		case c.ch <- space:
-		default:
-			c.server.Del(c)
-			err := fmt.Errorf("client %d is disconnected.", c.id)
-			c.server.Err(err)
+	case c.ch <- space:
+	default:
+		c.server.Del(c)
+		err := fmt.Errorf("client %s is disconnected", c.id)
+		c.server.Err(err)
 	}
 }
 
+// Done sends done message to the Client which closes the conection.
 func (c *Client) Done() {
 	c.doneCh <- true
 }
@@ -66,12 +70,12 @@ func (c *Client) listenWrite() {
 	for {
 		select {
 
-		// send message to the client
 		case gameState := <-c.ch:
 			err := websocket.JSON.Send(c.ws, gameState)
-			if (err != nil) { log.Println(err) }
+			if err != nil {
+				log.Println(err)
+			}
 
-		// receive done request
 		case <-c.doneCh:
 			c.server.Del(c)
 			c.doneCh <- true // for listenRead method
@@ -96,7 +100,6 @@ func (c *Client) listenRead() {
 		default:
 			var move Move
 			err := websocket.JSON.Receive(c.ws, &move)
-			move.ClientID = c.id
 			if err == io.EOF {
 				c.doneCh <- true
 			} else if err != nil {

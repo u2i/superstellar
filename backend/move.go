@@ -1,12 +1,10 @@
 package backend
 
-import "fmt"
-
+// Move struct describes client's spaceship move.
 type Move struct {
-	ClientID  string	`json:"client_id"`
-	Direction string	`json:"direction"`
 }
 
-func (self *Move) String() string {
-	return fmt.Sprintf("%d moves to %s", self.ClientID, self.Direction)
+// String returns string representation of Move.
+func (m *Move) String() string {
+	return ""
 }
