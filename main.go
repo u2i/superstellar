@@ -1,4 +1,4 @@
-package superstellar
+package main
 
 import (
 	"log"

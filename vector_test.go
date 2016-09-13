@@ -1,4 +1,4 @@
-package superstellar_test
+package main_test
 
 import (
 	. "superstellar/backend"
