@@ -10,7 +10,7 @@ import (
 var _ = Describe("Vector", func() {
 	Describe("Length", func() {
 		It("calculates length", func() {
-			Expect((&Vector{X: 3, Y: 4}).Length()).To(Equal(5.0))
+			Expect((&Vector{X: 3, Y: 4}).Length()).To(BeNumerically("~", 5.0))
 		})
 	})
 
@@ -23,8 +23,9 @@ var _ = Describe("Vector", func() {
 				expected = vector
 			})
 
-				It("does not change vector", func() {
-				Expect(vector.Normalize()).To(Equal(expected))
+			It("does not change vector", func() {
+				Expect(vector.Normalize().X).To(BeNumerically("~", expected.X))
+				Expect(vector.Normalize().Y).To(BeNumerically("~", expected.Y))
 			})
 		})
 
@@ -35,7 +36,8 @@ var _ = Describe("Vector", func() {
 			})
 
 			It("normalizes vector", func() {
-				Expect(vector.Normalize()).To(Equal(expected))
+				Expect(vector.Normalize().X).To(BeNumerically("~", expected.X))
+				Expect(vector.Normalize().Y).To(BeNumerically("~", expected.Y))
 			})
 		})
 	})
