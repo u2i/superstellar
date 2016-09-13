@@ -55,10 +55,13 @@ var render = function () {
     var shipsArray = Object.keys(ships).map(function(val) { return ships[val] });
 
 	if (shipReady) {
-		for (i = 0; i < shipsArray.length; i++) {
-			ship = shipsArray[i]
+		for (var shipID in ships) {
+			ship = ships[shipID]
 
 			ctx.translate(ship.position.x, ship.position.y);
+			ctx.fillStyle = "rgb(250, 250, 250)";
+			ctx.font = "18px Helvetica";
+			ctx.fillText(shipID.split('-')[0], -35, -60);
 			var angle = Math.atan(ship.facing.y, ship.facing.x);
 
 			ctx.rotate(angle);
