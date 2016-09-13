@@ -1,6 +1,9 @@
 package backend
 
-import "math/rand"
+import (
+	"math"
+	"math/rand"
+)
 
 // Space struct holds entire game state.
 type Space struct {
@@ -23,10 +26,32 @@ func (space *Space) RemoveSpaceship(clientID string) {
 }
 
 func (space *Space) randomUpdate() {
-	for _, v := range space.Spaceships {
-		facingDiff := &Vector{X: rand.Float64() - 0.5, Y: rand.Float64() - 0.5}
-		v.Facing = v.Facing.Add(facingDiff.Normalize().Multiply(0.15).Normalize())
-		positionDiff := &Vector{X: rand.Float64() - 0.5, Y: rand.Float64() - 0.5}
-		v.Position = v.Position.Add(positionDiff.Normalize().Multiply(5))
+	for _, e := range space.Spaceships {
+		if rand.Float64() < 0.05 {
+			e.InputThrust = !e.InputThrust
+		}
+		if rand.Float64() < 0.07 {
+			e.InputDirection = Direction(rand.Int() % 3)
+		}
+	}
+}
+
+func (space *Space) updatePhysics() {
+	for _, spaceship := range space.Spaceships {
+		if spaceship.InputThrust {
+			deltaVelocity := spaceship.getNormalizedFacing().Multiply(Acceleration)
+			spaceship.Velocity = spaceship.Velocity.Add(deltaVelocity)
+		}
+		spaceship.Position = spaceship.Position.Add(spaceship.Velocity)
+
+		angle := math.Atan2(spaceship.Facing.Y, spaceship.Facing.X)
+		switch spaceship.InputDirection {
+		case LEFT:
+			angle -= AngularVelocity
+		case RIGHT:
+			angle += AngularVelocity
+		}
+
+		spaceship.Facing = NewVector(math.Cos(angle), math.Sin(angle))
 	}
 }

@@ -8,11 +8,19 @@ document.body.appendChild(canvas);
 
 // Background image
 var shipReady = false;
+var shipThrustReady = false;
+
 var shipImage = new Image();
 shipImage.onload = function () {
 	shipReady = true;
 };
 shipImage.src = "images/ship.png";
+
+var shipThrustImage = new Image();
+shipThrustImage.onload = function () {
+	shipThrustReady = true;
+};
+shipThrustImage.src = "images/ship_thrust.png";
 
 var ships = {};
 
@@ -58,6 +66,8 @@ var render = function () {
 		for (var shipID in ships) {
 			ship = ships[shipID]
 
+			image = ship.thrust ? shipThrustImage : shipImage
+
 			ctx.translate(ship.position.x, ship.position.y);
 			ctx.fillStyle = "rgb(250, 250, 250)";
 			ctx.font = "18px Helvetica";
@@ -65,7 +75,7 @@ var render = function () {
 			var angle = Math.atan(ship.facing.y, ship.facing.x);
 
 			ctx.rotate(angle);
-			ctx.drawImage(shipImage, -30, -15);
+			ctx.drawImage(image, -30, -22);
 			ctx.rotate(-angle);
 			ctx.translate(-ship.position.x, -ship.position.y);
 		}

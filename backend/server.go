@@ -10,15 +10,16 @@ import (
 
 // Server struct holds server variables.
 type Server struct {
-	pattern  string
-	space    *Space
-	clients  map[string]*Client
-	addCh    chan *Client
-	delCh    chan *Client
-	moveCh   chan *Move
-	doneCh   chan bool
-	errCh    chan error
-	updateCh chan bool
+	pattern   string
+	space     *Space
+	clients   map[string]*Client
+	addCh     chan *Client
+	delCh     chan *Client
+	moveCh    chan *Move
+	doneCh    chan bool
+	errCh     chan error
+	updateCh  chan bool
+	physicsCh chan bool
 }
 
 // NewServer initializes a new server.
@@ -31,6 +32,7 @@ func NewServer(pattern string) *Server {
 	doneCh := make(chan bool)
 	errCh := make(chan error)
 	updateCh := make(chan bool)
+	physicsCh := make(chan bool)
 
 	return &Server{
 		pattern,
@@ -42,6 +44,7 @@ func NewServer(pattern string) *Server {
 		doneCh,
 		errCh,
 		updateCh,
+		physicsCh,
 	}
 }
 
@@ -75,7 +78,8 @@ func (s *Server) Listen() {
 	log.Println("Listening server...")
 
 	s.addNewClientHandler()
-	s.runTicker()
+	s.runSenderTicker()
+	s.runPhysicsTicker()
 	s.mainGameLoop()
 }
 
@@ -102,11 +106,20 @@ func (s *Server) addNewClientHandler() {
 	http.Handle(s.pattern, websocket.Handler(onConnected))
 }
 
-func (s *Server) runTicker() {
+func (s *Server) runSenderTicker() {
 	ticker := time.NewTicker(20 * time.Millisecond)
 	go func() {
 		for _ = range ticker.C {
 			s.updateCh <- true
+		}
+	}()
+}
+
+func (s *Server) runPhysicsTicker() {
+	ticker := time.NewTicker(20 * time.Millisecond)
+	go func() {
+		for _ = range ticker.C {
+			s.physicsCh <- true
 		}
 	}()
 }
@@ -126,6 +139,9 @@ func (s *Server) mainGameLoop() {
 
 		case <-s.updateCh:
 			s.handleUpdate()
+
+		case <-s.physicsCh:
+			s.handlePhysicsUpdate()
 
 		case err := <-s.errCh:
 			log.Println("Error:", err.Error())
@@ -160,4 +176,8 @@ func (s *Server) handleMoveCommand() {
 func (s *Server) handleUpdate() {
 	s.space.randomUpdate()
 	s.sendSpace()
+}
+
+func (s *Server) handlePhysicsUpdate() {
+	s.space.updatePhysics()
 }
