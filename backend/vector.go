@@ -39,7 +39,7 @@ func (v *Vector) Multiply(scalar float64) *Vector {
 
 // Length returns length of the vector.
 func (v *Vector) Length() float64 {
-	return math.Sqrt(v.X*v.X + v.Y*v.Y)
+	return math.Sqrt(v.X * v.X + v.Y * v.Y)
 }
 
 // Normalize returns a new normalized vector.
