@@ -30,7 +30,7 @@ func (space *Space) randomUpdate() {
 		if rand.Float64() < 0.05 {
 			e.InputThrust = !e.InputThrust
 		}
-		if rand.Float64() < 0.07 {
+		if rand.Float64() < 0.03 {
 			e.InputDirection = Direction(rand.Int() % 3)
 		}
 	}

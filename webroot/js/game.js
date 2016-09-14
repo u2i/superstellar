@@ -82,7 +82,7 @@ var render = function () {
 			ctx.fillStyle = "rgb(250, 250, 250)";
 			ctx.font = "18px Helvetica";
 			ctx.fillText(shipID.split('-')[0], -35, -60);
-			var angle = Math.atan2(ship.facing.x, ship.facing.y);
+			var angle = Math.atan2(-ship.facing.y, ship.facing.x);
 
 			ctx.rotate(angle);
 			ctx.drawImage(image, -30, -22);
