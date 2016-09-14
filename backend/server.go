@@ -156,7 +156,7 @@ func (s *Server) handleAddNewClient(c *Client) {
 	log.Println("Added new client")
 
 	s.clients[c.id] = c
-	spaceship := NewSpaceship(NewVector(400.0, 300.0))
+	spaceship := NewSpaceship(NewVector(0.0, 0.0))
 	s.space.AddSpaceship(c.id, spaceship)
 
 	log.Println("Now", len(s.clients), "clients connected.")

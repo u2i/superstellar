@@ -24,6 +24,8 @@ shipThrustImage.src = "images/ship_thrust.png";
 
 var ships = {};
 
+var viewport = {vx: 0, vy: 0, width: 800, height: 600}
+
 var ws = new WebSocket("ws://" + window.location.host + "/superstellar");
 
 ws.onmessage = function(e) {
@@ -53,6 +55,12 @@ addEventListener("keydown", function (e) {
 	ws.send($.toJSON({client_id: 1, direction: direction}))
 }, false);
 
+var translateToViewport = function (x, y, viewport) {
+    var newX = x + viewport.vx + viewport.width / 2;
+	var newY = -y - viewport.vy + viewport.height / 2;
+	return {x: newX, y: newY}
+}
+
 // Draw everything
 var render = function () {
 	ctx.beginPath();
@@ -68,7 +76,9 @@ var render = function () {
 
 			image = ship.thrust ? shipThrustImage : shipImage
 
-			ctx.translate(ship.position.x, ship.position.y);
+			var translatedPosition = translateToViewport(ship.position.x, ship.position.y, viewport)
+
+			ctx.translate(translatedPosition.x, translatedPosition.y);
 			ctx.fillStyle = "rgb(250, 250, 250)";
 			ctx.font = "18px Helvetica";
 			ctx.fillText(shipID.split('-')[0], -35, -60);
@@ -77,7 +87,7 @@ var render = function () {
 			ctx.rotate(angle);
 			ctx.drawImage(image, -30, -22);
 			ctx.rotate(-angle);
-			ctx.translate(-ship.position.x, -ship.position.y);
+			ctx.translate(-translatedPosition.x, -translatedPosition.y);
 		}
 	}
 
