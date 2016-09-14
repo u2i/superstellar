@@ -34,7 +34,7 @@ func NewSpaceship(position *Vector) *Spaceship {
 	return &Spaceship{
 		Position:       position,
 		Velocity:       ZeroVector(),
-		Facing:         NewVector(1.0, 0.0),
+		Facing:         NewVector(0.0, 1.0),
 		InputThrust:    false,
 		InputDirection: NONE,
 	}

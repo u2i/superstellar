@@ -82,7 +82,7 @@ var render = function () {
 			ctx.fillStyle = "rgb(250, 250, 250)";
 			ctx.font = "18px Helvetica";
 			ctx.fillText(shipID.split('-')[0], -35, -60);
-			var angle = Math.atan(ship.facing.y, ship.facing.x);
+			var angle = Math.atan2(ship.facing.x, ship.facing.y);
 
 			ctx.rotate(angle);
 			ctx.drawImage(image, -30, -22);
@@ -96,7 +96,11 @@ var render = function () {
 	ctx.font = "24px Helvetica";
 	ctx.textAlign = "left";
 	ctx.textBaseline = "top";
-	ctx.fillText("Ships: " + shipsArray.length, 680, 10);
+	ctx.fillText("Ships: " + shipsArray.length, 580, 10);
+	if (shipReady) {
+		ctx.fillText("pos: " + Math.round(shipsArray[0].position.x) + ", " + Math.round(shipsArray[0].position.y), 580, 50);
+		ctx.fillText("fac: " + (shipsArray[0].facing.x).toFixed(2) + ", " + (shipsArray[0].facing.y).toFixed(2), 580, 90);
+	}
 };
 
 // The main game loop
