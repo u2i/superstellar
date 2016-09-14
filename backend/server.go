@@ -1,6 +1,7 @@
 package backend
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
 	"time"
@@ -84,8 +85,16 @@ func (s *Server) Listen() {
 }
 
 func (s *Server) sendSpace() {
+	bytes, err := json.Marshal(s.space)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	str := string(bytes)
+
 	for _, c := range s.clients {
-		c.SendSpace(s.space)
+		c.SendSpace(&str)
 	}
 }
 

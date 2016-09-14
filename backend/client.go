@@ -16,7 +16,7 @@ type Client struct {
 	id     string
 	ws     *websocket.Conn
 	server *Server
-	ch     chan *Space
+	ch     chan *string
 	doneCh chan bool
 }
 
@@ -30,7 +30,7 @@ func NewClient(ws *websocket.Conn, server *Server) *Client {
 		panic("server cannot be nil")
 	}
 
-	ch := make(chan *Space, channelBufSize)
+	ch := make(chan *string, channelBufSize)
 	doneCh := make(chan bool)
 	id := uuid.NewV4().String()
 
@@ -43,7 +43,7 @@ func (c *Client) Conn() *websocket.Conn {
 }
 
 // SendSpace sends game state to the client.
-func (c *Client) SendSpace(space *Space) {
+func (c *Client) SendSpace(space *string) {
 	select {
 	case c.ch <- space:
 	default:
@@ -71,7 +71,7 @@ func (c *Client) listenWrite() {
 		select {
 
 		case gameState := <-c.ch:
-			err := websocket.JSON.Send(c.ws, gameState)
+			err := websocket.Message.Send(c.ws, *gameState)
 			if err != nil {
 				log.Println(err)
 			}
