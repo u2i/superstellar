@@ -22,15 +22,15 @@ const (
 
 // Spaceship struct describes a spaceship.
 type Spaceship struct {
-	Position       *Vector   `json:"position"`
-	Velocity       *Vector   `json:"veloctiy"`
-	Facing         *Vector   `json:"facing"`
-	InputThrust    bool      `json:"thrust"`
-	InputDirection Direction `json:"direction"`
+	Position       *IntVector `json:"position"`
+	Velocity       *Vector    `json:"velocity"`
+	Facing         *Vector    `json:"facing"`
+	InputThrust    bool       `json:"thrust"`
+	InputDirection Direction  `json:"direction"`
 }
 
 // NewSpaceship initializes new spaceship facing north with zero velocity.
-func NewSpaceship(position *Vector) *Spaceship {
+func NewSpaceship(position *IntVector) *Spaceship {
 	return &Spaceship{
 		Position:       position,
 		Velocity:       ZeroVector(),

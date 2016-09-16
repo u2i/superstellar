@@ -76,7 +76,7 @@ var render = function () {
 
 			image = ship.thrust ? shipThrustImage : shipImage
 
-			var translatedPosition = translateToViewport(ship.position.x, ship.position.y, viewport)
+			var translatedPosition = translateToViewport(ship.position.x/100, ship.position.y/100, viewport)
 
 			ctx.translate(translatedPosition.x, translatedPosition.y);
 			ctx.fillStyle = "rgb(250, 250, 250)";
