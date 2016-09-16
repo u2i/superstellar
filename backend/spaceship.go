@@ -1,6 +1,9 @@
 package backend
 
-import "fmt"
+import (
+	"fmt"
+	"superstellar/backend/proto"
+)
 
 // Direction is a type describing user input on spaceship rotation.
 type Direction int
@@ -22,6 +25,7 @@ const (
 
 // Spaceship struct describes a spaceship.
 type Spaceship struct {
+	ID             uint32
 	Position       *IntVector `json:"position"`
 	Velocity       *Vector    `json:"velocity"`
 	Facing         *Vector    `json:"facing"`
@@ -30,8 +34,9 @@ type Spaceship struct {
 }
 
 // NewSpaceship initializes new spaceship facing north with zero velocity.
-func NewSpaceship(position *IntVector) *Spaceship {
+func NewSpaceship(id uint32, position *IntVector) *Spaceship {
 	return &Spaceship{
+		ID:             id,
 		Position:       position,
 		Velocity:       ZeroVector(),
 		Facing:         NewVector(0.0, 1.0),
@@ -47,4 +52,14 @@ func (s *Spaceship) String() string {
 
 func (s *Spaceship) getNormalizedFacing() *Vector {
 	return s.Facing.Normalize()
+}
+
+func (s *Spaceship) toProto() *proto.Spaceship {
+	return &proto.Spaceship{
+		Id:          s.ID,
+		Position:    s.Position.toProto(),
+		Velocity:    s.Velocity.toProto(),
+		Facing:      float32(s.Facing.Radians()),
+		InputThrust: s.InputThrust,
+	}
 }

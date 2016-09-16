@@ -15,7 +15,7 @@ type Client struct {
 	id     uint32
 	ws     *websocket.Conn
 	server *Server
-	ch     chan *string
+	ch     chan *[]byte
 	doneCh chan bool
 }
 
@@ -29,7 +29,7 @@ func NewClient(ws *websocket.Conn, server *Server) *Client {
 		panic("server cannot be nil")
 	}
 
-	ch := make(chan *string, channelBufSize)
+	ch := make(chan *[]byte, channelBufSize)
 	doneCh := make(chan bool)
 	id := server.GenerateID()
 
@@ -42,9 +42,9 @@ func (c *Client) Conn() *websocket.Conn {
 }
 
 // SendSpace sends game state to the client.
-func (c *Client) SendSpace(space *string) {
+func (c *Client) SendSpace(bytes *[]byte) {
 	select {
-	case c.ch <- space:
+	case c.ch <- bytes:
 	default:
 		c.server.Del(c)
 		err := fmt.Errorf("client %d is disconnected", c.id)
@@ -69,8 +69,8 @@ func (c *Client) listenWrite() {
 	for {
 		select {
 
-		case gameState := <-c.ch:
-			err := websocket.Message.Send(c.ws, *gameState)
+		case bytes := <-c.ch:
+			err := websocket.Message.Send(c.ws, *bytes)
 			if err != nil {
 				log.Println(err)
 			}

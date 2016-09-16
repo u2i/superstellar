@@ -1,0 +1,25 @@
+syntax = "proto3";
+package superstellar;
+option go_package = "proto";
+
+message IntVector {
+  int32 x = 1;
+  int32 y = 2;
+}
+
+message Vector {
+  float x = 1;
+  float y = 2;
+}
+
+message Spaceship {
+  uint32    id = 1;
+  IntVector position = 2;
+  Vector    velocity = 3;
+  float     facing = 4;
+  bool      input_thrust = 5;
+}
+
+message Space {
+  repeated Spaceship spaceships = 1;
+}

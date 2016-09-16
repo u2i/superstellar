@@ -1,6 +1,9 @@
 package backend
 
-import "fmt"
+import (
+	"fmt"
+	"superstellar/backend/proto"
+)
 
 // IntVector structs holds 2D vector with int coordinates.
 type IntVector struct {
@@ -31,9 +34,9 @@ func (v *IntVector) Add(other *Vector) *IntVector {
 	}
 }
 
-// func (v *IntVector) toProto() *proto.IntVector {
-// 	return &proto.IntVector{
-// 		X: v.X,
-// 		Y: v.Y,
-// 	}
-// }
+func (v *IntVector) toProto() *proto.IntVector {
+	return &proto.IntVector{
+		X: v.X,
+		Y: v.Y,
+	}
+}

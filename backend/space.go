@@ -3,6 +3,7 @@ package backend
 import (
 	"math"
 	"math/rand"
+	"superstellar/backend/proto"
 )
 
 // Space struct holds entire game state.
@@ -54,4 +55,13 @@ func (space *Space) updatePhysics() {
 
 		spaceship.Facing = NewVector(math.Cos(angle), math.Sin(angle))
 	}
+}
+
+func (space *Space) toProto() *proto.Space {
+	protoSpaceships := make([]*proto.Spaceship, 0, len(space.Spaceships))
+	for _, spaceship := range space.Spaceships {
+		protoSpaceships = append(protoSpaceships, spaceship.toProto())
+	}
+
+	return &proto.Space{Spaceships: protoSpaceships}
 }

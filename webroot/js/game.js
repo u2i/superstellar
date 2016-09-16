@@ -5,6 +5,9 @@ canvas.width = 800;
 canvas.height = 600;
 document.body.appendChild(canvas);
 
+var ProtoBuf = dcodeIO.ProtoBuf;
+var builder = ProtoBuf.loadJsonFile("js/superstellar_proto.json");
+var Space = builder.build("superstellar.Space");
 
 // Background image
 var shipReady = false;
@@ -28,8 +31,14 @@ var viewport = {vx: 0, vy: 0, width: 800, height: 600}
 
 var ws = new WebSocket("ws://" + window.location.host + "/superstellar");
 
+
 ws.onmessage = function(e) {
-	ships = $.evalJSON(e.data).spaceships;
+	var fileReader = new FileReader();
+	fileReader.onload = function() {
+			ships = Space.decode(this.result).spaceships
+	};
+
+	fileReader.readAsArrayBuffer(e.data);
 };
 
 // Handle keyboard controls
@@ -56,7 +65,7 @@ addEventListener("keydown", function (e) {
 }, false);
 
 var translateToViewport = function (x, y, viewport) {
-    var newX = x + viewport.vx + viewport.width / 2;
+  var newX = x + viewport.vx + viewport.width / 2;
 	var newY = -y - viewport.vy + viewport.height / 2;
 	return {x: newX, y: newY}
 }
@@ -68,25 +77,22 @@ var render = function () {
 	ctx.fillStyle = "black";
 	ctx.fill();
 
-    var shipsArray = Object.keys(ships).map(function(val) { return ships[val] });
-
 	if (shipReady) {
 		for (var shipID in ships) {
-			ship = ships[shipID]
+			var ship = ships[shipID]
 
-			image = ship.thrust ? shipThrustImage : shipImage
+			image = ship.input_thrust ? shipThrustImage : shipImage
 
 			var translatedPosition = translateToViewport(ship.position.x/100, ship.position.y/100, viewport)
 
 			ctx.translate(translatedPosition.x, translatedPosition.y);
 			ctx.fillStyle = "rgb(250, 250, 250)";
 			ctx.font = "18px Helvetica";
-			ctx.fillText(shipID.split('-')[0], -35, -60);
-			var angle = Math.atan2(-ship.facing.y, ship.facing.x);
+			ctx.fillText(ship.id, -35, -60);
 
-			ctx.rotate(angle);
+			ctx.rotate(ship.facing);
 			ctx.drawImage(image, -30, -22);
-			ctx.rotate(-angle);
+			ctx.rotate(-ship.facing);
 			ctx.translate(-translatedPosition.x, -translatedPosition.y);
 		}
 	}
@@ -96,11 +102,7 @@ var render = function () {
 	ctx.font = "24px Helvetica";
 	ctx.textAlign = "left";
 	ctx.textBaseline = "top";
-	ctx.fillText("Ships: " + shipsArray.length, 580, 10);
-	if (shipReady) {
-		ctx.fillText("pos: " + Math.round(shipsArray[0].position.x) + ", " + Math.round(shipsArray[0].position.y), 580, 50);
-		ctx.fillText("fac: " + (shipsArray[0].facing.x).toFixed(2) + ", " + (shipsArray[0].facing.y).toFixed(2), 580, 90);
-	}
+	ctx.fillText("Ships: " + ships.length, 580, 10);
 };
 
 // The main game loop

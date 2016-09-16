@@ -1,10 +1,11 @@
 package backend
 
 import (
-	"encoding/json"
 	"log"
 	"net/http"
 	"time"
+
+	"github.com/golang/protobuf/proto"
 
 	"golang.org/x/net/websocket"
 )
@@ -97,16 +98,14 @@ func (s *Server) Listen() {
 }
 
 func (s *Server) sendSpace() {
-	bytes, err := json.Marshal(s.space)
+	bytes, err := proto.Marshal(s.space.toProto())
 	if err != nil {
 		log.Println(err)
 		return
 	}
 
-	str := string(bytes)
-
 	for _, c := range s.clients {
-		c.SendSpace(&str)
+		c.SendSpace(&bytes)
 	}
 }
 
@@ -180,7 +179,7 @@ func (s *Server) handleAddNewClient(c *Client) {
 	log.Println("Added new client")
 
 	s.clients[c.id] = c
-	spaceship := NewSpaceship(NewIntVector(0, 0))
+	spaceship := NewSpaceship(c.id, NewIntVector(0, 0))
 	s.space.AddSpaceship(c.id, spaceship)
 
 	log.Println("Now", len(s.clients), "clients connected.")

@@ -3,6 +3,7 @@ package backend
 import (
 	"fmt"
 	"math"
+	"superstellar/backend/proto"
 )
 
 // Vector structs holds 2D vector.
@@ -39,10 +40,22 @@ func (v *Vector) Multiply(scalar float64) *Vector {
 
 // Length returns length of the vector.
 func (v *Vector) Length() float64 {
-	return math.Sqrt(v.X * v.X + v.Y * v.Y)
+	return math.Sqrt(v.X*v.X + v.Y*v.Y)
 }
 
 // Normalize returns a new normalized vector.
 func (v *Vector) Normalize() *Vector {
 	return &Vector{X: v.X / v.Length(), Y: v.Y / v.Length()}
+}
+
+// Radians returns vector's angle in radians.
+func (v *Vector) Radians() float64 {
+	return math.Atan2(-v.Y, v.X)
+}
+
+func (v *Vector) toProto() *proto.Vector {
+	return &proto.Vector{
+		X: float32(v.X),
+		Y: float32(v.Y),
+	}
 }
