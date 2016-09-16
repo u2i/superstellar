@@ -31,9 +31,9 @@ func (v *IntVector) Add(other *Vector) *IntVector {
 	}
 }
 
-func (v *IntVector) toProto() *proto.IntVector {
-	return &proto.IntVector{
-		X: v.X,
-		Y: v.Y,
-	}
-}
+// func (v *IntVector) toProto() *proto.IntVector {
+// 	return &proto.IntVector{
+// 		X: v.X,
+// 		Y: v.Y,
+// 	}
+// }

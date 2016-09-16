@@ -7,21 +7,21 @@ import (
 
 // Space struct holds entire game state.
 type Space struct {
-	Spaceships map[string]*Spaceship `json:"spaceships"`
+	Spaceships map[uint32]*Spaceship `json:"spaceships"`
 }
 
 // NewSpace initializes new Space.
 func NewSpace() *Space {
-	return &Space{Spaceships: make(map[string]*Spaceship)}
+	return &Space{Spaceships: make(map[uint32]*Spaceship)}
 }
 
 // AddSpaceship adds new spaceship to the space.
-func (space *Space) AddSpaceship(clientID string, spaceship *Spaceship) {
+func (space *Space) AddSpaceship(clientID uint32, spaceship *Spaceship) {
 	space.Spaceships[clientID] = spaceship
 }
 
 // RemoveSpaceship removes spaceship from the space.
-func (space *Space) RemoveSpaceship(clientID string) {
+func (space *Space) RemoveSpaceship(clientID uint32) {
 	delete(space.Spaceships, clientID)
 }
 

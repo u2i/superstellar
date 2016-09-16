@@ -11,22 +11,24 @@ import (
 
 // Server struct holds server variables.
 type Server struct {
-	pattern   string
-	space     *Space
-	clients   map[string]*Client
-	addCh     chan *Client
-	delCh     chan *Client
-	moveCh    chan *Move
-	doneCh    chan bool
-	errCh     chan error
-	updateCh  chan bool
-	physicsCh chan bool
+	pattern      string
+	space        *Space
+	clients      map[uint32]*Client
+	addCh        chan *Client
+	delCh        chan *Client
+	moveCh       chan *Move
+	doneCh       chan bool
+	errCh        chan error
+	updateCh     chan bool
+	physicsCh    chan bool
+	generateIDCh chan chan uint32
+	clientID     uint32
 }
 
 // NewServer initializes a new server.
 func NewServer(pattern string) *Server {
 	space := NewSpace()
-	clients := make(map[string]*Client)
+	clients := make(map[uint32]*Client)
 	addCh := make(chan *Client)
 	delCh := make(chan *Client)
 	moveCh := make(chan *Move)
@@ -34,6 +36,7 @@ func NewServer(pattern string) *Server {
 	errCh := make(chan error)
 	updateCh := make(chan bool)
 	physicsCh := make(chan bool)
+	generateIDCh := make(chan chan uint32)
 
 	return &Server{
 		pattern,
@@ -46,6 +49,8 @@ func NewServer(pattern string) *Server {
 		errCh,
 		updateCh,
 		physicsCh,
+		generateIDCh,
+		0,
 	}
 }
 
@@ -72,6 +77,13 @@ func (s *Server) Done() {
 // Err sends error to the server.
 func (s *Server) Err(err error) {
 	s.errCh <- err
+}
+
+// GenerateID generates new unique ID for a client
+func (s *Server) GenerateID() uint32 {
+	ch := make(chan uint32)
+	s.generateIDCh <- ch
+	return <-ch
 }
 
 // Listen runs puts server into listening mode.
@@ -152,6 +164,9 @@ func (s *Server) mainGameLoop() {
 		case <-s.physicsCh:
 			s.handlePhysicsUpdate()
 
+		case ch := <-s.generateIDCh:
+			s.handleGenerateIDCh(ch)
+
 		case err := <-s.errCh:
 			log.Println("Error:", err.Error())
 
@@ -189,4 +204,9 @@ func (s *Server) handleUpdate() {
 
 func (s *Server) handlePhysicsUpdate() {
 	s.space.updatePhysics()
+}
+
+func (s *Server) handleGenerateIDCh(ch chan uint32) {
+	s.clientID++
+	ch <- s.clientID
 }

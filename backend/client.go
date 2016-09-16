@@ -5,7 +5,6 @@ import (
 	"io"
 	"log"
 
-	"github.com/satori/go.uuid"
 	"golang.org/x/net/websocket"
 )
 
@@ -13,7 +12,7 @@ const channelBufSize = 100
 
 // Client struct holds client-specific variables.
 type Client struct {
-	id     string
+	id     uint32
 	ws     *websocket.Conn
 	server *Server
 	ch     chan *string
@@ -32,7 +31,7 @@ func NewClient(ws *websocket.Conn, server *Server) *Client {
 
 	ch := make(chan *string, channelBufSize)
 	doneCh := make(chan bool)
-	id := uuid.NewV4().String()
+	id := server.GenerateID()
 
 	return &Client{id, ws, server, ch, doneCh}
 }
@@ -48,7 +47,7 @@ func (c *Client) SendSpace(space *string) {
 	case c.ch <- space:
 	default:
 		c.server.Del(c)
-		err := fmt.Errorf("client %s is disconnected", c.id)
+		err := fmt.Errorf("client %d is disconnected", c.id)
 		c.server.Err(err)
 	}
 }
