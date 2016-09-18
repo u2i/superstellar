@@ -15,6 +15,7 @@ type Server struct {
 	pattern      string
 	space        *Space
 	clients      map[uint32]*Client
+	monitor      *Monitor
 	addCh        chan *Client
 	delCh        chan *Client
 	moveCh       chan *Move
@@ -30,6 +31,7 @@ type Server struct {
 func NewServer(pattern string) *Server {
 	space := NewSpace()
 	clients := make(map[uint32]*Client)
+	monitor := newMonitor()
 	addCh := make(chan *Client)
 	delCh := make(chan *Client)
 	moveCh := make(chan *Move)
@@ -43,6 +45,7 @@ func NewServer(pattern string) *Server {
 		pattern,
 		space,
 		clients,
+		monitor,
 		addCh,
 		delCh,
 		moveCh,
@@ -94,6 +97,7 @@ func (s *Server) Listen() {
 	s.addNewClientHandler()
 	s.runSenderTicker()
 	s.runPhysicsTicker()
+	s.monitor.run()
 	s.mainGameLoop()
 }
 
@@ -202,7 +206,12 @@ func (s *Server) handleUpdate() {
 }
 
 func (s *Server) handlePhysicsUpdate() {
+	before := time.Now()
+
 	s.space.updatePhysics()
+
+	elapsed := time.Since(before)
+	s.monitor.addPhysicsTime(elapsed)
 }
 
 func (s *Server) handleGenerateIDCh(ch chan uint32) {

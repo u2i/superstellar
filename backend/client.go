@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"time"
 
 	"golang.org/x/net/websocket"
 )
@@ -12,11 +13,12 @@ const channelBufSize = 100
 
 // Client struct holds client-specific variables.
 type Client struct {
-	id     uint32
-	ws     *websocket.Conn
-	server *Server
-	ch     chan *[]byte
-	doneCh chan bool
+	id      uint32
+	ws      *websocket.Conn
+	server  *Server
+	ch      chan *[]byte
+	doneCh  chan bool
+	monitor *Monitor
 }
 
 // NewClient initializes a new Client struct with given websocket and Server.
@@ -32,8 +34,9 @@ func NewClient(ws *websocket.Conn, server *Server) *Client {
 	ch := make(chan *[]byte, channelBufSize)
 	doneCh := make(chan bool)
 	id := server.GenerateID()
+	monitor := server.monitor
 
-	return &Client{id, ws, server, ch, doneCh}
+	return &Client{id, ws, server, ch, doneCh, monitor}
 }
 
 // Conn returns client's websocket.Conn struct.
@@ -70,9 +73,15 @@ func (c *Client) listenWrite() {
 		select {
 
 		case bytes := <-c.ch:
+			before := time.Now()
 			err := websocket.Message.Send(c.ws, *bytes)
+			after := time.Now()
+
 			if err != nil {
 				log.Println(err)
+			} else {
+				elapsed := after.Sub(before)
+				c.monitor.addSendTime(elapsed)
 			}
 
 		case <-c.doneCh:
