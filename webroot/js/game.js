@@ -31,6 +31,9 @@ var viewport = {vx: 0, vy: 0, width: 800, height: 600}
 
 var ws = new WebSocket("ws://" + window.location.host + "/superstellar");
 
+var frameCounter = 0;
+var lastTime = Date.now();
+var fps = 0;
 
 ws.onmessage = function(e) {
 	var fileReader = new FileReader();
@@ -97,23 +100,28 @@ var render = function () {
 		}
 	}
 
+	frameCounter++;
+
+	if (frameCounter === 100) {
+		frameCounter = 0;
+		var now = Date.now();
+		var delta = (now - lastTime) / 1000;
+		fps = (100 / delta).toFixed(1);
+		lastTime = now;
+	}
+
 	// Score
 	ctx.fillStyle = "rgb(250, 250, 250)";
 	ctx.font = "24px Helvetica";
 	ctx.textAlign = "left";
 	ctx.textBaseline = "top";
 	ctx.fillText("Ships: " + ships.length, 580, 10);
+	ctx.fillText("FPS: " + fps, 580, 40);
 };
 
 // The main game loop
 var main = function () {
-	var now = Date.now();
-	var delta = now - then;
-
 	render();
-
-	then = now;
-
 	// Request to do this again ASAP
 	requestAnimationFrame(main);
 };
