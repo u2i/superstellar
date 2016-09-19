@@ -19,7 +19,7 @@ var shipThrustReady = false;
 
 var shipImage = new Image();
 shipImage.onload = function () {
-	shipReady = true;
+  shipReady = true;
 };
 shipImage.src = "images/ship.png";
 
@@ -30,6 +30,7 @@ shipThrustImage.onload = function () {
 shipThrustImage.src = "images/ship_thrust.png";
 
 var ships = [];
+var myID = 0;
 
 var viewport = {vx: 0, vy: 0, width: 800, height: 600}
 
@@ -42,8 +43,16 @@ var fps = 0;
 ws.onmessage = function(e) {
 	var fileReader = new FileReader();
 	fileReader.onload = function() {
-			ships = Space.decode(this.result).spaceships
-	};
+    ships = Space.decode(this.result).spaceships
+
+    if (myID == 0) {
+      for (var i in ships) {
+        if (ships[i].id > myID) {
+          myID = ships[i].id
+        }
+      }
+    }
+  };
 
 	fileReader.readAsArrayBuffer(e.data);
 };
@@ -88,10 +97,13 @@ var sendInput = function() {
 var render = function () {
 	ctx.beginPath();
 
+	var myShip;
+
 	if (ships.length > 0) {
-        var ownPosition = {x: ships[0].position.x/100, y: ships[0].position.y/100};
-        viewport = {vx: ownPosition.x, vy: ownPosition.y, width: 800, height: 600};
-    }
+    myShip = ships.find(function(ship) { return ship.id == myID })
+    var ownPosition = {x: myShip.position.x/100, y: myShip.position.y/100};
+    viewport = {vx: ownPosition.x, vy: ownPosition.y, width: 800, height: 600};
+  }
 
 	ctx.rect(0, 0, 800, 600);
 	ctx.fillStyle = "black";
@@ -134,6 +146,10 @@ var render = function () {
 	ctx.textBaseline = "top";
 	ctx.fillText("Ships: " + ships.length, 580, 10);
 	ctx.fillText("FPS: " + fps, 580, 40);
+	if (undefined != myShip) {
+    ctx.fillText("X: " + Math.floor(myShip.position.x / 100), 580, 70);
+    ctx.fillText("Y: " + Math.floor(myShip.position.y / 100), 580, 100);
+	}
 
 	sendInput()
 };
