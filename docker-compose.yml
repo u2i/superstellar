@@ -1,0 +1,31 @@
+version: '2'
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: docker/backend/Dockerfile
+    image: u2i/superstellar-backend
+    ports:
+    - "8080:8080"
+    volumes:
+    - .:/go/src/superstellar
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/frontend/Dockerfile
+    image: u2i/superstellar-frontend
+    ports:
+    - "8090:8090"
+    environment:
+    - BACKEND_HOST=localhost
+    - BACKEND_PORT=8080
+    depends_on:
+    - backend
+    volumes:
+    - .:/code
+  utils:
+    build:
+      context: .
+      dockerfile: docker/utils/Dockerfile
+    volumes:
+    - .:/go/src/superstellar
