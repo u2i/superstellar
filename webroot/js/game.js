@@ -1,4 +1,7 @@
-// Create the canvas
+const KEY_UP = 38
+const KEY_LEFT = 37
+const KEY_RIGHT = 39
+
 var canvas = document.createElement("canvas");
 var ctx = canvas.getContext("2d");
 canvas.width = 800;
@@ -8,6 +11,7 @@ document.body.appendChild(canvas);
 var ProtoBuf = dcodeIO.ProtoBuf;
 var builder = ProtoBuf.loadJsonFile("js/superstellar_proto.json");
 var Space = builder.build("superstellar.Space");
+var UserInput = builder.build("superstellar.UserInput")
 
 // Background image
 var shipReady = false;
@@ -48,29 +52,36 @@ ws.onmessage = function(e) {
 var keysDown = {};
 
 addEventListener("keydown", function (e) {
-	var direction
-	switch (e.keyCode) {
-		case 38:
-			direction = "up"
-			break;
-		case 40:
-			direction = "down"
-			break;
-		case 37:
-			direction = "left"
-			break;
-		case 39:
-			direction = "right"
-			break;
-	}
+	keysDown[e.keyCode] = true;
+}, false);
 
-	ws.send($.toJSON({client_id: 1, direction: direction}))
+addEventListener("keyup", function (e) {
+	delete keysDown[e.keyCode];
 }, false);
 
 var translateToViewport = function (x, y, viewport) {
   var newX = x - viewport.vx + viewport.width / 2;
 	var newY = -y + viewport.vy + viewport.height / 2;
 	return {x: newX, y: newY}
+}
+
+var sendInput = function() {
+	var thrust = KEY_UP in keysDown;
+
+	var direction = "NONE";
+	if (KEY_LEFT in keysDown) {
+		direction = "LEFT";
+	} else if (KEY_RIGHT in keysDown) {
+		direction = "RIGHT";
+	}
+
+	var userInput = new UserInput(thrust, direction);
+	var buffer = userInput.encode();
+
+	if (ws.readyState == WebSocket.OPEN) {
+			ws.send(buffer.toArrayBuffer());
+	}
+
 }
 
 // Draw everything
@@ -123,6 +134,8 @@ var render = function () {
 	ctx.textBaseline = "top";
 	ctx.fillText("Ships: " + ships.length, 580, 10);
 	ctx.fillText("FPS: " + fps, 580, 40);
+
+	sendInput()
 };
 
 // The main game loop

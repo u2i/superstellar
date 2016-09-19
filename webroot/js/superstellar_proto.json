@@ -1,7 +1,7 @@
 {
     "package": "superstellar",
     "options": {
-        "go_package": "proto"
+        "go_package": "pb"
     },
     "messages": [
         {
@@ -81,6 +81,42 @@
                     "type": "Spaceship",
                     "name": "spaceships",
                     "id": 1
+                }
+            ]
+        },
+        {
+            "name": "UserInput",
+            "fields": [
+                {
+                    "rule": "optional",
+                    "type": "bool",
+                    "name": "thrust",
+                    "id": 1
+                },
+                {
+                    "rule": "optional",
+                    "type": "Direction",
+                    "name": "direction",
+                    "id": 2
+                }
+            ]
+        }
+    ],
+    "enums": [
+        {
+            "name": "Direction",
+            "values": [
+                {
+                    "name": "NONE",
+                    "id": 0
+                },
+                {
+                    "name": "LEFT",
+                    "id": 1
+                },
+                {
+                    "name": "RIGHT",
+                    "id": 2
                 }
             ]
         }

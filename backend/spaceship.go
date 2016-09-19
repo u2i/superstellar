@@ -2,7 +2,7 @@ package backend
 
 import (
 	"fmt"
-	"superstellar/backend/proto"
+	"superstellar/backend/pb"
 )
 
 // Direction is a type describing user input on spaceship rotation.
@@ -10,14 +10,14 @@ type Direction int
 
 // Constants describing user input on spaceship rotation.
 const (
-	LEFT Direction = iota
+	NONE Direction = iota
 	RIGHT
-	NONE
+	LEFT
 )
 
 const (
 	// Acceleration is spaceship's linear acceleration on thruster.
-	Acceleration = 0.01
+	Acceleration = 0.05
 
 	// AngularVelocity is an angular velocity added on user input.
 	AngularVelocity = 0.1
@@ -26,11 +26,11 @@ const (
 // Spaceship struct describes a spaceship.
 type Spaceship struct {
 	ID             uint32
-	Position       *IntVector `json:"position"`
-	Velocity       *Vector    `json:"velocity"`
-	Facing         *Vector    `json:"facing"`
-	InputThrust    bool       `json:"thrust"`
-	InputDirection Direction  `json:"direction"`
+	Position       *IntVector
+	Velocity       *Vector
+	Facing         *Vector
+	InputThrust    bool
+	InputDirection Direction
 }
 
 // NewSpaceship initializes new spaceship facing north with zero velocity.
@@ -54,8 +54,13 @@ func (s *Spaceship) getNormalizedFacing() *Vector {
 	return s.Facing.Normalize()
 }
 
-func (s *Spaceship) toProto() *proto.Spaceship {
-	return &proto.Spaceship{
+func (s *Spaceship) updateUserInput(userInput *UserInput) {
+	s.InputThrust = userInput.Thrust
+	s.InputDirection = userInput.Direction
+}
+
+func (s *Spaceship) toProto() *pb.Spaceship {
+	return &pb.Spaceship{
 		Id:          s.ID,
 		Position:    s.Position.toProto(),
 		Velocity:    s.Velocity.toProto(),

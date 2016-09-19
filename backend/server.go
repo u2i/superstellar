@@ -18,7 +18,7 @@ type Server struct {
 	monitor      *Monitor
 	addCh        chan *Client
 	delCh        chan *Client
-	moveCh       chan *Move
+	inputCh      chan *UserInput
 	doneCh       chan bool
 	errCh        chan error
 	updateCh     chan bool
@@ -29,32 +29,20 @@ type Server struct {
 
 // NewServer initializes a new server.
 func NewServer(pattern string) *Server {
-	space := NewSpace()
-	clients := make(map[uint32]*Client)
-	monitor := newMonitor()
-	addCh := make(chan *Client)
-	delCh := make(chan *Client)
-	moveCh := make(chan *Move)
-	doneCh := make(chan bool)
-	errCh := make(chan error)
-	updateCh := make(chan bool)
-	physicsCh := make(chan bool)
-	generateIDCh := make(chan chan uint32)
-
 	return &Server{
-		pattern,
-		space,
-		clients,
-		monitor,
-		addCh,
-		delCh,
-		moveCh,
-		doneCh,
-		errCh,
-		updateCh,
-		physicsCh,
-		generateIDCh,
-		0,
+		pattern:      pattern,
+		space:        NewSpace(),
+		clients:      make(map[uint32]*Client),
+		monitor:      newMonitor(),
+		addCh:        make(chan *Client),
+		delCh:        make(chan *Client),
+		inputCh:      make(chan *UserInput),
+		doneCh:       make(chan bool),
+		errCh:        make(chan error),
+		updateCh:     make(chan bool),
+		physicsCh:    make(chan bool),
+		generateIDCh: make(chan chan uint32),
+		clientID:     0,
 	}
 }
 
@@ -68,9 +56,9 @@ func (s *Server) Del(c *Client) {
 	s.delCh <- c
 }
 
-// Move sends new move command to the server.
-func (s *Server) Move(move *Move) {
-	s.moveCh <- move
+// UserInput sends new move command to the server.
+func (s *Server) UserInput(userInput *UserInput) {
+	s.inputCh <- userInput
 }
 
 // Done sends done command to the server.
@@ -158,8 +146,8 @@ func (s *Server) mainGameLoop() {
 		case c := <-s.delCh:
 			s.handleDelClient(c)
 
-		case <-s.moveCh:
-			s.handleMoveCommand()
+		case input := <-s.inputCh:
+			s.handleUserInput(input)
 
 		case <-s.updateCh:
 			s.handleUpdate()
@@ -196,12 +184,11 @@ func (s *Server) handleDelClient(c *Client) {
 	delete(s.clients, c.id)
 }
 
-func (s *Server) handleMoveCommand() {
-
+func (s *Server) handleUserInput(userInput *UserInput) {
+	s.space.UpdateUserInput(userInput)
 }
 
 func (s *Server) handleUpdate() {
-	s.space.randomUpdate()
 	s.sendSpace()
 }
 

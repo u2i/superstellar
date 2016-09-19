@@ -3,7 +3,7 @@ package backend
 import (
 	"math"
 	"math/rand"
-	"superstellar/backend/proto"
+	"superstellar/backend/pb"
 )
 
 // Space struct holds entire game state.
@@ -24,6 +24,15 @@ func (space *Space) AddSpaceship(clientID uint32, spaceship *Spaceship) {
 // RemoveSpaceship removes spaceship from the space.
 func (space *Space) RemoveSpaceship(clientID uint32) {
 	delete(space.Spaceships, clientID)
+}
+
+// UpdateUserInput updates user input in correct spaceship
+func (space *Space) UpdateUserInput(userInput *UserInput) {
+	spaceship, found := space.Spaceships[userInput.ClientID]
+
+	if found {
+		spaceship.updateUserInput(userInput)
+	}
 }
 
 func (space *Space) randomUpdate() {
@@ -57,11 +66,11 @@ func (space *Space) updatePhysics() {
 	}
 }
 
-func (space *Space) toProto() *proto.Space {
-	protoSpaceships := make([]*proto.Spaceship, 0, len(space.Spaceships))
+func (space *Space) toProto() *pb.Space {
+	protoSpaceships := make([]*pb.Spaceship, 0, len(space.Spaceships))
 	for _, spaceship := range space.Spaceships {
 		protoSpaceships = append(protoSpaceships, spaceship.toProto())
 	}
 
-	return &proto.Space{Spaceships: protoSpaceships}
+	return &pb.Space{Spaceships: protoSpaceships}
 }

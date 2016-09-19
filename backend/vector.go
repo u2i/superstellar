@@ -3,7 +3,7 @@ package backend
 import (
 	"fmt"
 	"math"
-	"superstellar/backend/proto"
+	"superstellar/backend/pb"
 )
 
 // Vector structs holds 2D vector.
@@ -53,8 +53,8 @@ func (v *Vector) Radians() float64 {
 	return math.Atan2(-v.Y, v.X)
 }
 
-func (v *Vector) toProto() *proto.Vector {
-	return &proto.Vector{
+func (v *Vector) toProto() *pb.Vector {
+	return &pb.Vector{
 		X: float32(v.X),
 		Y: float32(v.Y),
 	}

@@ -1,6 +1,6 @@
 syntax = "proto3";
 package superstellar;
-option go_package = "proto";
+option go_package = "pb";
 
 message IntVector {
   int32 x = 1;
@@ -22,4 +22,15 @@ message Spaceship {
 
 message Space {
   repeated Spaceship spaceships = 1;
+}
+
+enum Direction {
+  NONE = 0;
+  LEFT = 1;
+  RIGHT = 2;
+}
+
+message UserInput {
+  bool thrust = 1;
+  Direction direction = 2;
 }

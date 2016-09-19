@@ -4,7 +4,10 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"superstellar/backend/pb"
 	"time"
+
+	"github.com/golang/protobuf/proto"
 
 	"golang.org/x/net/websocket"
 )
@@ -86,35 +89,46 @@ func (c *Client) listenWrite() {
 
 		case <-c.doneCh:
 			c.server.Del(c)
-			c.doneCh <- true // for listenRead method
+			c.doneCh <- true
 			return
 		}
 	}
 }
 
-// Listen read request via chanel
 func (c *Client) listenRead() {
 	log.Println("Listening read from client")
 	for {
 		select {
 
-		// receive done request
 		case <-c.doneCh:
 			c.server.Del(c)
-			c.doneCh <- true // for listenWrite method
+			c.doneCh <- true
 			return
 
-		// read data from websocket connection
 		default:
-			var move Move
-			err := websocket.JSON.Receive(c.ws, &move)
-			if err == io.EOF {
-				c.doneCh <- true
-			} else if err != nil {
-				c.server.Err(err)
-			} else {
-				c.server.Move(&move)
-			}
+			c.readFromWebSocket()
 		}
 	}
+}
+
+func (c *Client) readFromWebSocket() {
+	var data []byte
+	err := websocket.Message.Receive(c.ws, &data)
+	if err == io.EOF {
+		c.doneCh <- true
+	} else if err != nil {
+		c.server.Err(err)
+	} else {
+		c.unmarshalUserInput(data)
+	}
+}
+
+func (c *Client) unmarshalUserInput(data []byte) {
+	protoUserInput := &pb.UserInput{}
+	if err := proto.Unmarshal(data, protoUserInput); err != nil {
+		log.Fatalln("Failed to unmarshal UserInput:", err)
+	}
+
+	userInput := UserInputFromProto(protoUserInput, c.id)
+	c.server.UserInput(userInput)
 }
