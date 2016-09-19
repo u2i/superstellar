@@ -25,7 +25,7 @@ shipThrustImage.onload = function () {
 };
 shipThrustImage.src = "images/ship_thrust.png";
 
-var ships = {};
+var ships = [];
 
 var viewport = {vx: 0, vy: 0, width: 800, height: 600}
 
@@ -65,14 +65,20 @@ addEventListener("keydown", function (e) {
 }, false);
 
 var translateToViewport = function (x, y, viewport) {
-  var newX = x + viewport.vx + viewport.width / 2;
-	var newY = -y - viewport.vy + viewport.height / 2;
+  var newX = x - viewport.vx + viewport.width / 2;
+	var newY = -y + viewport.vy + viewport.height / 2;
 	return {x: newX, y: newY}
 }
 
 // Draw everything
 var render = function () {
 	ctx.beginPath();
+
+	if (ships.length > 0) {
+        var ownPosition = {x: ships[0].position.x/100, y: ships[0].position.y/100};
+        viewport = {vx: ownPosition.x, vy: ownPosition.y, width: 800, height: 600};
+    }
+
 	ctx.rect(0, 0, 800, 600);
 	ctx.fillStyle = "black";
 	ctx.fill();
