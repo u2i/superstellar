@@ -1,19 +1,23 @@
-var webpack = require('webpack');
+const webpack = require('webpack');
 
 module.exports = {
     entry: {
-	app: ["babel-polyfill", "./js/game.js"]
+	app: ["babel-polyfill", "./js/game.js"],
+	vendor: ['protobufjs']
     },
     output: {
-	filename: "bundle.js"
+	filename: "[name].js"
     },
     module: {
 	loaders: [
 	    {
 	    test: /\.js$/,
-	    //exclude: /node_modules/,
+	    exclude: /node_modules/,
 	    loader: 'babel'
 	}
 	]
-    }
+    },
+    plugins: [
+	new webpack.optimize.CommonsChunkPlugin("vendor", "vendor.js")
+    ]
 };

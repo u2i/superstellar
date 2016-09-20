@@ -2,7 +2,7 @@
   "name": "superstellar-frontend",
   "version": "0.0.1",
   "description": "",
-  "main": "bundle.js",
+  "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "webpack-dev-server --hot --inline --colors --host 0.0.0.0 --port 8090 --display-error-details"
