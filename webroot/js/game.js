@@ -34,7 +34,8 @@ var myID = 0;
 
 var viewport = {vx: 0, vy: 0, width: 800, height: 600}
 
-var ws = new WebSocket("ws://" + window.location.host + "/superstellar");
+// TODO: Use config for this
+var ws = new WebSocket("ws://127.0.0.1:8080/superstellar");
 
 var frameCounter = 0;
 var lastTime = Date.now();
@@ -113,7 +114,7 @@ var render = function () {
 		for (var shipID in ships) {
 			var ship = ships[shipID]
 
-			image = ship.input_thrust ? shipThrustImage : shipImage
+			let image = ship.input_thrust ? shipThrustImage : shipImage
 
 			var translatedPosition = translateToViewport(ship.position.x/100, ship.position.y/100, viewport)
 
