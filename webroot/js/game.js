@@ -1,14 +1,16 @@
+import ProtoBuf from 'protobufjs';
+
 const KEY_UP = 38
 const KEY_LEFT = 37
 const KEY_RIGHT = 39
 
+// Create the canvas
 var canvas = document.createElement("canvas");
 var ctx = canvas.getContext("2d");
 canvas.width = 800;
 canvas.height = 600;
 document.body.appendChild(canvas);
 
-var ProtoBuf = dcodeIO.ProtoBuf;
 var builder = ProtoBuf.loadJsonFile("js/superstellar_proto.json");
 var Space = builder.build("superstellar.Space");
 var UserInput = builder.build("superstellar.UserInput")
