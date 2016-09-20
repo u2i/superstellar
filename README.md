@@ -3,10 +3,13 @@ Massive multiplayer galactic game written in Golang
 
 ## Installation & running
 1. Clone this repository to your `$GOPATH/src` directory
-1. Run `go get`
-1. Run `go build && go install`
-1. Run `$GOPATH/bin/superstellar`
-1. Go to [localhost:8080](http://localhost:8080/)
+2. Run `go get`
+3. Run `go build && go install`
+4. Run `$GOPATH/bin/superstellar`
+5. cd webroot
+6. npm install
+7. npm run dev
+8. Go to localhost:8090
 
 ## Compiling protobufs
 
