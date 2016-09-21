@@ -4,70 +4,21 @@ import * as PIXI from "pixi.js";
 const renderer = new PIXI.WebGLRenderer(800, 600);
 const stage = new PIXI.Container();
 
-const KEY_UP = 38
-const KEY_LEFT = 37
-const KEY_RIGHT = 39
-
-// Create the canvas
-var canvas = document.createElement("canvas");
-var ctx = canvas.getContext("2d");
-canvas.width = 800;
-canvas.height = 600;
-document.body.appendChild(renderer.view);
-document.body.appendChild(canvas);
-
-var builder = ProtoBuf.loadJsonFile("js/superstellar_proto.json");
-var Space = builder.build("superstellar.Space");
-var UserInput = builder.build("superstellar.UserInput")
-
-// Background image
-var shipReady = false;
-var shipThrustReady = false;
-
-var _shipImage = new Image();
-_shipImage.onload = function () {
-  shipReady = true;
-};
-_shipImage.src = "images/ship.png";
-
-PIXI.loader.add(["images/ship.png", "images/ship_thrust.png"]).load(setup);
-
-let shipSprite, shipThrustSprite;
-function setup() {
-  shipSprite = new PIXI.Sprite(PIXI.loader.resources["images/ship.png"].texture);
-  shipThrustSprite = new PIXI.Sprite(PIXI.loader.resources["images/ship_thrust.png"].texture);
-
-  stage.addChild(shipSprite);
-  shipSprite.x = renderer.width / 2;
-  shipSprite.y = renderer.height / 2;
-  shipSprite.rotation = 3 * Math.PI / 2;
-  shipSprite.pivot.set(shipSprite.width / 2, shipSprite.height / 2);
-  renderer.render(stage);
-}
-
-
-var shipThrustImage = new Image();
-shipThrustImage.onload = function () {
-	shipThrustReady = true;
-};
-shipThrustImage.src = "images/ship_thrust.png";
-
-var ships = [];
-var myID = 0;
-
-var viewport = {vx: 0, vy: 0, width: 800, height: 600}
-
 // TODO: Use config for this
-var ws = new WebSocket("ws://127.0.0.1:8080/superstellar");
+const ws = new WebSocket("ws://127.0.0.1:8080/superstellar");
 
-var frameCounter = 0;
-var lastTime = Date.now();
-var fps = 0;
-
-ws.onmessage = function(e) {
+const webSocketMessageReceived = (e) => {
   var fileReader = new FileReader();
   fileReader.onload = function() {
     ships = Space.decode(this.result).spaceships
+    
+    for (var i in ships) {
+      let shipId = ships[i].id;
+      if (!(shipId in sprites)) {
+	sprites[shipId] = new PIXI.Sprite(shipTexture);
+	stage.addChild(sprites[shipId]);
+      }
+    }
 
     if (myID == 0) {
       for (var i in ships) {
@@ -80,6 +31,42 @@ ws.onmessage = function(e) {
 
   fileReader.readAsArrayBuffer(e.data);
 };
+
+
+const KEY_UP = 38;
+const KEY_LEFT = 37;
+const KEY_RIGHT = 39;
+
+document.body.appendChild(renderer.view);
+
+var builder = ProtoBuf.loadJsonFile("js/superstellar_proto.json");
+var Space = builder.build("superstellar.Space");
+var UserInput = builder.build("superstellar.UserInput")
+
+PIXI.loader.add(["images/ship.png", "images/ship_thrust.png"]).load(setup);
+
+let shipTexture;
+let shipThrustTexture;
+function setup() {
+  shipTexture = PIXI.loader.resources["images/ship.png"].texture;
+  shipThrustTexture = PIXI.loader.resources["images/ship_thrust.png"].texture;
+
+  ws.onmessage = webSocketMessageReceived;
+
+  // Let's play this game!
+  var then = Date.now();
+  main();
+}
+
+let sprites = {};
+var ships = [];
+var myID = 0;
+
+var viewport = {vx: 0, vy: 0, width: 800, height: 600}
+
+var frameCounter = 0;
+var lastTime = Date.now();
+var fps = 0;
 
 // Handle keyboard controls
 var keysDown = {};
@@ -114,13 +101,31 @@ var sendInput = function() {
   if (ws.readyState == WebSocket.OPEN) {
     ws.send(buffer.toArrayBuffer());
   }
+}
 
+const hudTextStyle = {
+  fontFamily: 'Helvetica',
+  fontSize: '24px',
+  fill: '#FFFFFF',
+  align: 'left',
+  textBaseline: 'top'
+};
+let hudText = new PIXI.Text('', hudTextStyle);
+hudText.x = 580;
+hudText.y = 0;
+stage.addChild(hudText);
+
+const buildHudText = (shipCount, fps, x, y) => {
+  let text = "Ships: " + shipCount + "\n";
+  text += "FPS: " + fps + "\n";
+  text += "X: " + x + "\n";
+  text += "Y: " + y + "\n";
+
+  return text;
 }
 
 // Draw everything
 var render = function () {
-  ctx.beginPath();
-
   var myShip;
 
   if (ships.length > 0) {
@@ -129,30 +134,15 @@ var render = function () {
     viewport = {vx: ownPosition.x, vy: ownPosition.y, width: 800, height: 600};
   }
 
-  ctx.rect(0, 0, 800, 600);
-  ctx.fillStyle = "black";
-  ctx.fill();
+  for (var idx in ships) {
+    let ship = ships[idx]
+    let sprite = sprites[ship.id];
 
-  if (shipReady) {
-    for (var shipID in ships) {
-      var ship = ships[shipID]
+    var translatedPosition = translateToViewport(ship.position.x/100, ship.position.y/100, viewport)
 
-      let image = ship.input_thrust ? shipThrustImage : _shipImage
-
-      var translatedPosition = translateToViewport(ship.position.x/100, ship.position.y/100, viewport)
-
-      ctx.translate(translatedPosition.x, translatedPosition.y);
-      ctx.fillStyle = "rgb(250, 250, 250)";
-      ctx.font = "18px Helvetica";
-      ctx.fillText(ship.id, -35, -60);
-
-      ctx.rotate(ship.facing);
-      shipSprite.rotation = ship.facing;
-
-      ctx.drawImage(image, -30, -22);
-      ctx.rotate(-ship.facing);
-      ctx.translate(-translatedPosition.x, -translatedPosition.y);
-    }
+    sprite.position.set(translatedPosition.x, translatedPosition.y);
+    sprite.pivot.set(sprite.width / 2, sprite.height / 2);
+    sprite.rotation = ship.facing;
   }
 
   frameCounter++;
@@ -165,18 +155,12 @@ var render = function () {
     lastTime = now;
   }
 
-  // Score
-  ctx.fillStyle = "rgb(250, 250, 250)";
-  ctx.font = "24px Helvetica";
-  ctx.textAlign = "left";
-  ctx.textBaseline = "top";
-  ctx.fillText("Ships: " + ships.length, 580, 10);
-  ctx.fillText("FPS: " + fps, 580, 40);
-  if (undefined != myShip) {
-    ctx.fillText("X: " + Math.floor(myShip.position.x / 100), 580, 70);
-    ctx.fillText("Y: " + Math.floor(myShip.position.y / 100), 580, 100);
-  }
+  let shipCount = ships.length;
 
+  let x = myShip ? Math.floor(myShip.position.x / 100) : '?';
+  let y = myShip ? Math.floor(myShip.position.y / 100) : '?';
+
+  hudText.text = buildHudText(shipCount, fps, x, y);
   renderer.render(stage);
   sendInput()
 };
@@ -188,6 +172,3 @@ var main = function () {
   requestAnimationFrame(main);
 };
 
-// Let's play this game!
-var then = Date.now();
-main();
