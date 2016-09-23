@@ -11,7 +11,7 @@ const webSocketMessageReceived = (e) => {
   var fileReader = new FileReader();
   fileReader.onload = function() {
     ships = Space.decode(this.result).spaceships
-    
+
     for (var i in ships) {
       let shipId = ships[i].id;
       if (!(shipId in sprites)) {
@@ -43,15 +43,48 @@ var builder = ProtoBuf.loadJsonFile("js/superstellar_proto.json");
 var Space = builder.build("superstellar.Space");
 var UserInput = builder.build("superstellar.UserInput")
 
-PIXI.loader.add(["images/ship.png", "images/ship_thrust.png"]).load(setup);
+PIXI.loader.add(["images/ship.png", "images/ship_thrust.png", "images/background1.png"]).load(setup);
 
 let shipTexture;
 let shipThrustTexture;
+let bgTexture;
+
+let tilingSprite;
+
+const hudTextStyle = {
+  fontFamily: 'Helvetica',
+  fontSize: '24px',
+  fill: '#FFFFFF',
+  align: 'left',
+  textBaseline: 'top'
+};
+
+const buildHudText = (shipCount, fps, x, y) => {
+  let text = "Ships: " + shipCount + "\n";
+  text += "FPS: " + fps + "\n";
+  text += "X: " + x + "\n";
+  text += "Y: " + y + "\n";
+
+  return text;
+}
+
+let hudText;
+
 function setup() {
   shipTexture = PIXI.loader.resources["images/ship.png"].texture;
   shipThrustTexture = PIXI.loader.resources["images/ship_thrust.png"].texture;
 
   ws.onmessage = webSocketMessageReceived;
+
+  bgTexture = PIXI.loader.resources["images/background1.png"].texture;
+
+  tilingSprite = new PIXI.extras.TilingSprite(bgTexture, renderer.width, renderer.height);
+  stage.addChild(tilingSprite);
+
+  hudText = new PIXI.Text('', hudTextStyle);
+  hudText.x = 580;
+  hudText.y = 0;
+  stage.addChild(hudText);
 
   // Let's play this game!
   var then = Date.now();
@@ -103,30 +136,12 @@ var sendInput = function() {
   }
 }
 
-const hudTextStyle = {
-  fontFamily: 'Helvetica',
-  fontSize: '24px',
-  fill: '#FFFFFF',
-  align: 'left',
-  textBaseline: 'top'
-};
-let hudText = new PIXI.Text('', hudTextStyle);
-hudText.x = 580;
-hudText.y = 0;
-stage.addChild(hudText);
-
-const buildHudText = (shipCount, fps, x, y) => {
-  let text = "Ships: " + shipCount + "\n";
-  text += "FPS: " + fps + "\n";
-  text += "X: " + x + "\n";
-  text += "Y: " + y + "\n";
-
-  return text;
-}
-
 // Draw everything
 var render = function () {
   var myShip;
+
+  let backgroundPos = translateToViewport(0, 0, viewport);
+  tilingSprite.tilePosition.set(backgroundPos.x, backgroundPos.y);
 
   if (ships.length > 0) {
     myShip = ships.find(function(ship) { return ship.id == myID })
