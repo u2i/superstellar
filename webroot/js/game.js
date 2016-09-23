@@ -43,7 +43,15 @@ var builder = ProtoBuf.loadJsonFile("js/superstellar_proto.json");
 var Space = builder.build("superstellar.Space");
 var UserInput = builder.build("superstellar.UserInput")
 
-PIXI.loader.add(["images/ship.png", "images/ship_thrust.png", "images/background1.png"]).load(setup);
+
+const loadProgressHandler = (loader, resource) => {
+  console.log(`progress: ${loader.progress}%`);
+};
+
+PIXI.loader.
+  add(["images/ship.png", "images/ship_thrust.png", "images/background1.png"]).
+  on("progress", loadProgressHandler).
+  load(setup);
 
 let shipTexture;
 let shipThrustTexture;
