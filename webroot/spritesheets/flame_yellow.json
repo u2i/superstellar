@@ -1,0 +1,44 @@
+{"frames": {
+
+"thrust_yellow_0.png":
+{
+	"frame": {"x":0,"y":0,"w":27,"h":30},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":27,"h":30},
+	"sourceSize": {"w":27,"h":30}
+},
+"thrust_yellow_1.png":
+{
+	"frame": {"x":27,"y":0,"w":27,"h":30},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":27,"h":30},
+	"sourceSize": {"w":27,"h":30}
+},
+"thrust_yellow_2.png":
+{
+	"frame": {"x":54,"y":0,"w":27,"h":30},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":27,"h":30},
+	"sourceSize": {"w":27,"h":30}
+},
+"thrust_yellow_3.png":
+{
+	"frame": {"x":81,"y":0,"w":27,"h":30},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":27,"h":30},
+	"sourceSize": {"w":27,"h":30}
+}},
+"meta": {
+	"app": "http://www.codeandweb.com/texturepacker",
+	"version": "1.0",
+	"image": "flame_yellow.png",
+	"format": "RGBA8888",
+	"size": {"w":108,"h":30},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:8420df6499c3e125e040c738f6887164:5801eb007ac0c99e98a721b6623f7b2a:95e53107a672104006b0af5ff17c562d$"
+}
+}
