@@ -17,10 +17,13 @@ const (
 
 const (
 	// Acceleration is spaceship's linear acceleration on thruster.
-	Acceleration = 0.05
+	Acceleration = 0.2
 
 	// AngularVelocity is an angular velocity added on user input.
 	AngularVelocity = 0.1
+
+	// Maximum speed of the spacecraft
+	MaxSpeed = 20
 )
 
 // Spaceship struct describes a spaceship.

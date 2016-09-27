@@ -51,6 +51,9 @@ func (space *Space) updatePhysics() {
 		if spaceship.InputThrust {
 			deltaVelocity := spaceship.getNormalizedFacing().Multiply(Acceleration)
 			spaceship.Velocity = spaceship.Velocity.Add(deltaVelocity)
+			if spaceship.Velocity.Length() > MaxSpeed {
+				spaceship.Velocity = spaceship.Velocity.Normalize().Multiply(MaxSpeed)
+			}
 		}
 		spaceship.Position = spaceship.Position.Add(spaceship.Velocity)
 
