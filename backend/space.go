@@ -6,6 +6,14 @@ import (
 	"superstellar/backend/pb"
 )
 
+const (
+	// Radius of playable world (in .01 units)
+	WorldRadius = 100000
+
+	// Width of boundary region (in .01 units), i.e. from WorldRadius till when no more movement is possible
+	BoundaryAnnulusWidth = 20000
+)
+
 // Space struct holds entire game state.
 type Space struct {
 	Spaceships map[uint32]*Spaceship `json:"spaceships"`
@@ -55,7 +63,14 @@ func (space *Space) updatePhysics() {
 				spaceship.Velocity = spaceship.Velocity.Normalize().Multiply(MaxSpeed)
 			}
 		}
+
 		spaceship.Position = spaceship.Position.Add(spaceship.Velocity)
+		if spaceship.Position.Length() > WorldRadius {
+			outreachLength := spaceship.Position.Length() - WorldRadius
+			gravityAcceleration := -(outreachLength / BoundaryAnnulusWidth) * Acceleration
+			deltaVelocity := spaceship.Position.Normalize().Multiply(gravityAcceleration)
+			spaceship.Velocity = spaceship.Velocity.Add(deltaVelocity)
+		}
 
 		angle := math.Atan2(spaceship.Facing.Y, spaceship.Facing.X)
 		switch spaceship.InputDirection {

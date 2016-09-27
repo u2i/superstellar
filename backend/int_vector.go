@@ -3,6 +3,7 @@ package backend
 import (
 	"fmt"
 	"superstellar/backend/pb"
+	"math"
 )
 
 // IntVector structs holds 2D vector with int coordinates.
@@ -39,4 +40,14 @@ func (v *IntVector) toProto() *pb.IntVector {
 		X: v.X,
 		Y: v.Y,
 	}
+}
+
+// Returns length of the vector.
+func (v *IntVector) Length() float64 {
+	return math.Sqrt(float64(v.X) * float64(v.X) + float64(v.Y) * float64(v.Y))
+}
+
+// Returns a new normalized vector.
+func (v *IntVector) Normalize() *Vector {
+	return &Vector{X: float64(v.X) / v.Length(), Y: float64(v.Y) / v.Length()}
 }
