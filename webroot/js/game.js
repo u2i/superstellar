@@ -5,7 +5,7 @@ const renderer = new PIXI.WebGLRenderer(800, 600);
 const stage = new PIXI.Container();
 
 // TODO: Use config for this
-const ws = new WebSocket("ws://127.0.0.1:8080/superstellar");
+const ws = new WebSocket("ws://" + window.location.hostname + ":8080/superstellar");
 
 const webSocketMessageReceived = (e) => {
   var fileReader = new FileReader();
@@ -15,16 +15,25 @@ const webSocketMessageReceived = (e) => {
     for (var i in ships) {
       let shipId = ships[i].id;
       if (!(shipId in sprites)) {
-	sprites[shipId] = new PIXI.Sprite(shipTexture);
-	stage.addChild(sprites[shipId]);
+	    sprites[shipId] = new PIXI.Sprite(shipTexture);
+	    thrusts[shipId] = new PIXI.extras.MovieClip(frames);
+	    shipContainers[shipId] = new PIXI.Container();
+
+	    stage.addChild(shipContainers[shipId]);
+
+		thrusts[shipId].position.set(-27, 7);
+
+	    shipContainers[shipId].addChild(sprites[shipId]);
+	    shipContainers[shipId].addChild(thrusts[shipId]);
+
       }
     }
 
     if (myID == 0) {
       for (var i in ships) {
-	if (ships[i].id > myID) {
-	  myID = ships[i].id
-	}
+        if (ships[i].id > myID) {
+          myID = ships[i].id
+		}
       }
     }
   };
@@ -49,7 +58,7 @@ const loadProgressHandler = (loader, resource) => {
 };
 
 PIXI.loader.
-  add(["images/ship.png", "images/ship_thrust.png", "images/background1.png"]).
+  add(["images/ship.png", "images/background1.png", "spritesheets/flame_yellow.json"]).
   on("progress", loadProgressHandler).
   load(setup);
 
@@ -77,10 +86,18 @@ const buildHudText = (shipCount, fps, x, y) => {
 }
 
 let hudText;
+let frames = [];
+let thrustAnim;
 
 function setup() {
   shipTexture = PIXI.loader.resources["images/ship.png"].texture;
-  shipThrustTexture = PIXI.loader.resources["images/ship_thrust.png"].texture;
+//  shipThrustTexture = PIXI.Texture.fromFrame("ship_thrust.png");
+
+  for (let i = 0; i < 4; i++) {
+    frames.push(PIXI.Texture.fromFrame('thrust_yellow_' + i + '.png'));
+  }
+
+  thrustAnim = new PIXI.extras.MovieClip(frames);
 
   ws.onmessage = webSocketMessageReceived;
 
@@ -100,7 +117,9 @@ function setup() {
 }
 
 let sprites = {};
-var ships = [];
+let ships = [];
+let thrusts = [];
+let shipContainers = [];
 var myID = 0;
 
 var viewport = {vx: 0, vy: 0, width: 800, height: 600}
@@ -160,12 +179,31 @@ var render = function () {
   for (var idx in ships) {
     let ship = ships[idx]
     let sprite = sprites[ship.id];
+	let thrust = thrusts[ship.id];
+	let container = shipContainers[ship.id];
+
+	if (ship.inputThrust) {
+		thrust.visible = true;
+//		sprite.texture = shipThrustTexture;
+	}
+	else {
+		thrust.visible = false;
+//		sprite.texture = shipTexture;
+	}
 
     var translatedPosition = translateToViewport(ship.position.x/100, ship.position.y/100, viewport)
 
-    sprite.position.set(translatedPosition.x, translatedPosition.y);
-    sprite.pivot.set(sprite.width / 2, sprite.height / 2);
-    sprite.rotation = ship.facing;
+    container.position.set(translatedPosition.x, translatedPosition.y);
+    container.pivot.set(sprite.width / 2, sprite.height / 2);
+    container.rotation = ship.facing;
+
+//    thrust.position.set(translatedPosition.x, translatedPosition.y);
+//    thrust.pivot.set(thrust.width / 2, thrust.height / 2);
+//    thrust.rotation = ship.facing;
+
+//     movie.anchor.set(0.5);
+    thrust.animationSpeed = 0.5;
+    thrust.play();
   }
 
   frameCounter++;

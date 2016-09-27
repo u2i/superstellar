@@ -68,7 +68,7 @@
                 {
                     "rule": "optional",
                     "type": "bool",
-                    "name": "input_thrust",
+                    "name": "inputThrust",
                     "id": 5
                 }
             ]
