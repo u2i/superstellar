@@ -2,34 +2,34 @@
 
 "thrust_yellow_0.png":
 {
-	"frame": {"x":0,"y":0,"w":27,"h":30},
+	"frame": {"x":1,"y":0,"w":26,"h":30},
 	"rotated": false,
 	"trimmed": false,
-	"spriteSourceSize": {"x":0,"y":0,"w":27,"h":30},
+	"spriteSourceSize": {"x":1,"y":0,"w":26,"h":30},
 	"sourceSize": {"w":27,"h":30}
 },
 "thrust_yellow_1.png":
 {
-	"frame": {"x":27,"y":0,"w":27,"h":30},
+	"frame": {"x":28,"y":0,"w":26,"h":30},
 	"rotated": false,
 	"trimmed": false,
-	"spriteSourceSize": {"x":0,"y":0,"w":27,"h":30},
+	"spriteSourceSize": {"x":0,"y":0,"w":26,"h":30},
 	"sourceSize": {"w":27,"h":30}
 },
 "thrust_yellow_2.png":
 {
-	"frame": {"x":54,"y":0,"w":27,"h":30},
+	"frame": {"x":55,"y":0,"w":26,"h":30},
 	"rotated": false,
 	"trimmed": false,
-	"spriteSourceSize": {"x":0,"y":0,"w":27,"h":30},
+	"spriteSourceSize": {"x":0,"y":0,"w":26,"h":30},
 	"sourceSize": {"w":27,"h":30}
 },
 "thrust_yellow_3.png":
 {
-	"frame": {"x":81,"y":0,"w":27,"h":30},
+	"frame": {"x":82,"y":0,"w":26,"h":30},
 	"rotated": false,
 	"trimmed": false,
-	"spriteSourceSize": {"x":0,"y":0,"w":27,"h":30},
+	"spriteSourceSize": {"x":0,"y":0,"w":26,"h":30},
 	"sourceSize": {"w":27,"h":30}
 }},
 "meta": {
