@@ -1,9 +1,9 @@
 import ProtoBuf from 'protobufjs';
 import * as PIXI from "pixi.js";
 import * as Constants from './constants.js';
-
-const renderer = new PIXI.WebGLRenderer(800, 600);
-const stage = new PIXI.Container();
+import * as Utils from './utils.js';
+import Spaceship from './spaceship.js';
+import { renderer, stage } from './globals.js';
 
 // TODO: Use config for this
 const ws = new WebSocket("ws://" + window.location.hostname + ":8080/superstellar");
@@ -11,30 +11,27 @@ const ws = new WebSocket("ws://" + window.location.hostname + ":8080/superstella
 const webSocketMessageReceived = (e) => {
   var fileReader = new FileReader();
   fileReader.onload = function() {
-    ships = Space.decode(this.result).spaceships
+    const ships = Space.decode(this.result).spaceships;
 
     for (var i in ships) {
       let shipId = ships[i].id;
-      if (!(shipId in sprites)) {
-	    sprites[shipId] = new PIXI.Sprite(shipTexture);
-	    thrusts[shipId] = new PIXI.extras.MovieClip(frames);
-	    shipContainers[shipId] = new PIXI.Container();
 
-	    stage.addChild(shipContainers[shipId]);
+      if (!(shipId in shipIds)) {
+	const newSpaceship = new Spaceship(shipTexture, shipThrustFrames, ships[i]);
 
-		thrusts[shipId].position.set(-27, 7);
+	spaceships.push(newSpaceship);
 
-	    shipContainers[shipId].addChild(sprites[shipId]);
-	    shipContainers[shipId].addChild(thrusts[shipId]);
-
+	shipIds[shipId] = newSpaceship;
+      } else {
+	shipIds[shipId].updateData(ships[i]);
       }
     }
 
     if (myID == 0) {
       for (var i in ships) {
-        if (ships[i].id > myID) {
-          myID = ships[i].id
-		}
+	if (ships[i].id > myID) {
+	  myID = ships[i].id
+	}
       }
     }
   };
@@ -47,11 +44,14 @@ const KEY_UP = 38;
 const KEY_LEFT = 37;
 const KEY_RIGHT = 39;
 
+const shipIds = {};
+const spaceships = [];
+
 document.body.appendChild(renderer.view);
 
-var builder = ProtoBuf.loadJsonFile(Constants.PROTOBUF_DEFINITION);
-var Space = builder.build(Constants.SPACE_DEFINITION);
-var UserInput = builder.build(Constants.USER_INPUT_DEFINITION);
+const builder = ProtoBuf.loadJsonFile(Constants.PROTOBUF_DEFINITION);
+const Space = builder.build(Constants.SPACE_DEFINITION);
+const UserInput = builder.build(Constants.USER_INPUT_DEFINITION);
 
 
 const loadProgressHandler = (loader, resource) => {
@@ -87,17 +87,15 @@ const buildHudText = (shipCount, fps, x, y) => {
 }
 
 let hudText;
-let frames = [];
+let shipThrustFrames = [];
 let thrustAnim;
 
 function setup() {
   shipTexture = PIXI.loader.resources[Constants.SHIP_TEXTURE].texture;
 
   Constants.FLAME_SPRITESHEET_FRAME_NAMES.forEach((frameName) =>  {
-    frames.push(PIXI.Texture.fromFrame(frameName));
+    shipThrustFrames.push(PIXI.Texture.fromFrame(frameName));
   });
-
-  thrustAnim = new PIXI.extras.MovieClip(frames);
 
   ws.onmessage = webSocketMessageReceived;
 
@@ -116,10 +114,6 @@ function setup() {
   main();
 }
 
-let sprites = {};
-let ships = [];
-let thrusts = [];
-let shipContainers = [];
 var myID = 0;
 
 var viewport = {vx: 0, vy: 0, width: 800, height: 600}
@@ -138,12 +132,6 @@ addEventListener("keydown", function (e) {
 addEventListener("keyup", function (e) {
   delete keysDown[e.keyCode];
 }, false);
-
-var translateToViewport = function (x, y, viewport) {
-  var newX = x - viewport.vx + viewport.width / 2;
-  var newY = -y + viewport.vy + viewport.height / 2;
-  return {x: newX, y: newY}
-}
 
 var sendInput = function() {
   var thrust = KEY_UP in keysDown;
@@ -167,45 +155,15 @@ var sendInput = function() {
 var render = function () {
   var myShip;
 
-  let backgroundPos = translateToViewport(0, 0, viewport);
+  let backgroundPos = Utils.translateToViewport(0, 0, viewport);
   tilingSprite.tilePosition.set(backgroundPos.x, backgroundPos.y);
 
-  if (ships.length > 0) {
-    myShip = ships.find(function(ship) { return ship.id == myID })
-    var ownPosition = {x: myShip.position.x/100, y: myShip.position.y/100};
-    viewport = {vx: ownPosition.x, vy: ownPosition.y, width: 800, height: 600};
+  if (spaceships.length > 0) {
+    myShip = spaceships.find(function(ship) { return ship.id == myID })
+    viewport = myShip.viewport();
   }
 
-  for (var idx in ships) {
-    let ship = ships[idx]
-    let sprite = sprites[ship.id];
-	let thrust = thrusts[ship.id];
-	let container = shipContainers[ship.id];
-
-	if (ship.inputThrust) {
-		thrust.visible = true;
-//		sprite.texture = shipThrustTexture;
-	}
-	else {
-		thrust.visible = false;
-//		sprite.texture = shipTexture;
-	}
-
-    var translatedPosition = translateToViewport(ship.position.x/100, ship.position.y/100, viewport)
-
-    container.position.set(translatedPosition.x, translatedPosition.y);
-    container.pivot.set(sprite.width / 2, sprite.height / 2);
-    container.rotation = ship.facing;
-
-//    thrust.position.set(translatedPosition.x, translatedPosition.y);
-//    thrust.pivot.set(thrust.width / 2, thrust.height / 2);
-//    thrust.rotation = ship.facing;
-
-//     movie.anchor.set(0.5);
-    thrust.animationSpeed = 0.5;
-    thrust.play();
-  }
-
+  spaceships.forEach((spaceship) => spaceship.update(viewport));
   frameCounter++;
 
   if (frameCounter === 100) {
@@ -216,7 +174,7 @@ var render = function () {
     lastTime = now;
   }
 
-  let shipCount = ships.length;
+  let shipCount = spaceships.length;
 
   let x = myShip ? Math.floor(myShip.position.x / 100) : '?';
   let y = myShip ? Math.floor(myShip.position.y / 100) : '?';
