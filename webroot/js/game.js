@@ -1,6 +1,6 @@
 import ProtoBuf from 'protobufjs';
 import * as PIXI from "pixi.js";
-import * as Assets from './assets.js';
+import * as Constants from './constants.js';
 
 const renderer = new PIXI.WebGLRenderer(800, 600);
 const stage = new PIXI.Container();
@@ -49,9 +49,9 @@ const KEY_RIGHT = 39;
 
 document.body.appendChild(renderer.view);
 
-var builder = ProtoBuf.loadJsonFile(Assets.PROTOBUF_DEFINITION);
-var Space = builder.build(Assets.SPACE_DEFINITION);
-var UserInput = builder.build(Assets.USER_INPUT_DEFINITION);
+var builder = ProtoBuf.loadJsonFile(Constants.PROTOBUF_DEFINITION);
+var Space = builder.build(Constants.SPACE_DEFINITION);
+var UserInput = builder.build(Constants.USER_INPUT_DEFINITION);
 
 
 const loadProgressHandler = (loader, resource) => {
@@ -59,7 +59,7 @@ const loadProgressHandler = (loader, resource) => {
 };
 
 PIXI.loader.
-  add([Assets.SHIP_TEXTURE, Assets.BACKGROUND_TEXTURE, Assets.FLAME_SPRITESHEET]).
+  add([Constants.SHIP_TEXTURE, Constants.BACKGROUND_TEXTURE, Constants.FLAME_SPRITESHEET]).
   on("progress", loadProgressHandler).
   load(setup);
 
@@ -91,9 +91,9 @@ let frames = [];
 let thrustAnim;
 
 function setup() {
-  shipTexture = PIXI.loader.resources[Assets.SHIP_TEXTURE].texture;
+  shipTexture = PIXI.loader.resources[Constants.SHIP_TEXTURE].texture;
 
-  Assets.FLAME_SPRITESHEET_FRAME_NAMES.forEach((frameName) =>  {
+  Constants.FLAME_SPRITESHEET_FRAME_NAMES.forEach((frameName) =>  {
     frames.push(PIXI.Texture.fromFrame(frameName));
   });
 
@@ -101,7 +101,7 @@ function setup() {
 
   ws.onmessage = webSocketMessageReceived;
 
-  bgTexture = PIXI.loader.resources[Assets.BACKGROUND_TEXTURE].texture;
+  bgTexture = PIXI.loader.resources[Constants.BACKGROUND_TEXTURE].texture;
 
   tilingSprite = new PIXI.extras.TilingSprite(bgTexture, renderer.width, renderer.height);
   stage.addChild(tilingSprite);
