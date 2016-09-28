@@ -1,5 +1,6 @@
 import ProtoBuf from 'protobufjs';
 import * as PIXI from "pixi.js";
+import * as Assets from './assets.js';
 
 const renderer = new PIXI.WebGLRenderer(800, 600);
 const stage = new PIXI.Container();
@@ -48,9 +49,9 @@ const KEY_RIGHT = 39;
 
 document.body.appendChild(renderer.view);
 
-var builder = ProtoBuf.loadJsonFile("js/superstellar_proto.json");
-var Space = builder.build("superstellar.Space");
-var UserInput = builder.build("superstellar.UserInput")
+var builder = ProtoBuf.loadJsonFile(Assets.PROTOBUF_DEFINITION);
+var Space = builder.build(Assets.SPACE_DEFINITION);
+var UserInput = builder.build(Assets.USER_INPUT_DEFINITION);
 
 
 const loadProgressHandler = (loader, resource) => {
@@ -58,7 +59,7 @@ const loadProgressHandler = (loader, resource) => {
 };
 
 PIXI.loader.
-  add(["images/ship.png", "images/background1.png", "spritesheets/flame_yellow.json"]).
+  add([Assets.SHIP_TEXTURE, Assets.BACKGROUND_TEXTURE, Assets.FLAME_SPRITESHEET]).
   on("progress", loadProgressHandler).
   load(setup);
 
@@ -90,18 +91,17 @@ let frames = [];
 let thrustAnim;
 
 function setup() {
-  shipTexture = PIXI.loader.resources["images/ship.png"].texture;
-//  shipThrustTexture = PIXI.Texture.fromFrame("ship_thrust.png");
+  shipTexture = PIXI.loader.resources[Assets.SHIP_TEXTURE].texture;
 
-  for (let i = 0; i < 4; i++) {
-    frames.push(PIXI.Texture.fromFrame('thrust_yellow_' + i + '.png'));
-  }
+  Assets.FLAME_SPRITESHEET_FRAME_NAMES.forEach((frameName) =>  {
+    frames.push(PIXI.Texture.fromFrame(frameName));
+  });
 
   thrustAnim = new PIXI.extras.MovieClip(frames);
 
   ws.onmessage = webSocketMessageReceived;
 
-  bgTexture = PIXI.loader.resources["images/background1.png"].texture;
+  bgTexture = PIXI.loader.resources[Assets.BACKGROUND_TEXTURE].texture;
 
   tilingSprite = new PIXI.extras.TilingSprite(bgTexture, renderer.width, renderer.height);
   stage.addChild(tilingSprite);
