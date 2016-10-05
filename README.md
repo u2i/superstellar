@@ -18,7 +18,8 @@ Massive multiplayer galactic game written in Golang
 1. Go to superstellar src directory.
 1. `brew install protobuf`
 1. `go get -u github.com/golang/protobuf/{proto,protoc-gen-go}`
-1. `protoc -I=protobuf --go_out=backend/pb protobuf/superstellar.proto`
+1. `protoc -I=protobuf --go_out=backend/pb protobuf/superstellar.proto` (you
+   need to have $GOPATH/bin in your $PATH so `protoc-gen-go` can be found)
 
 ### JavaScript
 
