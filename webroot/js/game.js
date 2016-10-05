@@ -8,23 +8,18 @@ import { renderer, stage } from './globals.js';
 // TODO: Use config for this
 const ws = new WebSocket("ws://" + window.location.hostname + ":8080/superstellar");
 
-const webSocketMessageReceived = (e) => {
-  var fileReader = new FileReader();
-  fileReader.onload = function() {
-    const ships = Space.decode(this.result).spaceships;
+const spaceMessageHandler = (space) => {
+  const ships = space.spaceships;
 
-    for (var i in ships) {
-      let shipId = ships[i].id;
+  for (var i in ships) {
+    let shipId = ships[i].id;
 
-      if (!(shipId in shipIds)) {
-	const newSpaceship = new Spaceship(shipTexture, shipThrustFrames, ships[i]);
+    if (!shipIds.has(shipId)) {
+      const newSpaceship = new Spaceship(shipTexture, shipThrustFrames, ships[i]);
 
-	spaceships.push(newSpaceship);
-
-	shipIds[shipId] = newSpaceship;
-      } else {
-	shipIds[shipId].updateData(ships[i]);
-      }
+      shipIds.set(shipId, newSpaceship);
+    } else {
+      shipIds.get(shipId).updateData(ships[i]);
     }
 
     if (myID == 0) {
@@ -34,6 +29,36 @@ const webSocketMessageReceived = (e) => {
 	}
       }
     }
+  }
+};
+
+const helloMessageHandler = (message) => {
+  myID = message.myId;
+};
+
+const playerLeftHandler = (message) => {
+  const playerId = message.id;
+
+  let spaceship = shipIds.get(playerId);
+
+  spaceship.remove();
+
+  shipIds.delete(playerId);
+};
+
+const messageHandlers = new Map();
+
+messageHandlers.set("hello", helloMessageHandler);
+messageHandlers.set("space", spaceMessageHandler);
+messageHandlers.set("playerLeft", playerLeftHandler);
+
+const webSocketMessageReceived = (e) => {
+  var fileReader = new FileReader();
+
+  fileReader.onload = function() {
+    const message = Message.decode(this.result);
+
+    messageHandlers.get(message.content)(message[message.content]);
   };
 
   fileReader.readAsArrayBuffer(e.data);
@@ -44,14 +69,15 @@ const KEY_UP = 38;
 const KEY_LEFT = 37;
 const KEY_RIGHT = 39;
 
-const shipIds = {};
-const spaceships = [];
+const shipIds = new Map();
 
 document.body.appendChild(renderer.view);
 
 const builder = ProtoBuf.loadJsonFile(Constants.PROTOBUF_DEFINITION);
+const Message = builder.build(Constants.MESSAGE_DEFINITION);
 const Space = builder.build(Constants.SPACE_DEFINITION);
 const UserInput = builder.build(Constants.USER_INPUT_DEFINITION);
+const PlayerLeft = builder.build(Constants.PLAYER_LEFT_DEFINITION);
 
 
 const loadProgressHandler = (loader, resource) => {
@@ -158,12 +184,12 @@ var render = function () {
   let backgroundPos = Utils.translateToViewport(0, 0, viewport);
   tilingSprite.tilePosition.set(backgroundPos.x, backgroundPos.y);
 
-  if (spaceships.length > 0) {
-    myShip = spaceships.find(function(ship) { return ship.id == myID })
+  if (shipIds.size > 0) {
+    myShip = shipIds.get(myID);
     viewport = myShip.viewport();
   }
 
-  spaceships.forEach((spaceship) => spaceship.update(viewport));
+  shipIds.forEach((spaceship) => spaceship.update(viewport));
   frameCounter++;
 
   if (frameCounter === 100) {
@@ -174,7 +200,7 @@ var render = function () {
     lastTime = now;
   }
 
-  let shipCount = spaceships.length;
+  let shipCount = shipIds.size;
 
   let x = myShip ? Math.floor(myShip.position.x / 100) : '?';
   let y = myShip ? Math.floor(myShip.position.y / 100) : '?';

@@ -90,5 +90,13 @@ func (space *Space) toProto() *pb.Space {
 		protoSpaceships = append(protoSpaceships, spaceship.toProto())
 	}
 
-	return &pb.Space{Spaceships: protoSpaceships}
+  return &pb.Space{Spaceships: protoSpaceships}
+}
+
+func (space *Space) toMessage() *pb.Message {
+	return &pb.Message{
+		Content: &pb.Message_Space{
+			Space: space.toProto(),
+		},
+	}
 }

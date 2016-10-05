@@ -3,6 +3,7 @@ package backend
 import (
 	"log"
 	"net/http"
+	"superstellar/backend/pb"
 	"time"
 
 	"github.com/golang/protobuf/proto"
@@ -90,14 +91,14 @@ func (s *Server) Listen() {
 }
 
 func (s *Server) sendSpace() {
-	bytes, err := proto.Marshal(s.space.toProto())
+	bytes, err := proto.Marshal(s.space.toMessage())
 	if err != nil {
 		log.Println(err)
 		return
 	}
 
 	for _, c := range s.clients {
-		c.SendSpace(&bytes)
+		c.SendMessage(&bytes)
 	}
 }
 
@@ -167,21 +168,60 @@ func (s *Server) mainGameLoop() {
 	}
 }
 
-func (s *Server) handleAddNewClient(c *Client) {
+func (s *Server) handleAddNewClient(client *Client) {
 	log.Println("Added new client")
 
-	s.clients[c.id] = c
-	spaceship := NewSpaceship(c.id, NewIntVector(0, 0))
-	s.space.AddSpaceship(c.id, spaceship)
+	s.clients[client.id] = client
+	spaceship := NewSpaceship(client.id, NewIntVector(0, 0))
+	s.space.AddSpaceship(client.id, spaceship)
+
+	s.sendHelloMessage(client)
 
 	log.Println("Now", len(s.clients), "clients connected.")
+}
+
+func (s *Server) sendHelloMessage(client *Client) {
+  message := &pb.Message{
+    Content: &pb.Message_Hello{
+      &pb.Hello{MyId: client.id},
+    },
+  }
+
+  bytes, err := proto.Marshal(message)
+    if err != nil {
+      log.Println(err)
+      return
+  }
+
+  client.SendMessage(&bytes);
 }
 
 func (s *Server) handleDelClient(c *Client) {
 	log.Println("Delete client")
 
 	s.space.RemoveSpaceship(c.id)
+
 	delete(s.clients, c.id)
+
+	s.sendUserLeftMessage(c.id)
+}
+
+func (s *Server) sendUserLeftMessage(userId uint32) {
+  message := &pb.Message{
+		Content: &pb.Message_PlayerLeft{
+			PlayerLeft: &pb.PlayerLeft{Id: userId},
+		},
+	}
+
+	bytes, err := proto.Marshal(message)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	for _, c := range s.clients {
+		c.SendMessage(&bytes)
+	}
 }
 
 func (s *Server) handleUserInput(userInput *UserInput) {

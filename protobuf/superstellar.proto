@@ -2,6 +2,14 @@ syntax = "proto3";
 package superstellar;
 option go_package = "pb";
 
+message Message {
+  oneof content {
+    Space space           = 1;
+    Hello hello           = 2;
+    PlayerLeft playerLeft = 3;
+  }
+}
+
 message IntVector {
   int32 x = 1;
   int32 y = 2;
@@ -17,11 +25,20 @@ message Spaceship {
   IntVector position = 2;
   Vector    velocity = 3;
   float     facing = 4;
-  bool      input_thrust = 5;
+  bool      inputThrust = 5;
+}
+
+message PlayerLeft {
+  uint32 id = 1;
 }
 
 message Space {
   repeated Spaceship spaceships = 1;
+}
+
+message Hello {
+  uint32 myId = 1;
+  //map<int32, String> idToPlayerName = 2;
 }
 
 enum Direction {

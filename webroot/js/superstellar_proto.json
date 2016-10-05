@@ -5,6 +5,39 @@
     },
     "messages": [
         {
+            "name": "Message",
+            "fields": [
+                {
+                    "rule": "optional",
+                    "type": "Space",
+                    "name": "space",
+                    "id": 1,
+                    "oneof": "content"
+                },
+                {
+                    "rule": "optional",
+                    "type": "Hello",
+                    "name": "hello",
+                    "id": 2,
+                    "oneof": "content"
+                },
+                {
+                    "rule": "optional",
+                    "type": "PlayerLeft",
+                    "name": "playerLeft",
+                    "id": 3,
+                    "oneof": "content"
+                }
+            ],
+            "oneofs": {
+                "content": [
+                    1,
+                    2,
+                    3
+                ]
+            }
+        },
+        {
             "name": "IntVector",
             "fields": [
                 {
@@ -74,12 +107,34 @@
             ]
         },
         {
+            "name": "PlayerLeft",
+            "fields": [
+                {
+                    "rule": "optional",
+                    "type": "uint32",
+                    "name": "id",
+                    "id": 1
+                }
+            ]
+        },
+        {
             "name": "Space",
             "fields": [
                 {
                     "rule": "repeated",
                     "type": "Spaceship",
                     "name": "spaceships",
+                    "id": 1
+                }
+            ]
+        },
+        {
+            "name": "Hello",
+            "fields": [
+                {
+                    "rule": "optional",
+                    "type": "uint32",
+                    "name": "myId",
                     "id": 1
                 }
             ]

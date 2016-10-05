@@ -44,6 +44,10 @@ export default class Spaceship {
     this.container.rotation = this.facing;
   }
 
+  remove () {
+    stage.removeChild(this.container);
+  }
+
   viewport () {
     return {
       vx: this.position.x / 100,
