@@ -6,7 +6,7 @@ import Spaceship from './spaceship.js';
 import { renderer, stage } from './globals.js';
 
 // TODO: Use config for this
-const ws = new WebSocket("ws://" + window.location.hostname + ":8080/superstellar");
+let ws; 
 
 const spaceMessageHandler = (space) => {
   const ships = space.spaceships;
@@ -20,14 +20,6 @@ const spaceMessageHandler = (space) => {
       shipIds.set(shipId, newSpaceship);
     } else {
       shipIds.get(shipId).updateData(ships[i]);
-    }
-
-    if (myID == 0) {
-      for (var i in ships) {
-	if (ships[i].id > myID) {
-	  myID = ships[i].id
-	}
-      }
     }
   }
 };
@@ -123,6 +115,7 @@ function setup() {
     shipThrustFrames.push(PIXI.Texture.fromFrame(frameName));
   });
 
+  ws = new WebSocket("ws://" + window.location.hostname + ":8080/superstellar");
   ws.onmessage = webSocketMessageReceived;
 
   bgTexture = PIXI.loader.resources[Constants.BACKGROUND_TEXTURE].texture;
@@ -179,7 +172,8 @@ var sendInput = function() {
 
 // Draw everything
 var render = function () {
-  var myShip;
+  if (!myID) { return }
+  let myShip;
 
   let backgroundPos = Utils.translateToViewport(0, 0, viewport);
   tilingSprite.tilePosition.set(backgroundPos.x, backgroundPos.y);
