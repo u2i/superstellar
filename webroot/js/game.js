@@ -1,89 +1,71 @@
-import ProtoBuf from 'protobufjs';
 import * as PIXI from "pixi.js";
-import * as Constants from './constants.js';
-import * as Utils from './utils.js';
-import Spaceship from './spaceship.js';
-import { renderer, stage } from './globals.js';
+import Assets from './assets';
+import * as Constants from './constants';
+import * as Utils from './utils';
+import Spaceship from './spaceship';
+import { renderer, stage, globalState } from './globals';
+import { initializeConnection, sendMessage, registerMessageHandler, UserInput } from './communicationLayer';
 
 // TODO: Use config for this
-let ws; 
-
-const spaceMessageHandler = (space) => {
-  const ships = space.spaceships;
-
-  for (var i in ships) {
-    let shipId = ships[i].id;
-
-    if (!shipIds.has(shipId)) {
-      const newSpaceship = new Spaceship(shipTexture, shipThrustFrames, ships[i]);
-
-      shipIds.set(shipId, newSpaceship);
-    } else {
-      shipIds.get(shipId).updateData(ships[i]);
-    }
-  }
-};
-
-const helloMessageHandler = (message) => {
-  myID = message.myId;
-};
-
-const playerLeftHandler = (message) => {
-  const playerId = message.id;
-
-  let spaceship = shipIds.get(playerId);
-
-  spaceship.remove();
-
-  shipIds.delete(playerId);
-};
-
-const messageHandlers = new Map();
-
-messageHandlers.set("hello", helloMessageHandler);
-messageHandlers.set("space", spaceMessageHandler);
-messageHandlers.set("playerLeft", playerLeftHandler);
-
-const webSocketMessageReceived = (e) => {
-  var fileReader = new FileReader();
-
-  fileReader.onload = function() {
-    const message = Message.decode(this.result);
-
-    messageHandlers.get(message.content)(message[message.content]);
-  };
-
-  fileReader.readAsArrayBuffer(e.data);
-};
-
+const HOST = window.location.hostname;
+const PORT = '8080';
+const PATH = '/superstellar';
 
 const KEY_UP = 38;
 const KEY_LEFT = 37;
 const KEY_RIGHT = 39;
 
-const shipIds = new Map();
-
 document.body.appendChild(renderer.view);
-
-const builder = ProtoBuf.loadJsonFile(Constants.PROTOBUF_DEFINITION);
-const Message = builder.build(Constants.MESSAGE_DEFINITION);
-const Space = builder.build(Constants.SPACE_DEFINITION);
-const UserInput = builder.build(Constants.USER_INPUT_DEFINITION);
-const PlayerLeft = builder.build(Constants.PLAYER_LEFT_DEFINITION);
-
 
 const loadProgressHandler = (loader, resource) => {
   console.log(`progress: ${loader.progress}%`);
 };
 
+const spaceMessageHandler = (space) => {
+  const ships = space.spaceships;
+  const shipTexture = Assets.getTexture(Constants.SHIP_TEXTURE);
+
+  let shipThrustFrames = [];
+
+  Constants.FLAME_SPRITESHEET_FRAME_NAMES.forEach((frameName) =>  {
+    shipThrustFrames.push(Assets.getTextureFromFrame(frameName));
+  });
+
+  for (var i in ships) {
+    let shipId = ships[i].id;
+
+    if (!globalState.spaceshipMap.has(shipId)) {
+      const newSpaceship = new Spaceship(shipTexture, shipThrustFrames, ships[i]);
+
+      globalState.spaceshipMap.set(shipId, newSpaceship);
+    } else {
+      globalState.spaceshipMap.get(shipId).updateData(ships[i]);
+    }
+  }
+};
+
+const helloMessageHandler = (message) => {
+  globalState.clientId = message.myId;
+};
+
+const playerLeftHandler = (message) => {
+  const playerId = message.id;
+
+  let spaceship = globalState.spaceshipMap.get(playerId);
+
+  spaceship.remove();
+
+  globalState.spaceshipMap.delete(playerId);
+};
+
+registerMessageHandler(Constants.HELLO_MESSAGE,       helloMessageHandler);
+registerMessageHandler(Constants.SPACE_MESSAGE,       spaceMessageHandler);
+registerMessageHandler(Constants.PLAYER_LEFT_MESSAGE, playerLeftHandler);
+
 PIXI.loader.
   add([Constants.SHIP_TEXTURE, Constants.BACKGROUND_TEXTURE, Constants.FLAME_SPRITESHEET]).
   on("progress", loadProgressHandler).
   load(setup);
-
-let shipTexture;
-let shipThrustTexture;
-let bgTexture;
 
 let tilingSprite;
 
@@ -105,20 +87,12 @@ const buildHudText = (shipCount, fps, x, y) => {
 }
 
 let hudText;
-let shipThrustFrames = [];
 let thrustAnim;
 
 function setup() {
-  shipTexture = PIXI.loader.resources[Constants.SHIP_TEXTURE].texture;
+  initializeConnection(HOST, PORT, PATH);
 
-  Constants.FLAME_SPRITESHEET_FRAME_NAMES.forEach((frameName) =>  {
-    shipThrustFrames.push(PIXI.Texture.fromFrame(frameName));
-  });
-
-  ws = new WebSocket("ws://" + window.location.hostname + ":8080/superstellar");
-  ws.onmessage = webSocketMessageReceived;
-
-  bgTexture = PIXI.loader.resources[Constants.BACKGROUND_TEXTURE].texture;
+  const bgTexture = Assets.getTexture(Constants.BACKGROUND_TEXTURE);
 
   tilingSprite = new PIXI.extras.TilingSprite(bgTexture, renderer.width, renderer.height);
   stage.addChild(tilingSprite);
@@ -132,8 +106,6 @@ function setup() {
   var then = Date.now();
   main();
 }
-
-var myID = 0;
 
 var viewport = {vx: 0, vy: 0, width: 800, height: 600}
 
@@ -161,29 +133,26 @@ var sendInput = function() {
   } else if (KEY_RIGHT in keysDown) {
     direction = "RIGHT";
   }
+  
+  let userInput = new UserInput(thrust, direction);
 
-  var userInput = new UserInput(thrust, direction);
-  var buffer = userInput.encode();
-
-  if (ws.readyState == WebSocket.OPEN) {
-    ws.send(buffer.toArrayBuffer());
-  }
+  sendMessage(userInput);
 }
 
 // Draw everything
 var render = function () {
-  if (!myID) { return }
+  if (!globalState.clientId) { return }
   let myShip;
 
   let backgroundPos = Utils.translateToViewport(0, 0, viewport);
   tilingSprite.tilePosition.set(backgroundPos.x, backgroundPos.y);
 
-  if (shipIds.size > 0) {
-    myShip = shipIds.get(myID);
+  if (globalState.spaceshipMap.size > 0) {
+    myShip = globalState.spaceshipMap.get(globalState.clientId);
     viewport = myShip.viewport();
   }
 
-  shipIds.forEach((spaceship) => spaceship.update(viewport));
+  globalState.spaceshipMap.forEach((spaceship) => spaceship.update(viewport));
   frameCounter++;
 
   if (frameCounter === 100) {
@@ -194,7 +163,7 @@ var render = function () {
     lastTime = now;
   }
 
-  let shipCount = shipIds.size;
+  let shipCount = globalState.spaceshipMap.size;
 
   let x = myShip ? Math.floor(myShip.position.x / 100) : '?';
   let y = myShip ? Math.floor(myShip.position.y / 100) : '?';
