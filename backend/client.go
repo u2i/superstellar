@@ -1,7 +1,6 @@
 package backend
 
 import (
-	"fmt"
 	"io"
 	"log"
 	"superstellar/backend/pb"
@@ -52,9 +51,7 @@ func (c *Client) SendMessage(bytes *[]byte) {
 	select {
 	case c.ch <- bytes:
 	default:
-		c.server.Del(c)
-		err := fmt.Errorf("client %d is disconnected", c.id)
-		c.server.Err(err)
+		log.Println("Error sending message")
 	}
 }
 
