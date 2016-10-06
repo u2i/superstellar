@@ -17,19 +17,21 @@ func main() {
 	log.SetFlags(log.Lshortfile)
 	rand.Seed(time.Now().UTC().UnixNano())
 
-	if len(os.Args) <= 2 {
-		log.Fatal("[clients] [sleep time]")
+	if len(os.Args) <= 3 {
+		log.Fatal("[host] [clients] [sleep time]")
 		os.Exit(1)
 	}
 
-	clients, err := strconv.ParseInt(os.Args[1], 10, 0)
+	host := os.Args[1]
+
+	clients, err := strconv.ParseInt(os.Args[2], 10, 0)
 
 	if err != nil {
 		log.Fatal("Incorrect number of clients")
 		os.Exit(1)
 	}
 
-	sleepTime, err := time.ParseDuration(os.Args[2])
+	sleepTime, err := time.ParseDuration(os.Args[3])
 
 	if err != nil {
 		log.Fatal("Incorrect sleep time")
@@ -40,16 +42,16 @@ func main() {
 
 	for i := 0; i < int(clients); i++ {
 		log.Printf("Running client %d\n", i+1)
-		go runClient()
+		go runClient(host)
 		time.Sleep(sleepTime)
 	}
 
 	<-ch
 }
 
-func runClient() {
-	origin := "http://localhost/"
-	url := "ws://localhost:8080/superstellar"
+func runClient(host string) {
+	origin := "http://" + host
+	url := "ws://" + host + ":8080/superstellar"
 	ws, err := websocket.Dial(url, "", origin)
 	if err != nil {
 		log.Fatal(err)
