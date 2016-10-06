@@ -46,12 +46,12 @@ func (c *Client) Conn() *websocket.Conn {
 	return c.ws
 }
 
-// SendSpace sends game state to the client.
+// SendMessage sends game state to the client.
 func (c *Client) SendMessage(bytes *[]byte) {
 	select {
 	case c.ch <- bytes:
 	default:
-		log.Println("Error sending message")
+		c.monitor.addDroppedMessage()
 	}
 }
 
