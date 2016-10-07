@@ -31,9 +31,12 @@ module.exports = {
     ],
     postLoaders: [
 	{
-	test: /\.js$/,
-	include: path.resolve(__dirname, 'node_modules/pixi.js'),
-	loader: 'transform/cacheable?brfs'
-    }
-    ]
+	    test: /\.js$/,
+	    include: path.resolve(__dirname, 'node_modules/pixi.js'),
+	    loader: 'transform/cacheable?brfs'
+	}
+    ],
+    // TODO: configure production build
+    debug: true,
+    devtool: 'eval-source-map'
 };
