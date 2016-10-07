@@ -28,6 +28,14 @@ type Server struct {
 	clientID     uint32
 }
 
+const (
+	// PhysicsTickInterval equals how often the physics is updated
+	PhysicsTickInterval = 20 * time.Millisecond
+
+	// BroadcastStateTickInterval equals how often we broadcast state to clients
+	BroadcastStateTickInterval = 20 * time.Millisecond
+)
+
 // NewServer initializes a new server.
 func NewServer(pattern string) *Server {
 	return &Server{
@@ -120,7 +128,7 @@ func (s *Server) addNewClientHandler() {
 }
 
 func (s *Server) runSenderTicker() {
-	ticker := time.NewTicker(20 * time.Millisecond)
+	ticker := time.NewTicker(BroadcastStateTickInterval)
 	go func() {
 		for _ = range ticker.C {
 			s.updateCh <- true
@@ -129,7 +137,7 @@ func (s *Server) runSenderTicker() {
 }
 
 func (s *Server) runPhysicsTicker() {
-	ticker := time.NewTicker(20 * time.Millisecond)
+	ticker := time.NewTicker(PhysicsTickInterval)
 	go func() {
 		for _ = range ticker.C {
 			s.physicsCh <- true
