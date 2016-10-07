@@ -189,19 +189,19 @@ func (s *Server) handleAddNewClient(client *Client) {
 }
 
 func (s *Server) sendHelloMessage(client *Client) {
-  message := &pb.Message{
-    Content: &pb.Message_Hello{
-      &pb.Hello{MyId: client.id},
-    },
-  }
+	message := &pb.Message{
+		Content: &pb.Message_Hello{
+			&pb.Hello{MyId: client.id},
+		},
+	}
 
-  bytes, err := proto.Marshal(message)
-    if err != nil {
-      log.Println(err)
-      return
-  }
+	bytes, err := proto.Marshal(message)
+	if err != nil {
+		log.Println(err)
+		return
+	}
 
-  client.SendMessage(&bytes);
+	client.SendMessage(&bytes)
 }
 
 func (s *Server) handleDelClient(c *Client) {
@@ -214,10 +214,10 @@ func (s *Server) handleDelClient(c *Client) {
 	s.sendUserLeftMessage(c.id)
 }
 
-func (s *Server) sendUserLeftMessage(userId uint32) {
-  message := &pb.Message{
+func (s *Server) sendUserLeftMessage(userID uint32) {
+	message := &pb.Message{
 		Content: &pb.Message_PlayerLeft{
-			PlayerLeft: &pb.PlayerLeft{Id: userId},
+			PlayerLeft: &pb.PlayerLeft{Id: userID},
 		},
 	}
 
