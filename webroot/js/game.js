@@ -109,8 +109,6 @@ function setup() {
   hudText.y = 0;
   stage.addChild(hudText);
 
-  // Let's play this game!
-  var then = Date.now();
   main();
 }
 
