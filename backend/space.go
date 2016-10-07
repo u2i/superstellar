@@ -7,21 +7,22 @@ import (
 )
 
 const (
-	// Radius of playable world (in .01 units)
+	// WorldRadius is the radius of playable world (in .01 units)
 	WorldRadius = 100000
 
-	// Width of boundary region (in .01 units), i.e. from WorldRadius till when no more movement is possible
+	// BoundaryAnnulusWidth is the width of boundary region (in .01 units), i.e. from WorldRadius till when no more movement is possible
 	BoundaryAnnulusWidth = 20000
 )
 
 // Space struct holds entire game state.
 type Space struct {
-	Spaceships map[uint32]*Spaceship `json:"spaceships"`
+	Spaceships     map[uint32]*Spaceship `json:"spaceships"`
+	PhysicsFrameID uint32
 }
 
 // NewSpace initializes new Space.
 func NewSpace() *Space {
-	return &Space{Spaceships: make(map[uint32]*Spaceship)}
+	return &Space{Spaceships: make(map[uint32]*Spaceship), PhysicsFrameID: 0}
 }
 
 // AddSpaceship adds new spaceship to the space.
@@ -82,6 +83,8 @@ func (space *Space) updatePhysics() {
 
 		spaceship.Facing = NewVector(math.Cos(angle), math.Sin(angle))
 	}
+
+	space.PhysicsFrameID++
 }
 
 func (space *Space) toProto() *pb.Space {
@@ -90,7 +93,7 @@ func (space *Space) toProto() *pb.Space {
 		protoSpaceships = append(protoSpaceships, spaceship.toProto())
 	}
 
-  return &pb.Space{Spaceships: protoSpaceships}
+	return &pb.Space{Spaceships: protoSpaceships, PhysicsFrameID: space.PhysicsFrameID}
 }
 
 func (space *Space) toMessage() *pb.Message {

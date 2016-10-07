@@ -33,7 +33,8 @@ message PlayerLeft {
 }
 
 message Space {
-  repeated Spaceship spaceships = 1;
+  uint32 physicsFrameID = 1;
+  repeated Spaceship spaceships = 2;
 }
 
 message Hello {

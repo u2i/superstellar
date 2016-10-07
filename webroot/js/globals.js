@@ -3,5 +3,6 @@ export const stage = new PIXI.Container();
 
 export const globalState = {
   clientId: null,
-  spaceshipMap: new Map()
+  spaceshipMap: new Map(),
+  physicsFrameID: 0
 };

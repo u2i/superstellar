@@ -121,10 +121,16 @@
             "name": "Space",
             "fields": [
                 {
+                    "rule": "optional",
+                    "type": "uint32",
+                    "name": "physicsFrameID",
+                    "id": 1
+                },
+                {
                     "rule": "repeated",
                     "type": "Spaceship",
                     "name": "spaceships",
-                    "id": 1
+                    "id": 2
                 }
             ]
         },

@@ -18,6 +18,7 @@ const loadProgressHandler = (loader, resource) => {
 };
 
 const spaceMessageHandler = (space) => {
+  globalState.physicsFrameID = space.physicsFrameID;
   const ships = space.spaceships;
   const shipTexture = Assets.getTexture(Constants.SHIP_TEXTURE);
 
