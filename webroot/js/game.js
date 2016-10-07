@@ -11,10 +11,6 @@ const HOST = window.location.hostname;
 const PORT = '8080';
 const PATH = '/superstellar';
 
-const KEY_UP = 38;
-const KEY_LEFT = 37;
-const KEY_RIGHT = 39;
-
 document.body.appendChild(renderer.view);
 
 const loadProgressHandler = (loader, resource) => {
@@ -114,23 +110,44 @@ var lastTime = Date.now();
 var fps = 0;
 
 // Handle keyboard controls
-var keysDown = {};
+const KEY_UP = 38;
+const KEY_LEFT = 37;
+const KEY_RIGHT = 39;
+
+const keysDown = new Map();
+
+keysDown.set(KEY_UP,    false);
+keysDown.set(KEY_LEFT,  false);
+keysDown.set(KEY_RIGHT, false);
 
 addEventListener("keydown", function (e) {
-  keysDown[e.keyCode] = true;
+  updateKeysState(e.keyCode, true);
 }, false);
 
 addEventListener("keyup", function (e) {
-  delete keysDown[e.keyCode];
+  updateKeysState(e.keyCode, false);
 }, false);
 
-var sendInput = function() {
-  var thrust = KEY_UP in keysDown;
+const updateKeysState = (keyCode, isPressed) => {
+  if (keyCode != KEY_UP && keyCode != KEY_LEFT && keyCode != KEY_RIGHT) {
+    return;
+  }
 
-  var direction = "NONE";
-  if (KEY_LEFT in keysDown) {
+  const lastState = keysDown.get(keyCode);
+
+  if (lastState != isPressed) {
+    keysDown.set(keyCode, isPressed);
+    sendInput();
+  }
+}
+
+var sendInput = function() {
+  const thrust = keysDown.get(KEY_UP);
+
+  let direction = "NONE";
+  if (keysDown.get(KEY_LEFT)) {
     direction = "LEFT";
-  } else if (KEY_RIGHT in keysDown) {
+  } else if (keysDown.get(KEY_RIGHT)) {
     direction = "RIGHT";
   }
   
@@ -170,7 +187,6 @@ var render = function () {
 
   hudText.text = buildHudText(shipCount, fps, x, y);
   renderer.render(stage);
-  sendInput()
 };
 
 // The main game loop
