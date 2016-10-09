@@ -42,13 +42,16 @@ message Hello {
   //map<int32, String> idToPlayerName = 2;
 }
 
-enum Direction {
-  NONE = 0;
+enum UserInput {
+  CENTER = 0;
   LEFT = 1;
   RIGHT = 2;
+  THRUST_ON = 3;
+  THRUST_OFF = 4;
+  FIRE_START = 5;
+  FIRE_STOP = 6;
 }
 
-message UserInput {
-  bool thrust = 1;
-  Direction direction = 2;
+message UserMessage {
+  UserInput userInput = 1;
 }

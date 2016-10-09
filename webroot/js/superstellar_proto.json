@@ -146,29 +146,23 @@
             ]
         },
         {
-            "name": "UserInput",
+            "name": "UserMessage",
             "fields": [
                 {
                     "rule": "optional",
-                    "type": "bool",
-                    "name": "thrust",
+                    "type": "UserInput",
+                    "name": "userInput",
                     "id": 1
-                },
-                {
-                    "rule": "optional",
-                    "type": "Direction",
-                    "name": "direction",
-                    "id": 2
                 }
             ]
         }
     ],
     "enums": [
         {
-            "name": "Direction",
+            "name": "UserInput",
             "values": [
                 {
-                    "name": "NONE",
+                    "name": "CENTER",
                     "id": 0
                 },
                 {
@@ -178,6 +172,22 @@
                 {
                     "name": "RIGHT",
                     "id": 2
+                },
+                {
+                    "name": "THRUST_ON",
+                    "id": 3
+                },
+                {
+                    "name": "THRUST_OFF",
+                    "id": 4
+                },
+                {
+                    "name": "FIRE_START",
+                    "id": 5
+                },
+                {
+                    "name": "FIRE_STOP",
+                    "id": 6
                 }
             ]
         }

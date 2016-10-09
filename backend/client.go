@@ -121,11 +121,11 @@ func (c *Client) readFromWebSocket() {
 }
 
 func (c *Client) unmarshalUserInput(data []byte) {
-	protoUserInput := &pb.UserInput{}
-	if err := proto.Unmarshal(data, protoUserInput); err != nil {
+	protoUserMessage := &pb.UserMessage{}
+	if err := proto.Unmarshal(data, protoUserMessage); err != nil {
 		log.Fatalln("Failed to unmarshal UserInput:", err)
 	}
 
-	userInput := UserInputFromProto(protoUserInput, c.id)
+	userInput := UserInputFromProto(protoUserMessage.UserInput, c.id)
 	c.server.UserInput(userInput)
 }

@@ -191,7 +191,7 @@ func (s *Server) handleAddNewClient(client *Client) {
 func (s *Server) sendHelloMessage(client *Client) {
 	message := &pb.Message{
 		Content: &pb.Message_Hello{
-			&pb.Hello{MyId: client.id},
+			Hello: &pb.Hello{MyId: client.id},
 		},
 	}
 

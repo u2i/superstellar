@@ -4,7 +4,7 @@ import * as Constants from './constants';
 import * as Utils from './utils';
 import Spaceship from './spaceship';
 import { renderer, stage, globalState } from './globals';
-import { initializeConnection, sendMessage, registerMessageHandler, UserInput } from './communicationLayer';
+import { initializeConnection, sendMessage, registerMessageHandler, UserMessage } from './communicationLayer';
 
 // TODO: Use config for this
 const HOST = window.location.hostname;
@@ -138,23 +138,24 @@ const updateKeysState = (keyCode, isPressed) => {
 
   if (lastState != isPressed) {
     keysDown.set(keyCode, isPressed);
-    sendInput();
+    sendInput(keyCode, isPressed);
   }
 }
 
-var sendInput = function() {
-  const thrust = keysDown.get(KEY_UP);
+var sendInput = (keyCode, isPressed) => {
+  let userInput = "CENTER"
 
-  let direction = "NONE";
-  if (keysDown.get(KEY_LEFT)) {
-    direction = "LEFT";
-  } else if (keysDown.get(KEY_RIGHT)) {
-    direction = "RIGHT";
+  if (keyCode == KEY_UP) {
+    userInput = isPressed ? "THRUST_ON" : "THRUST_OFF"
+  } else if (keyCode == KEY_LEFT) {
+    userInput = isPressed ? "LEFT" : "CENTER"
+  } else if (keyCode == KEY_RIGHT) {
+    userInput = isPressed ? "RIGHT" : "CENTER"
   }
-  
-  let userInput = new UserInput(thrust, direction);
 
-  sendMessage(userInput);
+  let userMessage = new UserMessage(userInput);
+
+  sendMessage(userMessage);
 }
 
 // Draw everything
@@ -196,4 +197,3 @@ var main = function () {
   // Request to do this again ASAP
   requestAnimationFrame(main);
 };
-

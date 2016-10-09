@@ -5,24 +5,21 @@ import "superstellar/backend/pb"
 // UserInput struct describes client's spaceship input.
 type UserInput struct {
 	ClientID  uint32
-	Thrust    bool
-	Direction Direction
+	UserInput pb.UserInput
 }
 
 // NewUserInput returns new instance of UserInput
 func NewUserInput(clientID uint32) *UserInput {
 	return &UserInput{
 		ClientID:  clientID,
-		Thrust:    false,
-		Direction: NONE,
+		UserInput: pb.UserInput_CENTER,
 	}
 }
 
 // UserInputFromProto returns new instance of UserInput basing on proto object.
-func UserInputFromProto(protoUserInput *pb.UserInput, clientID uint32) *UserInput {
+func UserInputFromProto(userInput pb.UserInput, clientID uint32) *UserInput {
 	return &UserInput{
 		ClientID:  clientID,
-		Thrust:    protoUserInput.Thrust,
-		Direction: Direction(protoUserInput.Direction),
+		UserInput: userInput,
 	}
 }

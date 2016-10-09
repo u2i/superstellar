@@ -22,7 +22,7 @@ const (
 	// AngularVelocity is an angular velocity added on user input.
 	AngularVelocity = 0.1
 
-	// Maximum speed of the spacecraft
+	// MaxSpeed maximum speed of the spacecraft
 	MaxSpeed = 20
 )
 
@@ -58,8 +58,18 @@ func (s *Spaceship) getNormalizedFacing() *Vector {
 }
 
 func (s *Spaceship) updateUserInput(userInput *UserInput) {
-	s.InputThrust = userInput.Thrust
-	s.InputDirection = userInput.Direction
+	switch userInput.UserInput {
+	case pb.UserInput_CENTER:
+		s.InputDirection = NONE
+	case pb.UserInput_LEFT:
+		s.InputDirection = LEFT
+	case pb.UserInput_RIGHT:
+		s.InputDirection = RIGHT
+	case pb.UserInput_THRUST_ON:
+		s.InputThrust = true
+	case pb.UserInput_THRUST_OFF:
+		s.InputThrust = false
+	}
 }
 
 func (s *Spaceship) toProto() *pb.Spaceship {

@@ -76,9 +76,9 @@ func (space *Space) updatePhysics() {
 		angle := math.Atan2(spaceship.Facing.Y, spaceship.Facing.X)
 		switch spaceship.InputDirection {
 		case LEFT:
-			angle -= AngularVelocity
-		case RIGHT:
 			angle += AngularVelocity
+		case RIGHT:
+			angle -= AngularVelocity
 		}
 
 		spaceship.Facing = NewVector(math.Cos(angle), math.Sin(angle))

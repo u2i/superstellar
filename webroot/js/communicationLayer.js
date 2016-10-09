@@ -1,7 +1,7 @@
 import ProtoBuf from 'protobufjs';
 import * as Constants from './constants';
 
-let ws; 
+let ws;
 
 const webSocketMessageReceived = (e) => {
   var fileReader = new FileReader();
@@ -23,8 +23,8 @@ export const handleProtoBufMessage = (protoBufMsg) => {
 
   const handlers = messageHandlers.get(message.content);
 
-  if (!handlers) { 
-    console.log(`Handlers for ${message.content} are not registered`) 
+  if (!handlers) {
+    console.log(`Handlers for ${message.content} are not registered`)
   } else {
     const messageContent = message[message.content];
 
@@ -34,7 +34,7 @@ export const handleProtoBufMessage = (protoBufMsg) => {
   }
 };
 
-export const sendUserInput = (thrust, direction) => {
+export const sendUserMessage = (userInput) => {
 };
 
 export const sendMessage = (protobufMsg) => {
@@ -49,7 +49,7 @@ export const sendMessage = (protobufMsg) => {
 const builder    = ProtoBuf.loadJsonFile(Constants.PROTOBUF_DEFINITION);
 export const Message    = builder.build(Constants.MESSAGE_DEFINITION);
 export const Space      = builder.build(Constants.SPACE_DEFINITION);
-export const UserInput  = builder.build(Constants.USER_INPUT_DEFINITION);
+export const UserMessage  = builder.build(Constants.USER_MESSAGE_DEFINITION);
 export const PlayerLeft = builder.build(Constants.PLAYER_LEFT_DEFINITION);
 
 const messageHandlers = new Map();
@@ -61,4 +61,3 @@ export const registerMessageHandler = (messageType, handler) => {
 
   messageHandlers.set(messageType, currentHandlers);
 };
-
