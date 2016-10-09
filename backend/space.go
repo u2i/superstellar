@@ -4,6 +4,7 @@ import (
 	"math"
 	"math/rand"
 	"superstellar/backend/pb"
+	"time"
 )
 
 const (
@@ -12,17 +13,25 @@ const (
 
 	// BoundaryAnnulusWidth is the width of boundary region (in .01 units), i.e. from WorldRadius till when no more movement is possible
 	BoundaryAnnulusWidth = 20000
+
+	// DefaultShotRange defines the default range of a shot
+	DefaultShotRange = 5000
 )
 
 // Space struct holds entire game state.
 type Space struct {
+	ShotsCh        chan *Shot
 	Spaceships     map[uint32]*Spaceship `json:"spaceships"`
 	PhysicsFrameID uint32
 }
 
 // NewSpace initializes new Space.
-func NewSpace() *Space {
-	return &Space{Spaceships: make(map[uint32]*Spaceship), PhysicsFrameID: 0}
+func NewSpace(shotsCh chan *Shot) *Space {
+	return &Space{
+		ShotsCh:        shotsCh,
+		Spaceships:     make(map[uint32]*Spaceship),
+		PhysicsFrameID: 0,
+	}
 }
 
 // AddSpaceship adds new spaceship to the space.
@@ -56,7 +65,18 @@ func (space *Space) randomUpdate() {
 }
 
 func (space *Space) updatePhysics() {
+	now := time.Now()
+
 	for _, spaceship := range space.Spaceships {
+		if spaceship.Fire {
+			timeSinceLastShot := now.Sub(spaceship.LastShotTime)
+			if timeSinceLastShot >= MinFireInterval {
+				shot := NewShot(spaceship.ID, space.PhysicsFrameID, spaceship.Position, spaceship.Facing, DefaultShotRange)
+				space.ShotsCh <- shot
+				spaceship.LastShotTime = now
+			}
+		}
+
 		if spaceship.InputThrust {
 			deltaVelocity := spaceship.getNormalizedFacing().Multiply(Acceleration)
 			spaceship.Velocity = spaceship.Velocity.Add(deltaVelocity)

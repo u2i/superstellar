@@ -55,9 +55,19 @@ const playerLeftHandler = (message) => {
   globalState.spaceshipMap.delete(playerId);
 };
 
+const shotHandler = (message) => {
+  let frameId = message.frameId;
+  let origin = message.origin;
+  let facing = message.facing;
+  let range = message.range;
+
+  console.log(frameId + " " + origin.x + " " + origin.y + " " + facing + " " + range);
+};
+
 registerMessageHandler(Constants.HELLO_MESSAGE,       helloMessageHandler);
 registerMessageHandler(Constants.SPACE_MESSAGE,       spaceMessageHandler);
 registerMessageHandler(Constants.PLAYER_LEFT_MESSAGE, playerLeftHandler);
+registerMessageHandler(Constants.SHOT_MESSAGE,        shotHandler);
 
 PIXI.loader.
   add([Constants.SHIP_TEXTURE, Constants.BACKGROUND_TEXTURE, Constants.FLAME_SPRITESHEET]).
@@ -111,12 +121,14 @@ var lastTime = Date.now();
 var fps = 0;
 
 // Handle keyboard controls
+const KEY_SPACE = 32;
 const KEY_UP = 38;
 const KEY_LEFT = 37;
 const KEY_RIGHT = 39;
 
 const keysDown = new Map();
 
+keysDown.set(KEY_SPACE,    false);
 keysDown.set(KEY_UP,    false);
 keysDown.set(KEY_LEFT,  false);
 keysDown.set(KEY_RIGHT, false);
@@ -130,11 +142,10 @@ addEventListener("keyup", function (e) {
 }, false);
 
 const updateKeysState = (keyCode, isPressed) => {
-  if (keyCode != KEY_UP && keyCode != KEY_LEFT && keyCode != KEY_RIGHT) {
+  const lastState = keysDown.get(keyCode);
+  if (lastState == undefined) {
     return;
   }
-
-  const lastState = keysDown.get(keyCode);
 
   if (lastState != isPressed) {
     keysDown.set(keyCode, isPressed);
@@ -145,12 +156,19 @@ const updateKeysState = (keyCode, isPressed) => {
 var sendInput = (keyCode, isPressed) => {
   let userInput = "CENTER"
 
-  if (keyCode == KEY_UP) {
-    userInput = isPressed ? "THRUST_ON" : "THRUST_OFF"
-  } else if (keyCode == KEY_LEFT) {
-    userInput = isPressed ? "LEFT" : "CENTER"
-  } else if (keyCode == KEY_RIGHT) {
-    userInput = isPressed ? "RIGHT" : "CENTER"
+  switch(keyCode) {
+    case KEY_UP:
+      userInput = isPressed ? "THRUST_ON" : "THRUST_OFF";
+      break;
+    case KEY_LEFT:
+      userInput = isPressed ? "LEFT" : "CENTER"
+      break;
+    case KEY_RIGHT:
+      userInput = isPressed ? "RIGHT" : "CENTER"
+      break;
+    case KEY_SPACE:
+      userInput = isPressed ? "FIRE_START" : "FIRE_STOP"
+      break;
   }
 
   let userMessage = new UserMessage(userInput);

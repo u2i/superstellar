@@ -27,13 +27,21 @@
                     "name": "playerLeft",
                     "id": 3,
                     "oneof": "content"
+                },
+                {
+                    "rule": "optional",
+                    "type": "Shot",
+                    "name": "shot",
+                    "id": 4,
+                    "oneof": "content"
                 }
             ],
             "oneofs": {
                 "content": [
                     1,
                     2,
-                    3
+                    3,
+                    4
                 ]
             }
         },
@@ -103,6 +111,35 @@
                     "type": "bool",
                     "name": "inputThrust",
                     "id": 5
+                }
+            ]
+        },
+        {
+            "name": "Shot",
+            "fields": [
+                {
+                    "rule": "optional",
+                    "type": "uint32",
+                    "name": "frameId",
+                    "id": 1
+                },
+                {
+                    "rule": "optional",
+                    "type": "IntVector",
+                    "name": "origin",
+                    "id": 2
+                },
+                {
+                    "rule": "optional",
+                    "type": "float",
+                    "name": "facing",
+                    "id": 3
+                },
+                {
+                    "rule": "optional",
+                    "type": "uint32",
+                    "name": "range",
+                    "id": 4
                 }
             ]
         },

@@ -20,6 +20,7 @@ type Server struct {
 	addCh        chan *Client
 	delCh        chan *Client
 	inputCh      chan *UserInput
+	shotsCh      chan *Shot
 	doneCh       chan bool
 	errCh        chan error
 	updateCh     chan bool
@@ -34,18 +35,23 @@ const (
 
 	// BroadcastStateTickInterval equals how often we broadcast state to clients
 	BroadcastStateTickInterval = 20 * time.Millisecond
+
+	// ShotsChannelSize defines the size of UserEvents channel.
+	ShotsChannelSize = 100
 )
 
 // NewServer initializes a new server.
 func NewServer(pattern string) *Server {
+	shotsCh := make(chan *Shot, ShotsChannelSize)
 	return &Server{
 		pattern:      pattern,
-		space:        NewSpace(),
+		space:        NewSpace(shotsCh),
 		clients:      make(map[uint32]*Client),
 		monitor:      newMonitor(),
 		addCh:        make(chan *Client),
 		delCh:        make(chan *Client),
 		inputCh:      make(chan *UserInput),
+		shotsCh:      shotsCh,
 		doneCh:       make(chan bool),
 		errCh:        make(chan error),
 		updateCh:     make(chan bool),
@@ -158,6 +164,9 @@ func (s *Server) mainGameLoop() {
 		case input := <-s.inputCh:
 			s.handleUserInput(input)
 
+		case shot := <-s.shotsCh:
+			s.sendShot(shot)
+
 		case <-s.updateCh:
 			s.handleUpdate()
 
@@ -202,6 +211,24 @@ func (s *Server) sendHelloMessage(client *Client) {
 	}
 
 	client.SendMessage(&bytes)
+}
+
+func (s *Server) sendShot(shot *Shot) {
+	message := &pb.Message{
+		Content: &pb.Message_Shot{
+			Shot: shot.toProto(),
+		},
+	}
+
+	bytes, err := proto.Marshal(message)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	for _, c := range s.clients {
+		c.SendMessage(&bytes)
+	}
 }
 
 func (s *Server) handleDelClient(c *Client) {

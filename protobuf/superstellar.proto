@@ -7,6 +7,7 @@ message Message {
     Space space           = 1;
     Hello hello           = 2;
     PlayerLeft playerLeft = 3;
+    Shot shot             = 4;
   }
 }
 
@@ -26,6 +27,13 @@ message Spaceship {
   Vector    velocity = 3;
   float     facing = 4;
   bool      inputThrust = 5;
+}
+
+message Shot {
+  uint32    frameId = 1;
+  IntVector origin = 2;
+  float     facing = 3;
+  uint32    range = 4;
 }
 
 message PlayerLeft {

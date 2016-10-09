@@ -51,6 +51,8 @@ export const Message    = builder.build(Constants.MESSAGE_DEFINITION);
 export const Space      = builder.build(Constants.SPACE_DEFINITION);
 export const UserMessage  = builder.build(Constants.USER_MESSAGE_DEFINITION);
 export const PlayerLeft = builder.build(Constants.PLAYER_LEFT_DEFINITION);
+export const UserEvent = builder.build(Constants.USER_EVENT_DEFINITION);
+
 
 const messageHandlers = new Map();
 
