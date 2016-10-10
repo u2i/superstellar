@@ -18,7 +18,8 @@
     "webpack-dev-server": "^1.16.1",
     "ify-loader": "^1.0.3",
     "brfs": "^1.4.1",
-    "transform-loader": "^0.2.3"
+    "transform-loader": "^0.2.3",
+    "raw-loader": "^0.5.1"
   },
   "dependencies": {
     "babel-polyfill": "^6.13.0",

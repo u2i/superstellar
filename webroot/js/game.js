@@ -7,6 +7,39 @@ const stage = new PIXI.Container();
 // TODO: Use config for this
 const ws = new WebSocket("ws://" + window.location.hostname + ":8080/superstellar");
 
+let overlay;
+
+function AnnulusFilter() {
+  PIXI.Filter.call(this, null, shaderContent);
+  this.uniforms.worldCoordinates = new Float32Array([0.0, 0.0]);
+  this.uniforms.worldSize = new Float32Array([1000.0, 1400.0]);
+  this.uniforms.magicMatrix = new PIXI.Matrix;
+}
+
+AnnulusFilter.prototype = Object.create(PIXI.Filter.prototype);
+AnnulusFilter.prototype.constructor = AnnulusFilter;
+
+Object.defineProperties(AnnulusFilter.prototype,
+{
+  worldCoordinates: {
+    get: function () {return this.uniforms.worldCoordinates;},
+    set: function (value) {this.uniforms.worldCoordinates = value;}
+  },
+  worldSize: {
+    get: function () {return this.uniforms.worldSize;},
+    set: function (value) {this.uniforms.worldSize = value;}
+  }
+});
+
+AnnulusFilter.prototype.apply = function (filterManager, input, output)
+{
+    filterManager.calculateNormalizedScreenSpaceMatrix(this.uniforms.magicMatrix);
+    filterManager.applyFilter(this, input, output);
+};
+
+let shaderContent = require('raw!../shaders/annulus_fog.frag');
+let fogShader = new AnnulusFilter();
+
 const webSocketMessageReceived = (e) => {
   var fileReader = new FileReader();
   fileReader.onload = function() {
@@ -106,6 +139,12 @@ function setup() {
   tilingSprite = new PIXI.extras.TilingSprite(bgTexture, renderer.width, renderer.height);
   stage.addChild(tilingSprite);
 
+  overlay = new PIXI.Graphics();
+  overlay.drawRect(0, 0, 10, 10);
+  overlay.filterArea = new PIXI.Rectangle(0, 0, 800, 600);
+  overlay.filters = [fogShader];
+  stage.addChild(overlay);
+
   hudText = new PIXI.Text('', hudTextStyle);
   hudText.x = 580;
   hudText.y = 0;
@@ -184,11 +223,9 @@ var render = function () {
 
 	if (ship.inputThrust) {
 		thrust.visible = true;
-//		sprite.texture = shipThrustTexture;
 	}
 	else {
 		thrust.visible = false;
-//		sprite.texture = shipTexture;
 	}
 
     var translatedPosition = translateToViewport(ship.position.x/100, ship.position.y/100, viewport)
@@ -196,10 +233,6 @@ var render = function () {
     container.position.set(translatedPosition.x, translatedPosition.y);
     container.pivot.set(sprite.width / 2, sprite.height / 2);
     container.rotation = ship.facing;
-
-//    thrust.position.set(translatedPosition.x, translatedPosition.y);
-//    thrust.pivot.set(thrust.width / 2, thrust.height / 2);
-//    thrust.rotation = ship.facing;
 
 //     movie.anchor.set(0.5);
     thrust.animationSpeed = 0.5;
@@ -222,8 +255,12 @@ var render = function () {
   let y = myShip ? Math.floor(myShip.position.y / 100) : '?';
 
   hudText.text = buildHudText(shipCount, fps, x, y);
+
+  fogShader.worldCoordinates[0] = x;
+  fogShader.worldCoordinates[1] = y;
+
   renderer.render(stage);
-  sendInput()
+  sendInput();
 };
 
 // The main game loop

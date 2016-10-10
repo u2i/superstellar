@@ -11,7 +11,7 @@ module.exports = {
     },
     module: {
 	loaders: [
-	    {
+    {
 	    test: /\.json$/,
 	    loader: 'json'
 	},
@@ -20,9 +20,13 @@ module.exports = {
 	    exclude: /node_modules/,
 	    loader: 'babel'
 	},
-	{ 
+	{
 	    test: path.resolve(__dirname, 'node_modules', 'pixi.js'),
-	    loader: 'ify' 
+	    loader: 'ify'
+	},
+	{
+
+		loader: 'raw'
 	}
 	]
     },
