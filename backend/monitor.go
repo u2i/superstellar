@@ -3,6 +3,7 @@ package backend
 import (
 	"log"
 	"math"
+	"sync/atomic"
 	"time"
 )
 
@@ -12,19 +13,21 @@ const channelBufferSize = 100
 type Monitor struct {
 	printCh chan bool
 
-	sendTimeCh    chan time.Duration
-	sendTimes     []time.Duration
-	physicsTimeCh chan time.Duration
-	physicsTimes  []time.Duration
+	sendTimeCh      chan time.Duration
+	sendTimes       []time.Duration
+	physicsTimeCh   chan time.Duration
+	physicsTimes    []time.Duration
+	droppedMessages uint64
 }
 
 func newMonitor() *Monitor {
 	return &Monitor{
-		printCh:       make(chan bool),
-		sendTimeCh:    make(chan time.Duration, channelBufferSize),
-		sendTimes:     newDurationSlice(),
-		physicsTimeCh: make(chan time.Duration, channelBufferSize),
-		physicsTimes:  newDurationSlice(),
+		printCh:         make(chan bool),
+		sendTimeCh:      make(chan time.Duration, channelBufferSize),
+		sendTimes:       newDurationSlice(),
+		physicsTimeCh:   make(chan time.Duration, channelBufferSize),
+		physicsTimes:    newDurationSlice(),
+		droppedMessages: 0,
 	}
 }
 
@@ -43,6 +46,10 @@ func (m *Monitor) addPhysicsTime(duration time.Duration) {
 	select {
 	case m.physicsTimeCh <- duration:
 	}
+}
+
+func (m *Monitor) addDroppedMessage() {
+	atomic.AddUint64(&m.droppedMessages, 1)
 }
 
 func (m *Monitor) loop() {
@@ -65,6 +72,9 @@ func newDurationSlice() []time.Duration {
 func (m *Monitor) print() {
 	m.printStats(m.sendTimes, "sendTime")
 	m.printStats(m.physicsTimes, "physicsTime")
+
+	droppedMessages := atomic.SwapUint64(&m.droppedMessages, 0)
+	log.Printf("dropped messages: %d", droppedMessages)
 
 	m.sendTimes = newDurationSlice()
 	m.physicsTimes = newDurationSlice()

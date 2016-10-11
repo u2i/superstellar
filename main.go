@@ -2,11 +2,13 @@ package main
 
 import (
 	"log"
+	"math/rand"
 	"net/http"
 	"superstellar/backend"
-	"math/rand"
 	"time"
 )
+
+import _ "net/http/pprof"
 
 func main() {
 	log.SetFlags(log.Lshortfile)

@@ -3,6 +3,7 @@ package backend
 import (
 	"fmt"
 	"superstellar/backend/pb"
+	"time"
 )
 
 // Direction is a type describing user input on spaceship rotation.
@@ -22,8 +23,11 @@ const (
 	// AngularVelocity is an angular velocity added on user input.
 	AngularVelocity = 0.1
 
-	// Maximum speed of the spacecraft
+	// MaxSpeed maximum speed of the spacecraft
 	MaxSpeed = 20
+
+	// MinFireInterval is a minimum time between firing.
+	MinFireInterval = 500 * time.Millisecond
 )
 
 // Spaceship struct describes a spaceship.
@@ -34,6 +38,8 @@ type Spaceship struct {
 	Facing         *Vector
 	InputThrust    bool
 	InputDirection Direction
+	Fire           bool
+	LastShotTime   time.Time
 }
 
 // NewSpaceship initializes new spaceship facing north with zero velocity.
@@ -45,6 +51,8 @@ func NewSpaceship(id uint32, position *IntVector) *Spaceship {
 		Facing:         NewVector(0.0, 1.0),
 		InputThrust:    false,
 		InputDirection: NONE,
+		Fire:           false,
+		LastShotTime:   time.Now(),
 	}
 }
 
@@ -58,8 +66,22 @@ func (s *Spaceship) getNormalizedFacing() *Vector {
 }
 
 func (s *Spaceship) updateUserInput(userInput *UserInput) {
-	s.InputThrust = userInput.Thrust
-	s.InputDirection = userInput.Direction
+	switch userInput.UserInput {
+	case pb.UserInput_CENTER:
+		s.InputDirection = NONE
+	case pb.UserInput_LEFT:
+		s.InputDirection = LEFT
+	case pb.UserInput_RIGHT:
+		s.InputDirection = RIGHT
+	case pb.UserInput_THRUST_ON:
+		s.InputThrust = true
+	case pb.UserInput_THRUST_OFF:
+		s.InputThrust = false
+	case pb.UserInput_FIRE_START:
+		s.Fire = true
+	case pb.UserInput_FIRE_STOP:
+		s.Fire = false
+	}
 }
 
 func (s *Spaceship) toProto() *pb.Spaceship {

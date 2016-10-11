@@ -9,11 +9,15 @@ It is generated from these files:
 	superstellar.proto
 
 It has these top-level messages:
+	Message
 	IntVector
 	Vector
 	Spaceship
+	Shot
+	PlayerLeft
 	Space
-	UserInput
+	Hello
+	UserMessage
 */
 package pb
 
@@ -32,29 +36,224 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
 
-type Direction int32
+type UserInput int32
 
 const (
-	Direction_NONE  Direction = 0
-	Direction_LEFT  Direction = 1
-	Direction_RIGHT Direction = 2
+	UserInput_CENTER     UserInput = 0
+	UserInput_LEFT       UserInput = 1
+	UserInput_RIGHT      UserInput = 2
+	UserInput_THRUST_ON  UserInput = 3
+	UserInput_THRUST_OFF UserInput = 4
+	UserInput_FIRE_START UserInput = 5
+	UserInput_FIRE_STOP  UserInput = 6
 )
 
-var Direction_name = map[int32]string{
-	0: "NONE",
+var UserInput_name = map[int32]string{
+	0: "CENTER",
 	1: "LEFT",
 	2: "RIGHT",
+	3: "THRUST_ON",
+	4: "THRUST_OFF",
+	5: "FIRE_START",
+	6: "FIRE_STOP",
 }
-var Direction_value = map[string]int32{
-	"NONE":  0,
-	"LEFT":  1,
-	"RIGHT": 2,
+var UserInput_value = map[string]int32{
+	"CENTER":     0,
+	"LEFT":       1,
+	"RIGHT":      2,
+	"THRUST_ON":  3,
+	"THRUST_OFF": 4,
+	"FIRE_START": 5,
+	"FIRE_STOP":  6,
 }
 
-func (x Direction) String() string {
-	return proto.EnumName(Direction_name, int32(x))
+func (x UserInput) String() string {
+	return proto.EnumName(UserInput_name, int32(x))
 }
-func (Direction) EnumDescriptor() ([]byte, []int) { return fileDescriptor0, []int{0} }
+func (UserInput) EnumDescriptor() ([]byte, []int) { return fileDescriptor0, []int{0} }
+
+type Message struct {
+	// Types that are valid to be assigned to Content:
+	//	*Message_Space
+	//	*Message_Hello
+	//	*Message_PlayerLeft
+	//	*Message_Shot
+	Content isMessage_Content `protobuf_oneof:"content"`
+}
+
+func (m *Message) Reset()                    { *m = Message{} }
+func (m *Message) String() string            { return proto.CompactTextString(m) }
+func (*Message) ProtoMessage()               {}
+func (*Message) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{0} }
+
+type isMessage_Content interface {
+	isMessage_Content()
+}
+
+type Message_Space struct {
+	Space *Space `protobuf:"bytes,1,opt,name=space,oneof"`
+}
+type Message_Hello struct {
+	Hello *Hello `protobuf:"bytes,2,opt,name=hello,oneof"`
+}
+type Message_PlayerLeft struct {
+	PlayerLeft *PlayerLeft `protobuf:"bytes,3,opt,name=playerLeft,oneof"`
+}
+type Message_Shot struct {
+	Shot *Shot `protobuf:"bytes,4,opt,name=shot,oneof"`
+}
+
+func (*Message_Space) isMessage_Content()      {}
+func (*Message_Hello) isMessage_Content()      {}
+func (*Message_PlayerLeft) isMessage_Content() {}
+func (*Message_Shot) isMessage_Content()       {}
+
+func (m *Message) GetContent() isMessage_Content {
+	if m != nil {
+		return m.Content
+	}
+	return nil
+}
+
+func (m *Message) GetSpace() *Space {
+	if x, ok := m.GetContent().(*Message_Space); ok {
+		return x.Space
+	}
+	return nil
+}
+
+func (m *Message) GetHello() *Hello {
+	if x, ok := m.GetContent().(*Message_Hello); ok {
+		return x.Hello
+	}
+	return nil
+}
+
+func (m *Message) GetPlayerLeft() *PlayerLeft {
+	if x, ok := m.GetContent().(*Message_PlayerLeft); ok {
+		return x.PlayerLeft
+	}
+	return nil
+}
+
+func (m *Message) GetShot() *Shot {
+	if x, ok := m.GetContent().(*Message_Shot); ok {
+		return x.Shot
+	}
+	return nil
+}
+
+// XXX_OneofFuncs is for the internal use of the proto package.
+func (*Message) XXX_OneofFuncs() (func(msg proto.Message, b *proto.Buffer) error, func(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error), func(msg proto.Message) (n int), []interface{}) {
+	return _Message_OneofMarshaler, _Message_OneofUnmarshaler, _Message_OneofSizer, []interface{}{
+		(*Message_Space)(nil),
+		(*Message_Hello)(nil),
+		(*Message_PlayerLeft)(nil),
+		(*Message_Shot)(nil),
+	}
+}
+
+func _Message_OneofMarshaler(msg proto.Message, b *proto.Buffer) error {
+	m := msg.(*Message)
+	// content
+	switch x := m.Content.(type) {
+	case *Message_Space:
+		b.EncodeVarint(1<<3 | proto.WireBytes)
+		if err := b.EncodeMessage(x.Space); err != nil {
+			return err
+		}
+	case *Message_Hello:
+		b.EncodeVarint(2<<3 | proto.WireBytes)
+		if err := b.EncodeMessage(x.Hello); err != nil {
+			return err
+		}
+	case *Message_PlayerLeft:
+		b.EncodeVarint(3<<3 | proto.WireBytes)
+		if err := b.EncodeMessage(x.PlayerLeft); err != nil {
+			return err
+		}
+	case *Message_Shot:
+		b.EncodeVarint(4<<3 | proto.WireBytes)
+		if err := b.EncodeMessage(x.Shot); err != nil {
+			return err
+		}
+	case nil:
+	default:
+		return fmt.Errorf("Message.Content has unexpected type %T", x)
+	}
+	return nil
+}
+
+func _Message_OneofUnmarshaler(msg proto.Message, tag, wire int, b *proto.Buffer) (bool, error) {
+	m := msg.(*Message)
+	switch tag {
+	case 1: // content.space
+		if wire != proto.WireBytes {
+			return true, proto.ErrInternalBadWireType
+		}
+		msg := new(Space)
+		err := b.DecodeMessage(msg)
+		m.Content = &Message_Space{msg}
+		return true, err
+	case 2: // content.hello
+		if wire != proto.WireBytes {
+			return true, proto.ErrInternalBadWireType
+		}
+		msg := new(Hello)
+		err := b.DecodeMessage(msg)
+		m.Content = &Message_Hello{msg}
+		return true, err
+	case 3: // content.playerLeft
+		if wire != proto.WireBytes {
+			return true, proto.ErrInternalBadWireType
+		}
+		msg := new(PlayerLeft)
+		err := b.DecodeMessage(msg)
+		m.Content = &Message_PlayerLeft{msg}
+		return true, err
+	case 4: // content.shot
+		if wire != proto.WireBytes {
+			return true, proto.ErrInternalBadWireType
+		}
+		msg := new(Shot)
+		err := b.DecodeMessage(msg)
+		m.Content = &Message_Shot{msg}
+		return true, err
+	default:
+		return false, nil
+	}
+}
+
+func _Message_OneofSizer(msg proto.Message) (n int) {
+	m := msg.(*Message)
+	// content
+	switch x := m.Content.(type) {
+	case *Message_Space:
+		s := proto.Size(x.Space)
+		n += proto.SizeVarint(1<<3 | proto.WireBytes)
+		n += proto.SizeVarint(uint64(s))
+		n += s
+	case *Message_Hello:
+		s := proto.Size(x.Hello)
+		n += proto.SizeVarint(2<<3 | proto.WireBytes)
+		n += proto.SizeVarint(uint64(s))
+		n += s
+	case *Message_PlayerLeft:
+		s := proto.Size(x.PlayerLeft)
+		n += proto.SizeVarint(3<<3 | proto.WireBytes)
+		n += proto.SizeVarint(uint64(s))
+		n += s
+	case *Message_Shot:
+		s := proto.Size(x.Shot)
+		n += proto.SizeVarint(4<<3 | proto.WireBytes)
+		n += proto.SizeVarint(uint64(s))
+		n += s
+	case nil:
+	default:
+		panic(fmt.Sprintf("proto: unexpected type %T in oneof", x))
+	}
+	return n
+}
 
 type IntVector struct {
 	X int32 `protobuf:"varint,1,opt,name=x" json:"x,omitempty"`
@@ -64,7 +263,7 @@ type IntVector struct {
 func (m *IntVector) Reset()                    { *m = IntVector{} }
 func (m *IntVector) String() string            { return proto.CompactTextString(m) }
 func (*IntVector) ProtoMessage()               {}
-func (*IntVector) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{0} }
+func (*IntVector) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{1} }
 
 type Vector struct {
 	X float32 `protobuf:"fixed32,1,opt,name=x" json:"x,omitempty"`
@@ -74,20 +273,20 @@ type Vector struct {
 func (m *Vector) Reset()                    { *m = Vector{} }
 func (m *Vector) String() string            { return proto.CompactTextString(m) }
 func (*Vector) ProtoMessage()               {}
-func (*Vector) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{1} }
+func (*Vector) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{2} }
 
 type Spaceship struct {
 	Id          uint32     `protobuf:"varint,1,opt,name=id" json:"id,omitempty"`
 	Position    *IntVector `protobuf:"bytes,2,opt,name=position" json:"position,omitempty"`
 	Velocity    *Vector    `protobuf:"bytes,3,opt,name=velocity" json:"velocity,omitempty"`
 	Facing      float32    `protobuf:"fixed32,4,opt,name=facing" json:"facing,omitempty"`
-	InputThrust bool       `protobuf:"varint,5,opt,name=input_thrust,json=inputThrust" json:"input_thrust,omitempty"`
+	InputThrust bool       `protobuf:"varint,5,opt,name=inputThrust" json:"inputThrust,omitempty"`
 }
 
 func (m *Spaceship) Reset()                    { *m = Spaceship{} }
 func (m *Spaceship) String() string            { return proto.CompactTextString(m) }
 func (*Spaceship) ProtoMessage()               {}
-func (*Spaceship) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{2} }
+func (*Spaceship) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{3} }
 
 func (m *Spaceship) GetPosition() *IntVector {
 	if m != nil {
@@ -103,14 +302,43 @@ func (m *Spaceship) GetVelocity() *Vector {
 	return nil
 }
 
+type Shot struct {
+	FrameId uint32     `protobuf:"varint,1,opt,name=frameId" json:"frameId,omitempty"`
+	Origin  *IntVector `protobuf:"bytes,2,opt,name=origin" json:"origin,omitempty"`
+	Facing  float32    `protobuf:"fixed32,3,opt,name=facing" json:"facing,omitempty"`
+	Range   uint32     `protobuf:"varint,4,opt,name=range" json:"range,omitempty"`
+}
+
+func (m *Shot) Reset()                    { *m = Shot{} }
+func (m *Shot) String() string            { return proto.CompactTextString(m) }
+func (*Shot) ProtoMessage()               {}
+func (*Shot) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{4} }
+
+func (m *Shot) GetOrigin() *IntVector {
+	if m != nil {
+		return m.Origin
+	}
+	return nil
+}
+
+type PlayerLeft struct {
+	Id uint32 `protobuf:"varint,1,opt,name=id" json:"id,omitempty"`
+}
+
+func (m *PlayerLeft) Reset()                    { *m = PlayerLeft{} }
+func (m *PlayerLeft) String() string            { return proto.CompactTextString(m) }
+func (*PlayerLeft) ProtoMessage()               {}
+func (*PlayerLeft) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{5} }
+
 type Space struct {
-	Spaceships []*Spaceship `protobuf:"bytes,1,rep,name=spaceships" json:"spaceships,omitempty"`
+	PhysicsFrameID uint32       `protobuf:"varint,1,opt,name=physicsFrameID" json:"physicsFrameID,omitempty"`
+	Spaceships     []*Spaceship `protobuf:"bytes,2,rep,name=spaceships" json:"spaceships,omitempty"`
 }
 
 func (m *Space) Reset()                    { *m = Space{} }
 func (m *Space) String() string            { return proto.CompactTextString(m) }
 func (*Space) ProtoMessage()               {}
-func (*Space) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{3} }
+func (*Space) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{6} }
 
 func (m *Space) GetSpaceships() []*Spaceship {
 	if m != nil {
@@ -119,47 +347,72 @@ func (m *Space) GetSpaceships() []*Spaceship {
 	return nil
 }
 
-type UserInput struct {
-	Thrust    bool      `protobuf:"varint,1,opt,name=thrust" json:"thrust,omitempty"`
-	Direction Direction `protobuf:"varint,2,opt,name=direction,enum=superstellar.Direction" json:"direction,omitempty"`
+type Hello struct {
+	MyId uint32 `protobuf:"varint,1,opt,name=myId" json:"myId,omitempty"`
 }
 
-func (m *UserInput) Reset()                    { *m = UserInput{} }
-func (m *UserInput) String() string            { return proto.CompactTextString(m) }
-func (*UserInput) ProtoMessage()               {}
-func (*UserInput) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{4} }
+func (m *Hello) Reset()                    { *m = Hello{} }
+func (m *Hello) String() string            { return proto.CompactTextString(m) }
+func (*Hello) ProtoMessage()               {}
+func (*Hello) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{7} }
+
+type UserMessage struct {
+	UserInput UserInput `protobuf:"varint,1,opt,name=userInput,enum=superstellar.UserInput" json:"userInput,omitempty"`
+}
+
+func (m *UserMessage) Reset()                    { *m = UserMessage{} }
+func (m *UserMessage) String() string            { return proto.CompactTextString(m) }
+func (*UserMessage) ProtoMessage()               {}
+func (*UserMessage) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{8} }
 
 func init() {
+	proto.RegisterType((*Message)(nil), "superstellar.Message")
 	proto.RegisterType((*IntVector)(nil), "superstellar.IntVector")
 	proto.RegisterType((*Vector)(nil), "superstellar.Vector")
 	proto.RegisterType((*Spaceship)(nil), "superstellar.Spaceship")
+	proto.RegisterType((*Shot)(nil), "superstellar.Shot")
+	proto.RegisterType((*PlayerLeft)(nil), "superstellar.PlayerLeft")
 	proto.RegisterType((*Space)(nil), "superstellar.Space")
-	proto.RegisterType((*UserInput)(nil), "superstellar.UserInput")
-	proto.RegisterEnum("superstellar.Direction", Direction_name, Direction_value)
+	proto.RegisterType((*Hello)(nil), "superstellar.Hello")
+	proto.RegisterType((*UserMessage)(nil), "superstellar.UserMessage")
+	proto.RegisterEnum("superstellar.UserInput", UserInput_name, UserInput_value)
 }
 
 func init() { proto.RegisterFile("superstellar.proto", fileDescriptor0) }
 
 var fileDescriptor0 = []byte{
-	// 313 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0x64, 0x91, 0x51, 0x4f, 0xc2, 0x30,
-	0x14, 0x85, 0x6d, 0x61, 0x64, 0xbd, 0x20, 0x21, 0x37, 0x46, 0xf7, 0xa8, 0x8b, 0x89, 0x86, 0x07,
-	0x62, 0x24, 0xc6, 0x57, 0x63, 0x44, 0x25, 0x31, 0x98, 0x54, 0xf4, 0x81, 0x17, 0x03, 0xa3, 0x4a,
-	0x13, 0xb2, 0x36, 0x6d, 0x31, 0xf0, 0xe3, 0xfc, 0x6f, 0x6e, 0x95, 0x4d, 0xc0, 0xb7, 0x9e, 0xd3,
-	0xef, 0xf4, 0x9e, 0xbb, 0x01, 0xda, 0x85, 0x16, 0xc6, 0x3a, 0x31, 0x9f, 0x8f, 0x4d, 0x47, 0x1b,
-	0xe5, 0x14, 0x36, 0x36, 0xbd, 0xf8, 0x0c, 0x58, 0x3f, 0x75, 0x6f, 0x22, 0x71, 0xca, 0x60, 0x03,
-	0xc8, 0x32, 0x22, 0xc7, 0xe4, 0x3c, 0xe0, 0x64, 0x99, 0xab, 0x55, 0x44, 0x7f, 0xd5, 0x2a, 0x3e,
-	0x85, 0xda, 0x2e, 0x45, 0xb7, 0x28, 0x9a, 0x53, 0xdf, 0x04, 0xd8, 0x8b, 0x1e, 0x27, 0xc2, 0xce,
-	0xa4, 0xc6, 0x26, 0x50, 0x39, 0xf5, 0xe8, 0x3e, 0xcf, 0x4e, 0xd8, 0x85, 0x50, 0x2b, 0x2b, 0x9d,
-	0x54, 0xa9, 0x8f, 0xd4, 0x2f, 0x8f, 0x3a, 0x5b, 0x0d, 0xcb, 0x2a, 0xbc, 0x04, 0xf1, 0x02, 0xc2,
-	0x2f, 0x31, 0x57, 0x89, 0x74, 0xab, 0xa8, 0xe2, 0x43, 0x07, 0xdb, 0xa1, 0x22, 0x51, 0x50, 0x78,
-	0x08, 0xb5, 0x8f, 0x71, 0x22, 0xd3, 0xcf, 0xa8, 0xea, 0x7b, 0xad, 0x15, 0x9e, 0x40, 0x43, 0xa6,
-	0x7a, 0xe1, 0xde, 0xdd, 0xcc, 0x2c, 0xac, 0x8b, 0x82, 0xec, 0x36, 0xe4, 0x75, 0xef, 0x0d, 0xbd,
-	0x15, 0xdf, 0x40, 0xe0, 0xeb, 0xe3, 0x35, 0x80, 0x2d, 0xf6, 0xb0, 0xd9, 0x0a, 0x95, 0xff, 0x65,
-	0xcb, 0x3d, 0xf9, 0x06, 0x1a, 0x8f, 0x80, 0xbd, 0x5a, 0x61, 0xfa, 0xf9, 0xa3, 0x79, 0x93, 0xf5,
-	0x2c, 0xe2, 0x67, 0xad, 0x15, 0x5e, 0x01, 0x9b, 0x4a, 0x93, 0xf5, 0x2e, 0xbe, 0x44, 0x73, 0xf7,
-	0xf1, 0xbb, 0xe2, 0x9a, 0xff, 0x91, 0xed, 0x36, 0xb0, 0xd2, 0xc7, 0x10, 0xaa, 0x83, 0xe7, 0x41,
-	0xaf, 0xb5, 0x97, 0x9f, 0x9e, 0x7a, 0xf7, 0xc3, 0x16, 0x41, 0x06, 0x01, 0xef, 0x3f, 0x3c, 0x0e,
-	0x5b, 0xf4, 0xb6, 0x3a, 0xa2, 0x7a, 0x32, 0xa9, 0xf9, 0x7f, 0xde, 0xfd, 0x09, 0x00, 0x00, 0xff,
-	0xff, 0x71, 0x42, 0x5e, 0xe2, 0x09, 0x02, 0x00, 0x00,
+	// 517 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x09, 0x6e, 0x88, 0x02, 0xff, 0x84, 0x93, 0x51, 0x6f, 0xd3, 0x30,
+	0x14, 0x85, 0x97, 0x34, 0xc9, 0x9a, 0xdb, 0xb5, 0x8a, 0x2e, 0x13, 0x44, 0x82, 0x87, 0x29, 0x42,
+	0x30, 0x81, 0x34, 0x10, 0x13, 0x42, 0xe2, 0x8d, 0xb1, 0x96, 0x56, 0x1a, 0xdb, 0xe4, 0xa6, 0x3c,
+	0xf0, 0x32, 0x65, 0xc1, 0x6d, 0x82, 0xba, 0x24, 0xb2, 0x5d, 0xb4, 0x3c, 0xf1, 0xc7, 0xf8, 0x19,
+	0xfc, 0x20, 0x6c, 0x2f, 0xc9, 0x9a, 0x80, 0xc4, 0x5b, 0xce, 0xbd, 0xdf, 0x51, 0x8f, 0x8f, 0x6b,
+	0x40, 0xbe, 0x29, 0x28, 0xe3, 0x82, 0xae, 0xd7, 0x11, 0x3b, 0x2a, 0x58, 0x2e, 0x72, 0xdc, 0xdb,
+	0x9e, 0x05, 0xbf, 0x0d, 0xd8, 0xfd, 0x4c, 0x39, 0x8f, 0x56, 0x14, 0x5f, 0x82, 0xcd, 0x8b, 0x28,
+	0xa6, 0xbe, 0x71, 0x60, 0x1c, 0x0e, 0xde, 0x3c, 0x38, 0x6a, 0xb9, 0xe7, 0x6a, 0x35, 0xdd, 0x21,
+	0x77, 0x8c, 0x82, 0x13, 0xb9, 0xc8, 0x7d, 0xf3, 0x5f, 0xf0, 0x54, 0xad, 0x14, 0xac, 0x19, 0x7c,
+	0x0f, 0x50, 0xac, 0xa3, 0x92, 0xb2, 0x33, 0xba, 0x14, 0x7e, 0x4f, 0x3b, 0xfc, 0xb6, 0xe3, 0xb2,
+	0xd9, 0x4b, 0xdb, 0x16, 0x8d, 0x87, 0x60, 0xf1, 0x24, 0x17, 0xbe, 0xa5, 0x5d, 0xd8, 0x09, 0x25,
+	0x37, 0x92, 0xd7, 0xc4, 0x89, 0x0b, 0xbb, 0x71, 0x9e, 0x09, 0x9a, 0x89, 0xe0, 0x39, 0xb8, 0xb3,
+	0x4c, 0x7c, 0xa1, 0xb1, 0xc8, 0x19, 0xee, 0x81, 0x71, 0xab, 0xcf, 0x64, 0x13, 0xe3, 0x56, 0xa9,
+	0x52, 0x87, 0x96, 0xaa, 0x0c, 0x9e, 0x82, 0xd3, 0xa5, 0xcc, 0x16, 0x65, 0x2a, 0xea, 0x97, 0x01,
+	0xae, 0x3e, 0x3f, 0x4f, 0xd2, 0x02, 0x47, 0x60, 0xa6, 0xdf, 0x34, 0x3a, 0x24, 0xf2, 0x0b, 0x8f,
+	0xa1, 0x5f, 0xe4, 0x3c, 0x15, 0x69, 0x9e, 0x55, 0x6d, 0x3c, 0x6a, 0xa7, 0x6c, 0xa2, 0x90, 0x06,
+	0xc4, 0xd7, 0xd0, 0xff, 0x41, 0xd7, 0x79, 0x9c, 0x8a, 0xb2, 0x2a, 0x64, 0xbf, 0x6d, 0xaa, 0x1d,
+	0x35, 0x85, 0x0f, 0xc1, 0x59, 0x46, 0x71, 0x9a, 0xad, 0x74, 0x15, 0x26, 0xa9, 0x14, 0x1e, 0xc0,
+	0x20, 0xcd, 0x8a, 0x8d, 0x08, 0x13, 0xb6, 0xe1, 0xc2, 0xb7, 0xe5, 0xb2, 0x4f, 0xb6, 0x47, 0xc1,
+	0x4f, 0xb0, 0x54, 0x51, 0xe8, 0xc3, 0xee, 0x92, 0x45, 0x37, 0x74, 0x56, 0xa7, 0xaf, 0x25, 0xbe,
+	0x02, 0x27, 0x67, 0xe9, 0x2a, 0xfd, 0xef, 0x01, 0x2a, 0x6c, 0x2b, 0x4c, 0xaf, 0x15, 0x66, 0x1f,
+	0x6c, 0x16, 0x65, 0x2b, 0xaa, 0x33, 0x0e, 0xc9, 0x9d, 0x08, 0x9e, 0x00, 0xdc, 0xdf, 0x6f, 0xb7,
+	0xbf, 0x20, 0x01, 0x5b, 0x97, 0x8b, 0xcf, 0x60, 0x54, 0x24, 0x25, 0x4f, 0x63, 0x3e, 0xd1, 0xb9,
+	0x4e, 0x2b, 0xa8, 0x33, 0xc5, 0x77, 0x00, 0xbc, 0xbe, 0x0d, 0x2e, 0x13, 0xf7, 0xfe, 0x4e, 0xdc,
+	0xdc, 0x16, 0xd9, 0x42, 0x83, 0xc7, 0x60, 0xeb, 0x7f, 0x26, 0x22, 0x58, 0x37, 0x65, 0x53, 0x83,
+	0xfe, 0x0e, 0x4e, 0x61, 0xb0, 0xe0, 0x94, 0xd5, 0xaf, 0xe1, 0x2d, 0xb8, 0x1b, 0x29, 0x67, 0xaa,
+	0x47, 0xcd, 0x8d, 0xba, 0xbf, 0xb1, 0xa8, 0xd7, 0xe4, 0x9e, 0x7c, 0xf1, 0x1d, 0xdc, 0x66, 0x8e,
+	0x00, 0xce, 0xc7, 0xf1, 0x79, 0x38, 0x26, 0xde, 0x0e, 0xf6, 0xc1, 0x3a, 0x1b, 0x4f, 0x42, 0xcf,
+	0x40, 0x17, 0x6c, 0x32, 0xfb, 0x34, 0x0d, 0x3d, 0x13, 0x87, 0xe0, 0x86, 0x53, 0xb2, 0x98, 0x87,
+	0x57, 0x17, 0xe7, 0x5e, 0x4f, 0x36, 0x03, 0xb5, 0x9c, 0x4c, 0x3c, 0x4b, 0xe9, 0xc9, 0x8c, 0x8c,
+	0xaf, 0xe6, 0xe1, 0x07, 0x12, 0x7a, 0xb6, 0xc2, 0x2b, 0x7d, 0x71, 0xe9, 0x39, 0x27, 0xd6, 0x57,
+	0xb3, 0xb8, 0xbe, 0x76, 0xf4, 0xbb, 0x3e, 0xfe, 0x13, 0x00, 0x00, 0xff, 0xff, 0x78, 0x0a, 0x4e,
+	0xd2, 0xed, 0x03, 0x00, 0x00,
 }

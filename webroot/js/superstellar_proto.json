@@ -5,6 +5,47 @@
     },
     "messages": [
         {
+            "name": "Message",
+            "fields": [
+                {
+                    "rule": "optional",
+                    "type": "Space",
+                    "name": "space",
+                    "id": 1,
+                    "oneof": "content"
+                },
+                {
+                    "rule": "optional",
+                    "type": "Hello",
+                    "name": "hello",
+                    "id": 2,
+                    "oneof": "content"
+                },
+                {
+                    "rule": "optional",
+                    "type": "PlayerLeft",
+                    "name": "playerLeft",
+                    "id": 3,
+                    "oneof": "content"
+                },
+                {
+                    "rule": "optional",
+                    "type": "Shot",
+                    "name": "shot",
+                    "id": 4,
+                    "oneof": "content"
+                }
+            ],
+            "oneofs": {
+                "content": [
+                    1,
+                    2,
+                    3,
+                    4
+                ]
+            }
+        },
+        {
             "name": "IntVector",
             "fields": [
                 {
@@ -74,40 +115,91 @@
             ]
         },
         {
-            "name": "Space",
+            "name": "Shot",
             "fields": [
                 {
-                    "rule": "repeated",
-                    "type": "Spaceship",
-                    "name": "spaceships",
+                    "rule": "optional",
+                    "type": "uint32",
+                    "name": "frameId",
+                    "id": 1
+                },
+                {
+                    "rule": "optional",
+                    "type": "IntVector",
+                    "name": "origin",
+                    "id": 2
+                },
+                {
+                    "rule": "optional",
+                    "type": "float",
+                    "name": "facing",
+                    "id": 3
+                },
+                {
+                    "rule": "optional",
+                    "type": "uint32",
+                    "name": "range",
+                    "id": 4
+                }
+            ]
+        },
+        {
+            "name": "PlayerLeft",
+            "fields": [
+                {
+                    "rule": "optional",
+                    "type": "uint32",
+                    "name": "id",
                     "id": 1
                 }
             ]
         },
         {
-            "name": "UserInput",
+            "name": "Space",
             "fields": [
                 {
                     "rule": "optional",
-                    "type": "bool",
-                    "name": "thrust",
+                    "type": "uint32",
+                    "name": "physicsFrameID",
                     "id": 1
                 },
                 {
-                    "rule": "optional",
-                    "type": "Direction",
-                    "name": "direction",
+                    "rule": "repeated",
+                    "type": "Spaceship",
+                    "name": "spaceships",
                     "id": 2
+                }
+            ]
+        },
+        {
+            "name": "Hello",
+            "fields": [
+                {
+                    "rule": "optional",
+                    "type": "uint32",
+                    "name": "myId",
+                    "id": 1
+                }
+            ]
+        },
+        {
+            "name": "UserMessage",
+            "fields": [
+                {
+                    "rule": "optional",
+                    "type": "UserInput",
+                    "name": "userInput",
+                    "id": 1
                 }
             ]
         }
     ],
     "enums": [
         {
-            "name": "Direction",
+            "name": "UserInput",
             "values": [
                 {
-                    "name": "NONE",
+                    "name": "CENTER",
                     "id": 0
                 },
                 {
@@ -117,6 +209,22 @@
                 {
                     "name": "RIGHT",
                     "id": 2
+                },
+                {
+                    "name": "THRUST_ON",
+                    "id": 3
+                },
+                {
+                    "name": "THRUST_OFF",
+                    "id": 4
+                },
+                {
+                    "name": "FIRE_START",
+                    "id": 5
+                },
+                {
+                    "name": "FIRE_STOP",
+                    "id": 6
                 }
             ]
         }

@@ -3,6 +3,7 @@ package backend
 import (
 	"log"
 	"net/http"
+	"superstellar/backend/pb"
 	"time"
 
 	"github.com/golang/protobuf/proto"
@@ -19,6 +20,7 @@ type Server struct {
 	addCh        chan *Client
 	delCh        chan *Client
 	inputCh      chan *UserInput
+	shotsCh      chan *Shot
 	doneCh       chan bool
 	errCh        chan error
 	updateCh     chan bool
@@ -27,16 +29,29 @@ type Server struct {
 	clientID     uint32
 }
 
+const (
+	// PhysicsTickInterval equals how often the physics is updated
+	PhysicsTickInterval = 20 * time.Millisecond
+
+	// BroadcastStateTickInterval equals how often we broadcast state to clients
+	BroadcastStateTickInterval = 20 * time.Millisecond
+
+	// ShotsChannelSize defines the size of UserEvents channel.
+	ShotsChannelSize = 100
+)
+
 // NewServer initializes a new server.
 func NewServer(pattern string) *Server {
+	shotsCh := make(chan *Shot, ShotsChannelSize)
 	return &Server{
 		pattern:      pattern,
-		space:        NewSpace(),
+		space:        NewSpace(shotsCh),
 		clients:      make(map[uint32]*Client),
 		monitor:      newMonitor(),
 		addCh:        make(chan *Client),
 		delCh:        make(chan *Client),
 		inputCh:      make(chan *UserInput),
+		shotsCh:      shotsCh,
 		doneCh:       make(chan bool),
 		errCh:        make(chan error),
 		updateCh:     make(chan bool),
@@ -90,14 +105,14 @@ func (s *Server) Listen() {
 }
 
 func (s *Server) sendSpace() {
-	bytes, err := proto.Marshal(s.space.toProto())
+	bytes, err := proto.Marshal(s.space.toMessage())
 	if err != nil {
 		log.Println(err)
 		return
 	}
 
 	for _, c := range s.clients {
-		c.SendSpace(&bytes)
+		c.SendMessage(&bytes)
 	}
 }
 
@@ -119,7 +134,7 @@ func (s *Server) addNewClientHandler() {
 }
 
 func (s *Server) runSenderTicker() {
-	ticker := time.NewTicker(20 * time.Millisecond)
+	ticker := time.NewTicker(BroadcastStateTickInterval)
 	go func() {
 		for _ = range ticker.C {
 			s.updateCh <- true
@@ -128,7 +143,7 @@ func (s *Server) runSenderTicker() {
 }
 
 func (s *Server) runPhysicsTicker() {
-	ticker := time.NewTicker(20 * time.Millisecond)
+	ticker := time.NewTicker(PhysicsTickInterval)
 	go func() {
 		for _ = range ticker.C {
 			s.physicsCh <- true
@@ -149,6 +164,9 @@ func (s *Server) mainGameLoop() {
 		case input := <-s.inputCh:
 			s.handleUserInput(input)
 
+		case shot := <-s.shotsCh:
+			s.sendShot(shot)
+
 		case <-s.updateCh:
 			s.handleUpdate()
 
@@ -167,21 +185,78 @@ func (s *Server) mainGameLoop() {
 	}
 }
 
-func (s *Server) handleAddNewClient(c *Client) {
+func (s *Server) handleAddNewClient(client *Client) {
 	log.Println("Added new client")
 
-	s.clients[c.id] = c
-	spaceship := NewSpaceship(c.id, NewIntVector(0, 0))
-	s.space.AddSpaceship(c.id, spaceship)
+	s.clients[client.id] = client
+	spaceship := NewSpaceship(client.id, NewIntVector(0, 0))
+	s.space.AddSpaceship(client.id, spaceship)
+
+	s.sendHelloMessage(client)
 
 	log.Println("Now", len(s.clients), "clients connected.")
+}
+
+func (s *Server) sendHelloMessage(client *Client) {
+	message := &pb.Message{
+		Content: &pb.Message_Hello{
+			Hello: &pb.Hello{MyId: client.id},
+		},
+	}
+
+	bytes, err := proto.Marshal(message)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	client.SendMessage(&bytes)
+}
+
+func (s *Server) sendShot(shot *Shot) {
+	message := &pb.Message{
+		Content: &pb.Message_Shot{
+			Shot: shot.toProto(),
+		},
+	}
+
+	bytes, err := proto.Marshal(message)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	for _, c := range s.clients {
+		c.SendMessage(&bytes)
+	}
 }
 
 func (s *Server) handleDelClient(c *Client) {
 	log.Println("Delete client")
 
 	s.space.RemoveSpaceship(c.id)
+
 	delete(s.clients, c.id)
+
+	s.sendUserLeftMessage(c.id)
+}
+
+func (s *Server) sendUserLeftMessage(userID uint32) {
+	message := &pb.Message{
+		Content: &pb.Message_PlayerLeft{
+			PlayerLeft: &pb.PlayerLeft{Id: userID},
+		},
+	}
+
+	bytes, err := proto.Marshal(message)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	for _, c := range s.clients {
+		c.SendMessage(&bytes)
+	}
 }
 
 func (s *Server) handleUserInput(userInput *UserInput) {

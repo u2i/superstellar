@@ -4,24 +4,34 @@ import (
 	"math"
 	"math/rand"
 	"superstellar/backend/pb"
+	"time"
 )
 
 const (
-	// Radius of playable world (in .01 units)
+	// WorldRadius is the radius of playable world (in .01 units)
 	WorldRadius = 100000
 
-	// Width of boundary region (in .01 units), i.e. from WorldRadius till when no more movement is possible
+	// BoundaryAnnulusWidth is the width of boundary region (in .01 units), i.e. from WorldRadius till when no more movement is possible
 	BoundaryAnnulusWidth = 20000
+
+	// DefaultShotRange defines the default range of a shot
+	DefaultShotRange = 5000
 )
 
 // Space struct holds entire game state.
 type Space struct {
-	Spaceships map[uint32]*Spaceship `json:"spaceships"`
+	ShotsCh        chan *Shot
+	Spaceships     map[uint32]*Spaceship `json:"spaceships"`
+	PhysicsFrameID uint32
 }
 
 // NewSpace initializes new Space.
-func NewSpace() *Space {
-	return &Space{Spaceships: make(map[uint32]*Spaceship)}
+func NewSpace(shotsCh chan *Shot) *Space {
+	return &Space{
+		ShotsCh:        shotsCh,
+		Spaceships:     make(map[uint32]*Spaceship),
+		PhysicsFrameID: 0,
+	}
 }
 
 // AddSpaceship adds new spaceship to the space.
@@ -55,7 +65,18 @@ func (space *Space) randomUpdate() {
 }
 
 func (space *Space) updatePhysics() {
+	now := time.Now()
+
 	for _, spaceship := range space.Spaceships {
+		if spaceship.Fire {
+			timeSinceLastShot := now.Sub(spaceship.LastShotTime)
+			if timeSinceLastShot >= MinFireInterval {
+				shot := NewShot(spaceship.ID, space.PhysicsFrameID, spaceship.Position, spaceship.Facing, DefaultShotRange)
+				space.ShotsCh <- shot
+				spaceship.LastShotTime = now
+			}
+		}
+
 		if spaceship.InputThrust {
 			deltaVelocity := spaceship.getNormalizedFacing().Multiply(Acceleration)
 			spaceship.Velocity = spaceship.Velocity.Add(deltaVelocity)
@@ -75,13 +96,15 @@ func (space *Space) updatePhysics() {
 		angle := math.Atan2(spaceship.Facing.Y, spaceship.Facing.X)
 		switch spaceship.InputDirection {
 		case LEFT:
-			angle -= AngularVelocity
-		case RIGHT:
 			angle += AngularVelocity
+		case RIGHT:
+			angle -= AngularVelocity
 		}
 
 		spaceship.Facing = NewVector(math.Cos(angle), math.Sin(angle))
 	}
+
+	space.PhysicsFrameID++
 }
 
 func (space *Space) toProto() *pb.Space {
@@ -90,5 +113,13 @@ func (space *Space) toProto() *pb.Space {
 		protoSpaceships = append(protoSpaceships, spaceship.toProto())
 	}
 
-	return &pb.Space{Spaceships: protoSpaceships}
+	return &pb.Space{Spaceships: protoSpaceships, PhysicsFrameID: space.PhysicsFrameID}
+}
+
+func (space *Space) toMessage() *pb.Message {
+	return &pb.Message{
+		Content: &pb.Message_Space{
+			Space: space.toProto(),
+		},
+	}
 }

@@ -1,7 +1,6 @@
 package backend
 
 import (
-	"fmt"
 	"io"
 	"log"
 	"superstellar/backend/pb"
@@ -47,14 +46,12 @@ func (c *Client) Conn() *websocket.Conn {
 	return c.ws
 }
 
-// SendSpace sends game state to the client.
-func (c *Client) SendSpace(bytes *[]byte) {
+// SendMessage sends game state to the client.
+func (c *Client) SendMessage(bytes *[]byte) {
 	select {
 	case c.ch <- bytes:
 	default:
-		c.server.Del(c)
-		err := fmt.Errorf("client %d is disconnected", c.id)
-		c.server.Err(err)
+		c.monitor.addDroppedMessage()
 	}
 }
 
@@ -124,11 +121,11 @@ func (c *Client) readFromWebSocket() {
 }
 
 func (c *Client) unmarshalUserInput(data []byte) {
-	protoUserInput := &pb.UserInput{}
-	if err := proto.Unmarshal(data, protoUserInput); err != nil {
+	protoUserMessage := &pb.UserMessage{}
+	if err := proto.Unmarshal(data, protoUserMessage); err != nil {
 		log.Fatalln("Failed to unmarshal UserInput:", err)
 	}
 
-	userInput := UserInputFromProto(protoUserInput, c.id)
+	userInput := UserInputFromProto(protoUserMessage.UserInput, c.id)
 	c.server.UserInput(userInput)
 }
