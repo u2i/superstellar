@@ -7,9 +7,8 @@ import Projectile from './projectile';
 import { renderer, stage, globalState } from './globals';
 import { initializeConnection, sendMessage, registerMessageHandler, UserMessage } from './communicationLayer';
 
-// TODO: Use config for this
-const HOST = window.location.hostname;
-const PORT = '8080';
+const HOST = BACKEND_HOST;
+const PORT = BACKEND_PORT;
 const PATH = '/superstellar';
 
 let overlay;
