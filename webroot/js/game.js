@@ -5,6 +5,7 @@ import * as Utils from './utils';
 import { renderer, stage, globalState } from './globals';
 import { initializeConnection, sendMessage, UserMessage } from './communicationLayer';
 import { initializeHandlers } from './messageHandlers';
+import { initializeControls } from './controls';
 
 const HOST = BACKEND_HOST;
 const PORT = BACKEND_PORT;
@@ -79,6 +80,7 @@ let thrustAnim;
 function setup() {
   initializeHandlers();
   initializeConnection(HOST, PORT, PATH);
+  initializeControls();
 
   const bgTexture = Assets.getTexture(Constants.BACKGROUND_TEXTURE);
 
@@ -104,62 +106,6 @@ var viewport = {vx: 0, vy: 0, width: 800, height: 600}
 var frameCounter = 0;
 var lastTime = Date.now();
 var fps = 0;
-
-// Handle keyboard controls
-const KEY_SPACE = 32;
-const KEY_UP = 38;
-const KEY_LEFT = 37;
-const KEY_RIGHT = 39;
-
-const keysDown = new Map();
-
-keysDown.set(KEY_SPACE,    false);
-keysDown.set(KEY_UP,    false);
-keysDown.set(KEY_LEFT,  false);
-keysDown.set(KEY_RIGHT, false);
-
-addEventListener("keydown", function (e) {
-  updateKeysState(e.keyCode, true);
-}, false);
-
-addEventListener("keyup", function (e) {
-  updateKeysState(e.keyCode, false);
-}, false);
-
-const updateKeysState = (keyCode, isPressed) => {
-  const lastState = keysDown.get(keyCode);
-  if (lastState == undefined) {
-    return;
-  }
-
-  if (lastState != isPressed) {
-    keysDown.set(keyCode, isPressed);
-    sendInput(keyCode, isPressed);
-  }
-}
-
-var sendInput = (keyCode, isPressed) => {
-  let userInput = "CENTER"
-
-  switch(keyCode) {
-    case KEY_UP:
-      userInput = isPressed ? "THRUST_ON" : "THRUST_OFF";
-      break;
-    case KEY_LEFT:
-      userInput = isPressed ? "LEFT" : "CENTER"
-      break;
-    case KEY_RIGHT:
-      userInput = isPressed ? "RIGHT" : "CENTER"
-      break;
-    case KEY_SPACE:
-      userInput = isPressed ? "FIRE_START" : "FIRE_STOP"
-      break;
-  }
-
-  let userMessage = new UserMessage(userInput);
-
-  sendMessage(userMessage);
-}
 
 // Draw everything
 var render = function () {
