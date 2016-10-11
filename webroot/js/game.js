@@ -6,6 +6,7 @@ import { renderer, stage, globalState } from './globals';
 import { initializeConnection, sendMessage, UserMessage } from './communicationLayer';
 import { initializeHandlers } from './messageHandlers';
 import { initializeControls } from './controls';
+import Hud from './hud';
 
 const HOST = BACKEND_HOST;
 const PORT = BACKEND_PORT;
@@ -57,25 +58,8 @@ PIXI.loader.
 
 let tilingSprite;
 
-const hudTextStyle = {
-  fontFamily: 'Helvetica',
-  fontSize: '24px',
-  fill: '#FFFFFF',
-  align: 'left',
-  textBaseline: 'top'
-};
-
-const buildHudText = (shipCount, fps, x, y) => {
-  let text = "Ships: " + shipCount + "\n";
-  text += "FPS: " + fps + "\n";
-  text += "X: " + x + "\n";
-  text += "Y: " + y + "\n";
-
-  return text;
-}
-
-let hudText;
 let thrustAnim;
+let hud;
 
 function setup() {
   initializeHandlers();
@@ -93,19 +77,12 @@ function setup() {
   overlay.filters = [fogShader];
   stage.addChild(overlay);
 
-  hudText = new PIXI.Text('', hudTextStyle);
-  hudText.x = 580;
-  hudText.y = 0;
-  stage.addChild(hudText);
+  hud = new Hud();
 
   main();
 }
 
 var viewport = {vx: 0, vy: 0, width: 800, height: 600}
-
-var frameCounter = 0;
-var lastTime = Date.now();
-var fps = 0;
 
 // Draw everything
 var render = function () {
@@ -123,22 +100,11 @@ var render = function () {
 
   globalState.spaceshipMap.forEach((spaceship) => spaceship.update(viewport));
   globalState.projectiles.forEach((projectile) => projectile.update(viewport));
-  frameCounter++;
 
-  if (frameCounter === 100) {
-    frameCounter = 0;
-    var now = Date.now();
-    var delta = (now - lastTime) / 1000;
-    fps = (100 / delta).toFixed(1);
-    lastTime = now;
-  }
-
-  let shipCount = globalState.spaceshipMap.size;
+  hud.update();
 
   let x = myShip ? Math.floor(myShip.position.x / 100) : '?';
   let y = myShip ? Math.floor(myShip.position.y / 100) : '?';
-
-  hudText.text = buildHudText(shipCount, fps, x, y);
 
   fogShader.worldCoordinates[0] = x;
   fogShader.worldCoordinates[1] = y;
