@@ -15,5 +15,5 @@ void main() {
 
 	float alpha = smoothstep(worldSize.x, worldSize.y, dist) * 0.6;
 
-	gl_FragColor = vec4(0.603 * alpha, 0.192 * alpha, 0.992 * alpha, alpha);
+	gl_FragColor = vec4(0.303 * alpha, 0.192 * alpha, 0.992 * alpha, alpha);
 }
