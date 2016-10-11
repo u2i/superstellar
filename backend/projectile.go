@@ -1,10 +1,14 @@
 package backend
 
-import "superstellar/backend/pb"
+import (
+	"superstellar/backend/pb"
+)
 
 const (
 	DefaultTtl = 50
 	ProjectileSpeed = 2000
+	// TODO: remove Konarski's factor
+	KonarskiFactor = 100
 )
 
 // Shot struct holds players' shots data.
@@ -12,30 +16,27 @@ type Projectile struct {
 	ClientID uint32
 	FrameID  uint32
 	Origin   *IntVector
-	Facing   *Vector
-	Range    uint32
+	Velocity *Vector
 	Position *IntVector
 }
 
 // NewProjectile returns new instance of Projectile
-func NewProjectile(clientID, frameID uint32, origin *IntVector, facing *Vector,
-	shotRange uint32) *Projectile {
+func NewProjectile(spaceship *Spaceship, frameID uint32) *Projectile {
 	return &Projectile{
-		ClientID: clientID,
+		ClientID: spaceship.ID,
 		FrameID:  frameID,
-		Origin:   origin,
-		Facing:   facing,
-		Range:    shotRange,
-		Position: origin,
+		Origin:   spaceship.Position,
+		Position: spaceship.Position,
+		// TODO: remove Konarski's factor
+		Velocity: spaceship.Facing.Multiply(ProjectileSpeed).Add(spaceship.Velocity.Multiply(KonarskiFactor)),
 	}
 }
 
-func (shot *Projectile) toProto() *pb.ProjectileFired {
+func (projectile *Projectile) toProto() *pb.ProjectileFired {
 	return &pb.ProjectileFired{
-		FrameId: shot.FrameID,
-		Origin:  shot.Origin.toProto(),
-		Facing:  float32(shot.Facing.Radians()),
+		FrameId: projectile.FrameID,
+		Origin:  projectile.Origin.toProto(),
 		Ttl: DefaultTtl,
-		Speed: ProjectileSpeed,
+		Velocity: projectile.Velocity.toProto(),
 	}
 }

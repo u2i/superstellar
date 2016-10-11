@@ -13,9 +13,6 @@ const (
 
 	// BoundaryAnnulusWidth is the width of boundary region (in .01 units), i.e. from WorldRadius till when no more movement is possible
 	BoundaryAnnulusWidth = 20000
-
-	// DefaultShotRange defines the default range of a shot
-	DefaultShotRange = 5000
 )
 
 // Space struct holds entire game state.
@@ -71,7 +68,7 @@ func (space *Space) updatePhysics() {
 		if spaceship.Fire {
 			timeSinceLastShot := now.Sub(spaceship.LastShotTime)
 			if timeSinceLastShot >= MinFireInterval {
-				projectile := NewProjectile(spaceship.ID, space.PhysicsFrameID, spaceship.Position, spaceship.Facing, DefaultShotRange)
+				projectile := NewProjectile(spaceship, space.PhysicsFrameID)
 				space.ShotsCh <- projectile
 				spaceship.LastShotTime = now
 			}

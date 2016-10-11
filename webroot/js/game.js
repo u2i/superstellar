@@ -89,7 +89,7 @@ const playerLeftHandler = (message) => {
 };
 
 const projectileFiredHandler = (message) => {
-  let { frameId, origin, facing, ttl, speed } = message;
+  let { frameId, origin, ttl, velocity } = message;
 
   let animationFrames = [];
 
@@ -97,7 +97,7 @@ const projectileFiredHandler = (message) => {
     animationFrames.push(Assets.getTextureFromFrame(frameName));
   });
 
-  globalState.projectiles.push(new Projectile(animationFrames, frameId, origin, facing, ttl, speed));
+  globalState.projectiles.push(new Projectile(animationFrames, frameId, origin, ttl, velocity));
 };
 
 registerMessageHandler(Constants.HELLO_MESSAGE,            helloMessageHandler);

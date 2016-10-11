@@ -3,15 +3,11 @@ import * as Utils from './utils.js';
 import * as Constants from './constants';
 
 export default class Projectile {
-  constructor (animationFrames, frameId, origin, facing, ttl, speed) {
+  constructor (animationFrames, frameId, origin, ttl, velocity) {
     this.frameId = frameId;
     this.origin  = origin;
-    this.facing  = facing;
     this.ttl     = ttl;
-    this.speed   = speed;
-
-
-    this.velocity = new PIXI.Point(Math.cos(facing) * speed, Math.sin(facing) * (-speed));
+    this.velocity   = velocity;
 
     this.animation = new PIXI.extras.MovieClip(animationFrames);
 
@@ -22,7 +18,7 @@ export default class Projectile {
     this._updatePosition();
 
     this.animation.position.set(this.position.x / 100, this.position.y / 100);
-    this.animation.rotation = this.facing;
+    this.animation.rotation = Math.atan2(-this.velocity.y, this.velocity.x);
     this.animation.animationSpeed = 10;
     this.animation.play();
 
@@ -39,7 +35,7 @@ export default class Projectile {
     this.animation.play();
 
     const translatedPosition = Utils.translateToViewport(
-      this.position.x / 100, 
+      this.position.x / 100,
       this.position.y / 100, 
       viewport
     )

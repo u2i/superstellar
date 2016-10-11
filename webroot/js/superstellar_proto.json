@@ -131,21 +131,15 @@
                 },
                 {
                     "rule": "optional",
-                    "type": "float",
-                    "name": "facing",
+                    "type": "Vector",
+                    "name": "velocity",
                     "id": 3
-                },
-                {
-                    "rule": "optional",
-                    "type": "float",
-                    "name": "speed",
-                    "id": 4
                 },
                 {
                     "rule": "optional",
                     "type": "uint32",
                     "name": "ttl",
-                    "id": 5
+                    "id": 4
                 }
             ]
         },
