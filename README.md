@@ -37,7 +37,6 @@ It's possible to dump various information from the running server, e.g. stacktra
 
 ### JavaScript
 
-1. Clone https://github.com/dcodeIO/ProtoBuf.js/
-1. `npm install`
+1. `npm install -g pbjs`
 1. Go to superstellar src directory.
-1. `node [path to Protobuf.js repo]/bin/pbjs -s proto -t json protobuf/superstellar.proto > webroot/js/superstellar_proto.json`
+1. `pbjs protobuf/superstellar.proto > webroot/js/superstellar_proto.json`
