@@ -23,10 +23,6 @@ module.exports = {
 	{
 	    test: path.resolve(__dirname, 'node_modules', 'pixi.js'),
 	    loader: 'ify'
-	},
-	{
-
-		loader: 'raw'
 	}
 	]
     },
