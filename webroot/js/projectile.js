@@ -3,13 +3,15 @@ import * as Utils from './utils.js';
 import * as Constants from './constants';
 
 export default class Projectile {
-  constructor (animationFrames, frameId, origin, facing, range) {
+  constructor (animationFrames, frameId, origin, facing, ttl, speed) {
     this.frameId = frameId;
     this.origin  = origin;
     this.facing  = facing;
-    this.range   = range;
+    this.ttl     = ttl;
+    this.speed   = speed;
 
-    this.velocity = new PIXI.Point(Math.cos(facing) * 1000, Math.sin(facing) * (-1000));
+
+    this.velocity = new PIXI.Point(Math.cos(facing) * speed, Math.sin(facing) * (-speed));
 
     this.animation = new PIXI.extras.MovieClip(animationFrames);
 
@@ -28,6 +30,11 @@ export default class Projectile {
   }
 
   update (viewport) {
+    if(globalState.physicsFrameID > this.frameId + this.ttl) {
+        this.remove();
+        globalState.projectiles.splice(globalState.projectiles.indexOf(this), 1);
+    }
+
     this._updatePosition();
     this.animation.play();
 

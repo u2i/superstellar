@@ -2,8 +2,13 @@ package backend
 
 import "superstellar/backend/pb"
 
+const (
+	DefaultTtl = 50
+	ProjectileSpeed = 2000
+)
+
 // Shot struct holds players' shots data.
-type Shot struct {
+type Projectile struct {
 	ClientID uint32
 	FrameID  uint32
 	Origin   *IntVector
@@ -12,10 +17,10 @@ type Shot struct {
 	Position *IntVector
 }
 
-// NewShot returns new instance of Shot
-func NewShot(clientID, frameID uint32, origin *IntVector, facing *Vector,
-	shotRange uint32) *Shot {
-	return &Shot{
+// NewProjectile returns new instance of Projectile
+func NewProjectile(clientID, frameID uint32, origin *IntVector, facing *Vector,
+	shotRange uint32) *Projectile {
+	return &Projectile{
 		ClientID: clientID,
 		FrameID:  frameID,
 		Origin:   origin,
@@ -25,11 +30,12 @@ func NewShot(clientID, frameID uint32, origin *IntVector, facing *Vector,
 	}
 }
 
-func (shot *Shot) toProto() *pb.Shot {
-	return &pb.Shot{
+func (shot *Projectile) toProto() *pb.ProjectileFired {
+	return &pb.ProjectileFired{
 		FrameId: shot.FrameID,
 		Origin:  shot.Origin.toProto(),
 		Facing:  float32(shot.Facing.Radians()),
-		Range:   shot.Range,
+		Ttl: DefaultTtl,
+		Speed: ProjectileSpeed,
 	}
 }

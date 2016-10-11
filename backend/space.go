@@ -20,13 +20,13 @@ const (
 
 // Space struct holds entire game state.
 type Space struct {
-	ShotsCh        chan *Shot
+	ShotsCh        chan *Projectile
 	Spaceships     map[uint32]*Spaceship `json:"spaceships"`
 	PhysicsFrameID uint32
 }
 
 // NewSpace initializes new Space.
-func NewSpace(shotsCh chan *Shot) *Space {
+func NewSpace(shotsCh chan *Projectile) *Space {
 	return &Space{
 		ShotsCh:        shotsCh,
 		Spaceships:     make(map[uint32]*Spaceship),
@@ -71,8 +71,8 @@ func (space *Space) updatePhysics() {
 		if spaceship.Fire {
 			timeSinceLastShot := now.Sub(spaceship.LastShotTime)
 			if timeSinceLastShot >= MinFireInterval {
-				shot := NewShot(spaceship.ID, space.PhysicsFrameID, spaceship.Position, spaceship.Facing, DefaultShotRange)
-				space.ShotsCh <- shot
+				projectile := NewProjectile(spaceship.ID, space.PhysicsFrameID, spaceship.Position, spaceship.Facing, DefaultShotRange)
+				space.ShotsCh <- projectile
 				spaceship.LastShotTime = now
 			}
 		}

@@ -21,4 +21,4 @@ export const MESSAGE_DEFINITION       = "superstellar.Message";
 export const HELLO_MESSAGE       = "hello";
 export const SPACE_MESSAGE       = "space";
 export const PLAYER_LEFT_MESSAGE = "playerLeft";
-export const SHOT_MESSAGE  = "shot";
+export const PROJECTILE_FIRED_MESSAGE  = "projectileFired";

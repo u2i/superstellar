@@ -30,8 +30,8 @@
                 },
                 {
                     "rule": "optional",
-                    "type": "Shot",
-                    "name": "shot",
+                    "type": "ProjectileFired",
+                    "name": "projectileFired",
                     "id": 4,
                     "oneof": "content"
                 }
@@ -115,7 +115,7 @@
             ]
         },
         {
-            "name": "Shot",
+            "name": "ProjectileFired",
             "fields": [
                 {
                     "rule": "optional",
@@ -137,9 +137,15 @@
                 },
                 {
                     "rule": "optional",
-                    "type": "uint32",
-                    "name": "range",
+                    "type": "float",
+                    "name": "speed",
                     "id": 4
+                },
+                {
+                    "rule": "optional",
+                    "type": "uint32",
+                    "name": "ttl",
+                    "id": 5
                 }
             ]
         },

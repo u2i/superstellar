@@ -4,10 +4,10 @@ option go_package = "pb";
 
 message Message {
   oneof content {
-    Space space           = 1;
-    Hello hello           = 2;
-    PlayerLeft playerLeft = 3;
-    Shot shot             = 4;
+    Space space                     = 1;
+    Hello hello                     = 2;
+    PlayerLeft playerLeft           = 3;
+    ProjectileFired projectileFired = 4;
   }
 }
 
@@ -29,11 +29,12 @@ message Spaceship {
   bool      inputThrust = 5;
 }
 
-message Shot {
+message ProjectileFired {
   uint32    frameId = 1;
   IntVector origin = 2;
   float     facing = 3;
-  uint32    range = 4;
+  float     speed = 4;
+  uint32    ttl = 5;
 }
 
 message PlayerLeft {

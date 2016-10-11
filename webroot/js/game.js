@@ -89,8 +89,8 @@ const playerLeftHandler = (message) => {
   globalState.spaceshipMap.delete(playerId);
 };
 
-const shotHandler = (message) => {
-  let { frameId, origin, facing, range } = message;
+const projectileFiredHandler = (message) => {
+  let { frameId, origin, facing, ttl, speed } = message;
 
   let animationFrames = [];
 
@@ -98,13 +98,13 @@ const shotHandler = (message) => {
     animationFrames.push(Assets.getTextureFromFrame(frameName));
   });
 
-  globalState.projectiles.push(new Projectile(animationFrames, frameId, origin, facing, range));
+  globalState.projectiles.push(new Projectile(animationFrames, frameId, origin, facing, ttl, speed));
 };
 
-registerMessageHandler(Constants.HELLO_MESSAGE,       helloMessageHandler);
-registerMessageHandler(Constants.SPACE_MESSAGE,       spaceMessageHandler);
-registerMessageHandler(Constants.PLAYER_LEFT_MESSAGE, playerLeftHandler);
-registerMessageHandler(Constants.SHOT_MESSAGE,        shotHandler);
+registerMessageHandler(Constants.HELLO_MESSAGE,            helloMessageHandler);
+registerMessageHandler(Constants.SPACE_MESSAGE,            spaceMessageHandler);
+registerMessageHandler(Constants.PLAYER_LEFT_MESSAGE,      playerLeftHandler);
+registerMessageHandler(Constants.PROJECTILE_FIRED_MESSAGE, projectileFiredHandler);
 
 PIXI.loader.
   add([Constants.SHIP_TEXTURE, Constants.BACKGROUND_TEXTURE, Constants.FLAME_SPRITESHEET, Constants.PROJECTILE_SPRITESHEET]).

@@ -20,7 +20,7 @@ type Server struct {
 	addCh        chan *Client
 	delCh        chan *Client
 	inputCh      chan *UserInput
-	shotsCh      chan *Shot
+	shotsCh      chan *Projectile
 	doneCh       chan bool
 	errCh        chan error
 	updateCh     chan bool
@@ -42,7 +42,7 @@ const (
 
 // NewServer initializes a new server.
 func NewServer(pattern string) *Server {
-	shotsCh := make(chan *Shot, ShotsChannelSize)
+	shotsCh := make(chan *Projectile, ShotsChannelSize)
 	return &Server{
 		pattern:      pattern,
 		space:        NewSpace(shotsCh),
@@ -213,10 +213,10 @@ func (s *Server) sendHelloMessage(client *Client) {
 	client.SendMessage(&bytes)
 }
 
-func (s *Server) sendShot(shot *Shot) {
+func (s *Server) sendShot(shot *Projectile) {
 	message := &pb.Message{
-		Content: &pb.Message_Shot{
-			Shot: shot.toProto(),
+		Content: &pb.Message_ProjectileFired{
+			ProjectileFired: shot.toProto(),
 		},
 	}
 
