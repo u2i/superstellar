@@ -2,10 +2,9 @@ import * as PIXI from "pixi.js";
 import Assets from './assets';
 import * as Constants from './constants';
 import * as Utils from './utils';
-import Spaceship from './spaceship';
-import Projectile from './projectile';
 import { renderer, stage, globalState } from './globals';
-import { initializeConnection, sendMessage, registerMessageHandler, UserMessage } from './communicationLayer';
+import { initializeConnection, sendMessage, UserMessage } from './communicationLayer';
+import { initializeHandlers } from './messageHandlers';
 
 const HOST = BACKEND_HOST;
 const PORT = BACKEND_PORT;
@@ -50,61 +49,6 @@ const loadProgressHandler = (loader, resource) => {
   console.log(`progress: ${loader.progress}%`);
 };
 
-const spaceMessageHandler = (space) => {
-  globalState.physicsFrameID = space.physicsFrameID;
-  const ships = space.spaceships;
-  const shipTexture = Assets.getTexture(Constants.SHIP_TEXTURE);
-
-  let shipThrustFrames = [];
-
-  Constants.FLAME_SPRITESHEET_FRAME_NAMES.forEach((frameName) =>  {
-    shipThrustFrames.push(Assets.getTextureFromFrame(frameName));
-  });
-
-  for (var i in ships) {
-    let shipId = ships[i].id;
-
-    if (!globalState.spaceshipMap.has(shipId)) {
-      const newSpaceship = new Spaceship(shipTexture, shipThrustFrames, ships[i]);
-
-      globalState.spaceshipMap.set(shipId, newSpaceship);
-    } else {
-      globalState.spaceshipMap.get(shipId).updateData(ships[i]);
-    }
-  }
-};
-
-const helloMessageHandler = (message) => {
-  globalState.clientId = message.myId;
-};
-
-const playerLeftHandler = (message) => {
-  const playerId = message.id;
-
-  let spaceship = globalState.spaceshipMap.get(playerId);
-
-  spaceship.remove();
-
-  globalState.spaceshipMap.delete(playerId);
-};
-
-const projectileFiredHandler = (message) => {
-  let { frameId, origin, ttl, velocity } = message;
-
-  let animationFrames = [];
-
-  Constants.PROJECTILE_SPRITESHEET_FRAME_NAMES.forEach((frameName) => {
-    animationFrames.push(Assets.getTextureFromFrame(frameName));
-  });
-
-  globalState.projectiles.push(new Projectile(animationFrames, frameId, origin, ttl, velocity));
-};
-
-registerMessageHandler(Constants.HELLO_MESSAGE,            helloMessageHandler);
-registerMessageHandler(Constants.SPACE_MESSAGE,            spaceMessageHandler);
-registerMessageHandler(Constants.PLAYER_LEFT_MESSAGE,      playerLeftHandler);
-registerMessageHandler(Constants.PROJECTILE_FIRED_MESSAGE, projectileFiredHandler);
-
 PIXI.loader.
   add([Constants.SHIP_TEXTURE, Constants.BACKGROUND_TEXTURE, Constants.FLAME_SPRITESHEET, Constants.PROJECTILE_SPRITESHEET]).
   on("progress", loadProgressHandler).
@@ -133,6 +77,7 @@ let hudText;
 let thrustAnim;
 
 function setup() {
+  initializeHandlers();
   initializeConnection(HOST, PORT, PATH);
 
   const bgTexture = Assets.getTexture(Constants.BACKGROUND_TEXTURE);
