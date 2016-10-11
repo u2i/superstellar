@@ -37,6 +37,6 @@ It's possible to dump various information from the running server, e.g. stacktra
 
 ### JavaScript
 
-1. `npm install -g pbjs`
+1. `npm install -g protobufjs`
 1. Go to superstellar src directory.
 1. `pbjs protobuf/superstellar.proto > webroot/js/superstellar_proto.json`
