@@ -1,0 +1,36 @@
+{"frames": {
+
+"bullet1.png":
+{
+	"frame": {"x":0,"y":0,"w":20,"h":9},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":20,"h":9},
+	"sourceSize": {"w":20,"h":9}
+},
+"bullet2.png":
+{
+	"frame": {"x":20,"y":0,"w":20,"h":9},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":20,"h":9},
+	"sourceSize": {"w":20,"h":9}
+},
+"bullet3.png":
+{
+	"frame": {"x":40,"y":0,"w":20,"h":9},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":20,"h":9},
+	"sourceSize": {"w":20,"h":9}
+}},
+"meta": {
+	"app": "http://www.codeandweb.com/texturepacker",
+	"version": "1.0",
+	"image": "projectile.png",
+	"format": "RGBA8888",
+	"size": {"w":60,"h":9},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:dc21e72f5418a400fc4309dc4669ee7f:032cf0650fb641cb530ceeafd529021b:da285cc143f726eb6004a48f2931db98$"
+}
+}

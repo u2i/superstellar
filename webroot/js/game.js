@@ -3,6 +3,7 @@ import Assets from './assets';
 import * as Constants from './constants';
 import * as Utils from './utils';
 import Spaceship from './spaceship';
+import Projectile from './projectile';
 import { renderer, stage, globalState } from './globals';
 import { initializeConnection, sendMessage, registerMessageHandler, UserMessage } from './communicationLayer';
 
@@ -89,12 +90,15 @@ const playerLeftHandler = (message) => {
 };
 
 const shotHandler = (message) => {
-  let frameId = message.frameId;
-  let origin = message.origin;
-  let facing = message.facing;
-  let range = message.range;
+  let { frameId, origin, facing, range } = message;
 
-  console.log(frameId + " " + origin.x + " " + origin.y + " " + facing + " " + range);
+  let animationFrames = [];
+
+  Constants.PROJECTILE_SPRITESHEET_FRAME_NAMES.forEach((frameName) => {
+    animationFrames.push(Assets.getTextureFromFrame(frameName));
+  });
+
+  globalState.projectiles.push(new Projectile(animationFrames, frameId, origin, facing, range));
 };
 
 registerMessageHandler(Constants.HELLO_MESSAGE,       helloMessageHandler);
@@ -103,7 +107,7 @@ registerMessageHandler(Constants.PLAYER_LEFT_MESSAGE, playerLeftHandler);
 registerMessageHandler(Constants.SHOT_MESSAGE,        shotHandler);
 
 PIXI.loader.
-  add([Constants.SHIP_TEXTURE, Constants.BACKGROUND_TEXTURE, Constants.FLAME_SPRITESHEET]).
+  add([Constants.SHIP_TEXTURE, Constants.BACKGROUND_TEXTURE, Constants.FLAME_SPRITESHEET, Constants.PROJECTILE_SPRITESHEET]).
   on("progress", loadProgressHandler).
   load(setup);
 
@@ -228,6 +232,7 @@ var render = function () {
   }
 
   globalState.spaceshipMap.forEach((spaceship) => spaceship.update(viewport));
+  globalState.projectiles.forEach((projectile) => projectile.update(viewport));
   frameCounter++;
 
   if (frameCounter === 100) {
