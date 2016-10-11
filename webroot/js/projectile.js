@@ -11,8 +11,6 @@ export default class Projectile {
 
     this.velocity = new PIXI.Point(Math.cos(facing) * 1000, Math.sin(facing) * (-1000));
 
-    console.log("range", this.range);
-
     this.animation = new PIXI.extras.MovieClip(animationFrames);
 
     const frameOffset = frameId - globalState.physicsFrameID;
@@ -20,8 +18,6 @@ export default class Projectile {
     this.position = new PIXI.Point();
 
     this._updatePosition();
-
-    console.log("position", this.position);
 
     this.animation.position.set(this.position.x / 100, this.position.y / 100);
     this.animation.rotation = this.facing;
