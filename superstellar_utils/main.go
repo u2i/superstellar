@@ -59,7 +59,8 @@ func runClient(host string) {
 	var msg = make([]byte, 1024)
 
 	thrust := false
-	direction := pb.Direction_NONE
+	fire := false
+	userInput := pb.UserInput_CENTER
 
 	for {
 		if _, err = ws.Read(msg); err != nil {
@@ -68,24 +69,37 @@ func runClient(host string) {
 
 		if rand.Int()%100 < 5 {
 			thrust = !thrust
-		}
-
-		if rand.Int()%100 < 5 {
+			if thrust {
+				userInput = pb.UserInput_THRUST_ON
+			} else {
+				userInput = pb.UserInput_THRUST_OFF
+			}
+		} else if rand.Int()%100 < 5 {
 			switch rand.Int() % 3 {
 			case 0:
-				direction = pb.Direction_NONE
+				userInput = pb.UserInput_CENTER
 			case 1:
-				direction = pb.Direction_LEFT
+				userInput = pb.UserInput_LEFT
 			case 2:
-				direction = pb.Direction_RIGHT
+				userInput = pb.UserInput_RIGHT
+			}
+		} else if rand.Int()%100 < 5 {
+			fire = !fire
+			if fire {
+				userInput = pb.UserInput_FIRE_START
+			} else {
+				userInput = pb.UserInput_FIRE_STOP
 			}
 		}
 
-		userInput := &pb.UserInput{Thrust: thrust, Direction: direction}
-		bytes, err := proto.Marshal(userInput)
-		if err == nil {
-			websocket.Message.Send(ws, bytes)
-		}
+		send(ws, userInput)
+	}
+}
 
+func send(ws *websocket.Conn, userInput pb.UserInput) {
+	userMessage := &pb.UserMessage{UserInput: userInput}
+	bytes, err := proto.Marshal(userMessage)
+	if err == nil {
+		websocket.Message.Send(ws, bytes)
 	}
 }
