@@ -13,7 +13,7 @@ void main() {
 
 	float dist = distance(vec2(curX, curY), vec2(0.0, 0.0));
 
-	float alpha = smoothstep(worldSize.x, worldSize.y, dist);
+	float alpha = smoothstep(worldSize.x, worldSize.y, dist) * 0.6;
 
 	gl_FragColor = vec4(0.603 * alpha, 0.192 * alpha, 0.992 * alpha, alpha);
 }
