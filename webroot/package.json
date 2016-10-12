@@ -5,7 +5,8 @@
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "webpack-dev-server --hot --inline --colors --host 0.0.0.0 --port 8090 --display-error-details"
+    "dev": "webpack-dev-server --hot --inline --colors --host 0.0.0.0 --port 8090 --display-error-details",
+    "build": "webpack -p --config ./webpack.production.config.js"
   },
   "author": "u2i",
   "license": "ISC",
