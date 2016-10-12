@@ -3,11 +3,12 @@ import * as Utils from './utils.js';
 import * as Constants from './constants';
 
 export default class Projectile {
-  constructor (animationFrames, frameId, origin, ttl, velocity) {
-    this.frameId = frameId;
-    this.origin  = origin;
-    this.ttl     = ttl;
-    this.velocity   = velocity;
+  constructor (animationFrames, frameId, origin, ttl, velocity, facing) {
+    this.frameId  = frameId;
+    this.origin   = origin;
+    this.ttl      = ttl;
+    this.velocity = velocity;
+    this.facing   = facing;
 
     this.animation = new PIXI.extras.MovieClip(animationFrames);
 
@@ -16,7 +17,7 @@ export default class Projectile {
     this._updatePosition();
 
     this.animation.position.set(this.position.x / 100, this.position.y / 100);
-    this.animation.rotation = Math.atan2(-this.velocity.y, this.velocity.x);
+    this.animation.rotation = this.facing;
     this.animation.animationSpeed = 10;
     this.animation.play();
 

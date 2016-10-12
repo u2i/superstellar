@@ -4,7 +4,7 @@ import { globalState } from '../globals';
 import Projectile from '../projectile';
 
 const projectileFiredHandler = (message) => {
-  let { frameId, origin, ttl, velocity } = message;
+  let { frameId, origin, ttl, velocity, facing } = message;
 
   let animationFrames = [];
 
@@ -12,7 +12,7 @@ const projectileFiredHandler = (message) => {
     animationFrames.push(Assets.getTextureFromFrame(frameName));
   });
 
-  globalState.projectiles.push(new Projectile(animationFrames, frameId, origin, ttl, velocity));
+  globalState.projectiles.push(new Projectile(animationFrames, frameId, origin, ttl, velocity, facing));
 };
 
 export default projectileFiredHandler;

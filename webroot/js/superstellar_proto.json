@@ -137,9 +137,15 @@
                 },
                 {
                     "rule": "optional",
+                    "type": "float",
+                    "name": "facing",
+                    "id": 4
+                },
+                {
+                    "rule": "optional",
                     "type": "uint32",
                     "name": "ttl",
-                    "id": 4
+                    "id": 5
                 }
             ]
         },

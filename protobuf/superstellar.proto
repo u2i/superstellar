@@ -33,7 +33,8 @@ message ProjectileFired {
   uint32    frameId = 1;
   IntVector origin = 2;
   Vector    velocity = 3;
-  uint32    ttl = 4;
+  float     facing = 4;
+  uint32    ttl = 5;
 }
 
 message PlayerLeft {
