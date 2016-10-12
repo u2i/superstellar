@@ -11,8 +11,6 @@ export default class Projectile {
 
     this.animation = new PIXI.extras.MovieClip(animationFrames);
 
-    const frameOffset = frameId - globalState.physicsFrameID;
-
     this.position = new PIXI.Point();
 
     this._updatePosition();
