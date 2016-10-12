@@ -58,7 +58,6 @@ PIXI.loader.
 
 let tilingSprite;
 
-let thrustAnim;
 let hud;
 
 function setup() {
