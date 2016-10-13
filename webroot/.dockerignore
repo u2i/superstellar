@@ -1,0 +1,6 @@
+**/*.js
+!app.js
+!vendor.js
+node_modules
+.*
+Dockerfile
