@@ -18,13 +18,13 @@ const (
 
 const (
 	// Acceleration is spaceship's linear acceleration on thruster.
-	Acceleration = 0.2
+	Acceleration = 20.0
 
 	// AngularVelocity is an angular velocity added on user input.
 	AngularVelocity = 0.1
 
 	// MaxSpeed maximum speed of the spacecraft
-	MaxSpeed = 20
+	MaxSpeed = 2000
 
 	// MinFireInterval is a minimum time between firing.
 	MinFireInterval = 500 * time.Millisecond
@@ -33,7 +33,7 @@ const (
 // Spaceship struct describes a spaceship.
 type Spaceship struct {
 	ID             uint32
-	Position       *IntVector
+	Position       *Point
 	Velocity       *Vector
 	Facing         *Vector
 	InputThrust    bool
@@ -43,7 +43,7 @@ type Spaceship struct {
 }
 
 // NewSpaceship initializes new spaceship facing north with zero velocity.
-func NewSpaceship(id uint32, position *IntVector) *Spaceship {
+func NewSpaceship(id uint32, position *Point) *Spaceship {
 	return &Spaceship{
 		ID:             id,
 		Position:       position,

@@ -6,20 +6,21 @@ import (
 )
 
 const (
-	DefaultTtl      = 50
+	// DefaultTTL describes the default number of frames the projectile lives.
+	DefaultTTL = 50
+
+	// ProjectileSpeed describes projectile speed. Captain Obvious.
 	ProjectileSpeed = 2000
-	// TODO: remove Konarski's factor
-	KonarskiFactor = 100
 )
 
-// Shot struct holds players' shots data.
+// Projectile struct holds players' shots data.
 type Projectile struct {
 	ClientID uint32
 	FrameID  uint32
 	Facing   float32
-	Origin   *IntVector
+	Origin   *Point
 	Velocity *Vector
-	Position *IntVector
+	Position *Point
 }
 
 // NewProjectile returns new instance of Projectile
@@ -32,8 +33,7 @@ func NewProjectile(spaceship *Spaceship, frameID uint32) *Projectile {
 		Origin:   spaceship.Position,
 		Position: spaceship.Position,
 		Facing:   facing,
-		// TODO: remove Konarski's factor
-		Velocity: spaceship.Facing.Multiply(ProjectileSpeed).Add(spaceship.Velocity.Multiply(KonarskiFactor)),
+		Velocity: spaceship.Facing.Multiply(ProjectileSpeed).Add(spaceship.Velocity),
 	}
 }
 
@@ -41,7 +41,7 @@ func (projectile *Projectile) toProto() *pb.ProjectileFired {
 	return &pb.ProjectileFired{
 		FrameId:  projectile.FrameID,
 		Origin:   projectile.Origin.toProto(),
-		Ttl:      DefaultTtl,
+		Ttl:      DefaultTTL,
 		Facing:   projectile.Facing,
 		Velocity: projectile.Velocity.toProto(),
 	}

@@ -46,7 +46,7 @@
             }
         },
         {
-            "name": "IntVector",
+            "name": "Point",
             "fields": [
                 {
                     "rule": "optional",
@@ -90,7 +90,7 @@
                 },
                 {
                     "rule": "optional",
-                    "type": "IntVector",
+                    "type": "Point",
                     "name": "position",
                     "id": 2
                 },
@@ -125,7 +125,7 @@
                 },
                 {
                     "rule": "optional",
-                    "type": "IntVector",
+                    "type": "Point",
                     "name": "origin",
                     "id": 2
                 },

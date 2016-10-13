@@ -189,7 +189,7 @@ func (s *Server) handleAddNewClient(client *Client) {
 	log.Println("Added new client")
 
 	s.clients[client.id] = client
-	spaceship := NewSpaceship(client.id, NewIntVector(0, 0))
+	spaceship := NewSpaceship(client.id, NewPoint(0, 0))
 	s.space.AddSpaceship(client.id, spaceship)
 
 	s.sendHelloMessage(client)

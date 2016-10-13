@@ -11,7 +11,7 @@ message Message {
   }
 }
 
-message IntVector {
+message Point {
   int32 x = 1;
   int32 y = 2;
 }
@@ -23,7 +23,7 @@ message Vector {
 
 message Spaceship {
   uint32    id = 1;
-  IntVector position = 2;
+  Point     position = 2;
   Vector    velocity = 3;
   float     facing = 4;
   bool      inputThrust = 5;
@@ -31,7 +31,7 @@ message Spaceship {
 
 message ProjectileFired {
   uint32    frameId = 1;
-  IntVector origin = 2;
+  Point     origin = 2;
   Vector    velocity = 3;
   float     facing = 4;
   uint32    ttl = 5;
