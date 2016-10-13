@@ -8,7 +8,7 @@ import { initializeHandlers } from './messageHandlers';
 import { initializeControls } from './controls';
 import Hud from './hud';
 
-const HOST = BACKEND_HOST;
+const HOST = window.location.hostname;
 const PORT = BACKEND_PORT;
 const PATH = '/superstellar';
 
