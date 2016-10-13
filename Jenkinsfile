@@ -78,7 +78,9 @@ stage('Build frontend') {
 }
 
 masterBranchOnly {
-    stage(name: 'Deploy', concurrency: 1) {
+    stage(name: 'Deploy') {
+        milestone label: 'deploy'
+
         node('docker') {
             withCleanup {
                 String fileName = java.util.UUID.randomUUID().toString()
