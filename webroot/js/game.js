@@ -72,7 +72,7 @@ function setup() {
 
   overlay = new PIXI.Graphics();
   overlay.drawRect(0, 0, 10, 10);
-  overlay.filterArea = new PIXI.Rectangle(0, 0, 800, 600);
+  overlay.filterArea = new PIXI.Rectangle(0, 0, renderer.width, renderer.width);
   overlay.filters = [fogShader];
   stage.addChild(overlay);
 
@@ -80,6 +80,16 @@ function setup() {
 
   main();
 }
+
+window.addEventListener("resize", () => {
+  Utils.getCurrentWindowSize((width, height) => {
+    renderer.resize(width, height);
+    tilingSprite.width = width;
+    tilingSprite.height = height;
+    overlay.filterArea.width = width;
+    overlay.filterArea.height = height;
+  });
+});
 
 var viewport = {vx: 0, vy: 0, width: 800, height: 600}
 
