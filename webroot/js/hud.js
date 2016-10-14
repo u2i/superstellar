@@ -39,14 +39,16 @@ export default class Hud {
   _updateHudText () {
     const playerShip = globalState.spaceshipMap.get(globalState.clientId);
 
-    let text = "Ships: " + globalState.spaceshipMap.size + "\n";
+    let text = "FPS: " + this.fps + "\n";
+    text += "Ships: " + globalState.spaceshipMap.size + "\n";
 
-    let x = playerShip ? Math.floor(playerShip.position.x / 100) : '?';
-    let y = playerShip ? Math.floor(playerShip.position.y / 100) : '?';
+    if (__DEBUG__) {
+      let x = playerShip ? Math.floor(playerShip.position.x / 100) : '?';
+      let y = playerShip ? Math.floor(playerShip.position.y / 100) : '?';
 
-    text += "FPS: " + this.fps + "\n";
-    text += "X: " + x + "\n";
-    text += "Y: " + y + "\n";
+      text += "X: " + x + "\n";
+      text += "Y: " + y + "\n";
+    }
 
     return text;
   }

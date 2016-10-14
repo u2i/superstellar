@@ -24,10 +24,11 @@ module.exports = {
     },
     plugins: [
         new webpack.optimize.CommonsChunkPlugin("vendor", "vendor.js"),
-
         new webpack.DefinePlugin({
             'BACKEND_HOST': JSON.stringify(process.env.BACKEND_HOST || 'localhost'),
-            'BACKEND_PORT': JSON.stringify(process.env.BACKEND_PORT || '8080')
+            'BACKEND_PORT': JSON.stringify(process.env.BACKEND_PORT || '8080'),
+            '__DEBUG__': process.env.DEBUG
+
         })
     ],
     postLoaders: [{

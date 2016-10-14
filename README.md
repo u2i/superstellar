@@ -27,6 +27,18 @@ It's possible to dump various information from the running server, e.g. stacktra
 1. Run server
 1. Go to [http://localhost:8080/debug/pprof/](http://localhost:8080/debug/pprof/)
 
+## Using JS `__DEBUG__` flag
+
+If you run `DEBUG=true npm run dev` you will see additional debugging
+informations. You can add your own debugging info in code. Just detect that
+we're in the debug mode:
+
+```javascript
+if (__DEBUG__) {
+   console.log("I'm in debug mode!");
+}
+```
+
 ## Compiling protobufs
 
 ### Golang
