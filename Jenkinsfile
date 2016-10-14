@@ -22,59 +22,62 @@ stage('Checkout') {
     }
 }   
 
-stage('Build & Test backend') {
-    node('docker') {
-        withCleanup {
-            unstash 'source'
+stage('Build & Test') {
+    parallel(
+        backend: {
+            node('docker') {
+                withCleanup {
+                    unstash 'source'
 
-            docker.image('golang:1.7.1').inside("-e HOME=/go -w /go/src/superstellar -v ${pwd()}:/go/src/superstellar") {
-                sh 'git config --global user.name "Dummy" && git config --global user.email "dummy@example.com"'
-                sh """
-                    go get superstellar github.com/onsi/ginkgo github.com/onsi/gomega
-                    go build superstellar
-                    go test superstellar
-                """
-                sh 'cp /go/bin/superstellar .'
-            }
+                    docker.image('golang:1.7.1').inside("-e HOME=/go -w /go/src/superstellar -v ${pwd()}:/go/src/superstellar") {
+                        sh 'git config --global user.name "Dummy" && git config --global user.email "dummy@example.com"'
+                        sh """
+                            go get superstellar github.com/onsi/ginkgo github.com/onsi/gomega
+                            go build superstellar
+                            go test superstellar
+                        """
+                        sh 'cp /go/bin/superstellar .'
+                    }
 
-            stage('Package & Publish backend') {
-                masterBranchOnly {
-                    def image = docker.build('u2i/superstellar')
+                    masterBranchOnly {
+                        stage('Package & Publish backend') {
+                            def image = docker.build('u2i/superstellar')
 
-                    privateRegistry {
-                        image.push(env.BUILD_NUMBER)
-                        image.push('latest')
+                            privateRegistry {
+                                image.push(env.BUILD_NUMBER)
+                                image.push('latest')
+                            }
+                        }
                     }
                 }
             }
-        }
-    }
-}
+        },
+        frontend: {
+            node('docker') {
+                withCleanup {
+                    unstash 'source'
 
-stage('Build frontend') {
-    node('docker') {
-        withCleanup {
-            unstash 'source'
+                    dir('webroot') {
+                        docker.image('node:6.7').inside("-e HOME=${pwd()}") {
+                            sh 'npm --quiet install'
+                            sh 'PATH=$PATH:node_modules/.bin npm --quiet run build'
+                        }
 
-            dir('webroot') {
-                docker.image('node:6.7').inside("-e HOME=${pwd()}") {
-                    sh 'npm --quiet install'
-                    sh 'PATH=$PATH:node_modules/.bin npm --quiet run build'
-                }
+                        masterBranchOnly {
+                            stage('Package & Publish frontend') {
+                                def image = docker.build('u2i/superstellar_nginx')
 
-                stage('Package & Publish frontend') {
-                    masterBranchOnly {
-                        def image = docker.build('u2i/superstellar_nginx')
-
-                        privateRegistry {
-                            image.push(env.BUILD_NUMBER)
-                            image.push('latest')
+                                privateRegistry {
+                                    image.push(env.BUILD_NUMBER)
+                                    image.push('latest')
+                                }
+                            }
                         }
                     }
                 }
             }
         }
-    }
+    )
 }
 
 masterBranchOnly {
