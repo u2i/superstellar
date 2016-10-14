@@ -1,3 +1,5 @@
+[![Build Status](http://jenkins.talkwit.tv/buildStatus/icon?job=u2i/superstellar/master)](http://jenkins.talkwit.tv/job/u2i/job/superstellar/job/master/)
+
 # superstellar
 Massive multiplayer galactic game written in Golang
 
