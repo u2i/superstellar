@@ -118,7 +118,15 @@ def aws(String cmd) {
 }
 
 def privateRegistry(Closure cl) {
-    docker.withRegistry(DOCKER_REGISTRY_URL, DOCKER_REGISTRY_CREDENTIALS) {
+    String fileName = java.util.UUID.randomUUID().toString()
+
+    aws("--region eu-central-1 ecr get-login > $fileName")
+
+    String dockerLoginCommand = readFile(fileName).trim()
+
+    sh dockerLoginCommand
+
+    docker.withRegistry(DOCKER_REGISTRY_URL) {
         cl()
     }
 }
