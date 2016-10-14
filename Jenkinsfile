@@ -100,6 +100,23 @@ masterBranchOnly {
             }
         }
     }
+
+    stage(name: 'Health Check') {
+        sleep 10
+
+        retry(5) {
+            try {
+                node('docker') {
+                    withCleanup {
+                        sh 'docker run --rm appropriate/curl --fail -I http://superstellar.u2i.is'
+                    }
+                }
+            } catch(Exception e) {
+                sleep 10
+                throw e
+            }
+        }
+    }
 }
 
 def masterBranchOnly(Closure cl) {
