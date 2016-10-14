@@ -19,6 +19,7 @@ export default class Projectile {
     this.animation.position.set(this.position.x / 100, this.position.y / 100);
     this.animation.rotation = this.facing;
     this.animation.animationSpeed = 10;
+    this.animation.pivot.set(0, this.animation.height / 2);
     this.animation.play();
 
     stage.addChild(this.animation);
