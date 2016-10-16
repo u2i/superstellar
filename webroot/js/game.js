@@ -18,6 +18,7 @@ function AnnulusFilter() {
   PIXI.Filter.call(this, null, shaderContent);
   this.uniforms.worldCoordinates = new Float32Array([0.0, 0.0]);
   this.uniforms.worldSize = new Float32Array([1000.0, 1400.0]);
+  this.uniforms.windowSize = new Float32Array([renderer.width, renderer.height]);
   this.uniforms.magicMatrix = new PIXI.Matrix;
 }
 
@@ -33,6 +34,9 @@ Object.defineProperties(AnnulusFilter.prototype,
   worldSize: {
     get: function () {return this.uniforms.worldSize;},
     set: function (value) {this.uniforms.worldSize = value;}
+  },
+  windowSize: {
+    set: function (value) {this.uniforms.windowSize = value;}
   }
 });
 
@@ -72,7 +76,7 @@ function setup() {
 
   overlay = new PIXI.Graphics();
   overlay.drawRect(0, 0, 10, 10);
-  overlay.filterArea = new PIXI.Rectangle(0, 0, renderer.width, renderer.width);
+  overlay.filterArea = new PIXI.Rectangle(0, 0, renderer.width, renderer.height);
   overlay.filters = [fogShader];
   stage.addChild(overlay);
 
@@ -88,10 +92,12 @@ window.addEventListener("resize", () => {
     tilingSprite.height = height;
     overlay.filterArea.width = width;
     overlay.filterArea.height = height;
+    fogShader.windowSize[0] = width;
+    fogShader.windowSize[1] = height;
   });
 });
 
-var viewport = {vx: 0, vy: 0, width: 800, height: 600}
+var viewport = {vx: 0, vy: 0, width: renderer.width, height: renderer.height}
 
 // Draw everything
 var render = function () {
