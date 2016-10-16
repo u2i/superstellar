@@ -86,15 +86,14 @@ function setup() {
 }
 
 window.addEventListener("resize", () => {
-  Utils.getCurrentWindowSize((width, height) => {
-    renderer.resize(width, height);
-    tilingSprite.width = width;
-    tilingSprite.height = height;
-    overlay.filterArea.width = width;
-    overlay.filterArea.height = height;
-    fogShader.windowSize[0] = width;
-    fogShader.windowSize[1] = height;
-  });
+  const windowSize = Utils.getCurrentWindowSize();
+  renderer.resize(windowSize.width, windowSize.height);
+  tilingSprite.width = windowSize.width;
+  tilingSprite.height = windowSize.height;
+  overlay.filterArea.width = windowSize.width;
+  overlay.filterArea.height = windowSize.height;
+  fogShader.windowSize[0] = windowSize.width;
+  fogShader.windowSize[1] = windowSize.width;
 });
 
 var viewport = {vx: 0, vy: 0, width: renderer.width, height: renderer.height}

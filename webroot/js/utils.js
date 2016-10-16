@@ -4,7 +4,7 @@ export const translateToViewport = (x, y, viewport) => {
 	return {x: newX, y: newY}
 };
 
-export const getCurrentWindowSize = (callback) => {
+export const getCurrentWindowSize = () => {
   const width = window.innerWidth
   || document.documentElement.clientWidth
   || document.body.clientWidth;
@@ -13,5 +13,5 @@ export const getCurrentWindowSize = (callback) => {
   || document.documentElement.clientHeight
   || document.body.clientHeight;
 
-  return callback(width, height);
+  return {width: width, height: height};
 };

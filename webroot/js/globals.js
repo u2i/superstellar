@@ -1,7 +1,9 @@
 import { getCurrentWindowSize } from './utils';
 
-export const renderer = getCurrentWindowSize(
-  (width, height) => new PIXI.WebGLRenderer(width, height, {autoResize: true})
+const windowSize = getCurrentWindowSize();
+
+export const renderer = new PIXI.WebGLRenderer(
+  windowSize.width, windowSize.height, {autoResize: true}
 );
 export const stage = new PIXI.Container();
 
