@@ -2,7 +2,7 @@ import * as PIXI from "pixi.js";
 import Assets from './assets';
 import * as Constants from './constants';
 import * as Utils from './utils';
-import { renderer, stage, globalState } from './globals';
+import { renderer, stage, globalState, hudRightOffset } from './globals';
 import { initializeConnection, sendMessage, UserMessage } from './communicationLayer';
 import { initializeHandlers } from './messageHandlers';
 import { initializeControls } from './controls';
@@ -80,7 +80,7 @@ function setup() {
   overlay.filters = [fogShader];
   stage.addChild(overlay);
 
-  hud = new Hud();
+  hud = new Hud(renderer.width);
 
   main();
 }
@@ -92,8 +92,7 @@ window.addEventListener("resize", () => {
   tilingSprite.height = windowSize.height;
   overlay.filterArea.width = windowSize.width;
   overlay.filterArea.height = windowSize.height;
-  fogShader.windowSize[0] = windowSize.width;
-  fogShader.windowSize[1] = windowSize.width;
+  hud.text.x = windowSize.width - hudRightOffset;
 });
 
 var viewport = {vx: 0, vy: 0, width: renderer.width, height: renderer.height}
