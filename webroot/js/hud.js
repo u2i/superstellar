@@ -1,8 +1,8 @@
 import * as PIXI from "pixi.js";
-import { globalState, stage, hudRightOffset } from './globals';
+import { globalState, stage } from './globals';
 
 export default class Hud {
-  constructor (canvasWidth) {
+  constructor () {
     this.hudTextStyle = {
       fontFamily: 'Helvetica',
       fontSize: '24px',
@@ -12,8 +12,6 @@ export default class Hud {
     };
 
     this.text = new PIXI.Text('', this.hudTextStyle);
-    this.text.x = canvasWidth - hudRightOffset;
-    this.text.y = 0;
 
     this.frameCounter = 0;
     this.fps = 0;
@@ -34,6 +32,11 @@ export default class Hud {
     }
 
     this.text.text = this._updateHudText();
+  }
+
+  setPosition(width, height = 0) {
+    this.text.x = width;
+    this.text.y = height;
   }
 
   _updateHudText () {

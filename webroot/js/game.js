@@ -80,7 +80,8 @@ function setup() {
   overlay.filters = [fogShader];
   stage.addChild(overlay);
 
-  hud = new Hud(renderer.width);
+  hud = new Hud();
+  hud.setPosition(renderer.width - hudRightOffset);
 
   main();
 }
@@ -92,7 +93,7 @@ window.addEventListener("resize", () => {
   tilingSprite.height = windowSize.height;
   overlay.filterArea.width = windowSize.width;
   overlay.filterArea.height = windowSize.height;
-  hud.text.x = windowSize.width - hudRightOffset;
+  hud.setPosition(windowSize.width - hudRightOffset);
 });
 
 var viewport = {vx: 0, vy: 0, width: renderer.width, height: renderer.height}
