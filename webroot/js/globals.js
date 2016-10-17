@@ -13,5 +13,3 @@ export const globalState = {
   physicsFrameID: 0,
   projectiles: []
 };
-
-export const hudRightOffset = 150;

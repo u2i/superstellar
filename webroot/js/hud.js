@@ -1,7 +1,13 @@
 import * as PIXI from "pixi.js";
 import { globalState, stage } from './globals';
 
+const rightOffset = 150;
+
 export default class Hud {
+    static get rightOffset() {
+      return rightOffset;
+    }
+
   constructor () {
     this.hudTextStyle = {
       fontFamily: 'Helvetica',
