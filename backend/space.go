@@ -5,6 +5,8 @@ import (
 	"math/rand"
 	"superstellar/backend/pb"
 	"time"
+	"log"
+	"container/list"
 )
 
 const (
@@ -77,18 +79,20 @@ func (space *Space) updatePhysics() {
 		if spaceship.InputThrust {
 			deltaVelocity := spaceship.getNormalizedFacing().Multiply(Acceleration)
 			spaceship.Velocity = spaceship.Velocity.Add(deltaVelocity)
-			if spaceship.Velocity.Length() > MaxSpeed {
-				spaceship.Velocity = spaceship.Velocity.Normalize().Multiply(MaxSpeed)
-			}
 		}
 
-		spaceship.Position = spaceship.Position.Add(spaceship.Velocity)
-		if spaceship.Position.Length() > WorldRadius {
+		if spaceship.Position.Add(spaceship.Velocity).Length() > WorldRadius {
 			outreachLength := spaceship.Position.Length() - WorldRadius
 			gravityAcceleration := -(outreachLength / BoundaryAnnulusWidth) * Acceleration
 			deltaVelocity := spaceship.Position.Normalize().Multiply(gravityAcceleration)
 			spaceship.Velocity = spaceship.Velocity.Add(deltaVelocity)
 		}
+
+		if spaceship.Velocity.Length() > MaxSpeed {
+			spaceship.Velocity = spaceship.Velocity.Normalize().Multiply(MaxSpeed)
+		}
+
+		spaceship.Position = spaceship.Position.Add(spaceship.Velocity)
 
 		angle := math.Atan2(spaceship.Facing.Y, spaceship.Facing.X)
 		switch spaceship.InputDirection {
@@ -100,6 +104,78 @@ func (space *Space) updatePhysics() {
 
 		spaceship.Facing = NewVector(math.Cos(angle), math.Sin(angle))
 	}
+
+	collided := make(map[*Spaceship]bool)
+	oldVelocity := make(map[*Spaceship]*Vector)
+
+	for _, spaceship := range space.Spaceships {
+
+		collided[spaceship] = true
+
+		for _, otherSpaceship := range space.Spaceships {
+			if !collided[otherSpaceship] && spaceship.detectCollision(otherSpaceship) {
+				if _, exists := oldVelocity[spaceship]; !exists {
+					oldVelocity[spaceship] = spaceship.Velocity.Multiply(-1.0)
+				}
+
+				if _, exists := oldVelocity[otherSpaceship]; !exists {
+					oldVelocity[otherSpaceship] = otherSpaceship.Velocity.Multiply(-1.0)
+				}
+
+				spaceship.collide(otherSpaceship)
+			}
+		}
+	}
+
+	queue := list.New()
+	collidedThisTurn := make(map[*Spaceship]bool)
+
+	for spaceship := range oldVelocity {
+		queue.PushBack(spaceship)
+		collidedThisTurn[spaceship] = true
+	}
+
+	for e := queue.Front(); e != nil; e = e.Next() {
+		spaceship := e.Value.(*Spaceship)
+		collidedThisTurn[spaceship] = true
+		spaceship.Position = spaceship.Position.Add(oldVelocity[spaceship])
+
+		for _, otherSpaceship := range space.Spaceships {
+			if !collidedThisTurn[otherSpaceship] && spaceship.detectCollision(otherSpaceship) {
+				oldVelocity[otherSpaceship] = otherSpaceship.Velocity.Multiply(-1.0)
+				queue.PushBack(otherSpaceship)
+
+				spaceship.collide(otherSpaceship)
+			}
+		}
+	}
+
+	// TODO kod przeciwzakrzepowy - wywalic jak zrobimy losowe spawnowanie
+	collided2 := make(map[*Spaceship]bool)
+
+	for _, spaceship := range space.Spaceships {
+		collided2[spaceship] = true
+		for _, otherSpaceship := range space.Spaceships {
+			if !collided2[otherSpaceship] && spaceship.detectCollision(otherSpaceship) {
+				log.Printf("COLLISON")
+				if val, exists := oldVelocity[spaceship]; exists {
+					log.Printf("ov1: %f %f", val.X, val.Y)
+				}
+				if val, exists := oldVelocity[otherSpaceship]; exists {
+					log.Printf("ov2: %f %f", val.X, val.Y)
+				}
+				log.Printf("v1: %f %f", spaceship.Velocity.X, spaceship.Velocity.Y)
+				log.Printf("v2: %f %f", otherSpaceship.Velocity.X, otherSpaceship.Velocity.Y)
+				log.Printf("p1: %d %d", spaceship.Position.X, spaceship.Position.Y)
+				log.Printf("p2: %d %d", otherSpaceship.Position.X, otherSpaceship.Position.Y)
+
+				randAngle := rand.Float64() * 2 * math.Pi
+				randMove := NewVector(5000, 0).Rotate(randAngle)
+				spaceship.Position = spaceship.Position.Add(randMove)
+			}
+		}
+	}
+	// koniec kodu przeciwzakrzepowego
 
 	space.PhysicsFrameID++
 }

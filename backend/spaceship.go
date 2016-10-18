@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"superstellar/backend/pb"
 	"time"
+	"math"
 )
 
 // Direction is a type describing user input on spaceship rotation.
@@ -24,7 +25,7 @@ const (
 	AngularVelocity = 0.1
 
 	// MaxSpeed maximum speed of the spacecraft
-	MaxSpeed = 2000
+	MaxSpeed = 1999
 
 	// MinFireInterval is a minimum time between firing.
 	MinFireInterval = 500 * time.Millisecond
@@ -92,4 +93,28 @@ func (s *Spaceship) toProto() *pb.Spaceship {
 		Facing:      float32(s.Facing.Radians()),
 		InputThrust: s.InputThrust,
 	}
+}
+
+func (s *Spaceship) detectCollision(other *Spaceship) bool {
+	v := Point{X: s.Position.X - other.Position.X, Y: s.Position.Y - other.Position.Y}
+	dist := v.Length()
+
+	return dist < 4000
+}
+
+func (s *Spaceship) collide(other *Spaceship) {
+	v := Point{
+		X: s.Position.X - other.Position.X,
+		Y: s.Position.Y - other.Position.Y,
+	}
+
+	transformAngle := -math.Atan2(float64(v.Y), float64(v.X))
+	newV1 := s.Velocity.Rotate(transformAngle)
+	newV2 := other.Velocity.Rotate(transformAngle)
+
+	switchedV1 := Vector{X: newV2.X, Y: newV1.Y}
+	switchedV2 := Vector{X: newV1.X, Y: newV2.Y}
+
+	s.Velocity = switchedV1.Rotate(-transformAngle)
+	other.Velocity = switchedV2.Rotate(-transformAngle)
 }

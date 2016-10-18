@@ -10,10 +10,22 @@ export default class Spaceship {
 
     this.thrustAnimation.position.set(-27, 7);
     this.thrustAnimation.animationSpeed = 0.5;
-    
+
+    if (__DEBUG__) {
+      this.collisionSphere = new PIXI.Graphics();
+      this.collisionSphere.beginFill(0xFF77FF);
+      this.collisionSphere.alpha = 0.3;
+      this.collisionSphere.drawCircle(this.sprite.width / 2, this.sprite.height / 2, 20);
+    }
+
     stage.addChild(this.container);
     this.container.addChild(this.sprite);
     this.container.addChild(this.thrustAnimation);
+
+    if (__DEBUG__) {
+      this.container.addChild(this.collisionSphere);
+    }
+
     this.container.pivot.set(this.sprite.width / 2, this.sprite.height / 2);
   }
 

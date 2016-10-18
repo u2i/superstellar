@@ -53,6 +53,13 @@ func (v *Vector) Radians() float64 {
 	return math.Atan2(-v.Y, v.X)
 }
 
+func (v *Vector) Rotate(angle float64) *Vector {
+	return &Vector{
+		X: math.Cos(angle) * v.X - math.Sin(angle) * v.Y,
+		Y: math.Sin(angle) * v.X + math.Cos(angle) * v.Y,
+	}
+}
+
 func (v *Vector) toProto() *pb.Vector {
 	return &pb.Vector{
 		X: float32(v.X),
