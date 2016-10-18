@@ -18,6 +18,7 @@ function AnnulusFilter() {
   PIXI.Filter.call(this, null, shaderContent);
   this.uniforms.worldCoordinates = new Float32Array([0.0, 0.0]);
   this.uniforms.worldSize = new Float32Array([1000.0, 1400.0]);
+  this.uniforms.dimensions = new Float32Array([renderer.width, renderer.height, 0, 0]);
   this.uniforms.magicMatrix = new PIXI.Matrix;
 }
 
@@ -33,6 +34,9 @@ Object.defineProperties(AnnulusFilter.prototype,
   worldSize: {
     get: function () {return this.uniforms.worldSize;},
     set: function (value) {this.uniforms.worldSize = value;}
+  },
+  dimensions: {
+    get: function () {return this.uniforms.dimensions;}
   }
 });
 
@@ -90,6 +94,8 @@ window.addEventListener("resize", () => {
   overlay.filterArea.width = windowSize.width;
   overlay.filterArea.height = windowSize.height;
   hud.setPosition(windowSize.width - Hud.rightOffset);
+  fogShader.dimensions[0] = windowSize.width;
+  fogShader.dimensions[1] = windowSize.height;
 });
 
 var viewport = {vx: 0, vy: 0, width: renderer.width, height: renderer.height}
