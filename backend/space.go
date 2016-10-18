@@ -129,10 +129,12 @@ func (space *Space) updatePhysics() {
 
 	queue := list.New()
 	collidedThisTurn := make(map[*Spaceship]bool)
+	visited := make(map[*Spaceship]bool)
 
 	for spaceship := range oldVelocity {
 		queue.PushBack(spaceship)
 		collidedThisTurn[spaceship] = true
+		visited[spaceship] = true
 	}
 
 	for e := queue.Front(); e != nil; e = e.Next() {
@@ -143,7 +145,10 @@ func (space *Space) updatePhysics() {
 		for _, otherSpaceship := range space.Spaceships {
 			if !collidedThisTurn[otherSpaceship] && spaceship.detectCollision(otherSpaceship) {
 				oldVelocity[otherSpaceship] = otherSpaceship.Velocity.Multiply(-1.0)
-				queue.PushBack(otherSpaceship)
+				if !visited[otherSpaceship] {
+					visited[otherSpaceship] = true
+					queue.PushBack(otherSpaceship)
+				}
 
 				spaceship.collide(otherSpaceship)
 			}
