@@ -1,12 +1,12 @@
 package backend
 
 import (
+	"container/list"
+	"log"
 	"math"
 	"math/rand"
 	"superstellar/backend/pb"
 	"time"
-	"log"
-	"container/list"
 )
 
 const (
@@ -19,17 +19,21 @@ const (
 
 // Space struct holds entire game state.
 type Space struct {
-	ShotsCh        chan *Projectile
-	Spaceships     map[uint32]*Spaceship `json:"spaceships"`
-	PhysicsFrameID uint32
+	ShotsCh          chan *Projectile
+	Spaceships       map[uint32]*Spaceship `json:"spaceships"`
+	Projectiles      map[*Projectile]bool
+	PhysicsFrameID   uint32
+	NextProjectileID uint32
 }
 
 // NewSpace initializes new Space.
 func NewSpace(shotsCh chan *Projectile) *Space {
 	return &Space{
-		ShotsCh:        shotsCh,
-		Spaceships:     make(map[uint32]*Spaceship),
-		PhysicsFrameID: 0,
+		ShotsCh:          shotsCh,
+		Spaceships:       make(map[uint32]*Spaceship),
+		Projectiles:      make(map[*Projectile]bool),
+		PhysicsFrameID:   0,
+		NextProjectileID: 0,
 	}
 }
 
@@ -43,6 +47,16 @@ func (space *Space) RemoveSpaceship(clientID uint32) {
 	delete(space.Spaceships, clientID)
 }
 
+// AddProjectile adds projectile to the space.``
+func (space *Space) AddProjectile(projectile *Projectile) {
+	space.Projectiles[projectile] = true
+}
+
+// RemoveProjectile removes projectile from the space.
+func (space *Space) RemoveProjectile(projectile *Projectile) {
+	delete(space.Projectiles, projectile)
+}
+
 // UpdateUserInput updates user input in correct spaceship
 func (space *Space) UpdateUserInput(userInput *UserInput) {
 	spaceship, found := space.Spaceships[userInput.ClientID]
@@ -50,6 +64,12 @@ func (space *Space) UpdateUserInput(userInput *UserInput) {
 	if found {
 		spaceship.updateUserInput(userInput)
 	}
+}
+
+func (space *Space) nextProjectileID() uint32 {
+	ID := space.NextProjectileID
+	space.NextProjectileID++
+	return ID
 }
 
 func (space *Space) randomUpdate() {
@@ -70,7 +90,9 @@ func (space *Space) updatePhysics() {
 		if spaceship.Fire {
 			timeSinceLastShot := now.Sub(spaceship.LastShotTime)
 			if timeSinceLastShot >= MinFireInterval {
-				projectile := NewProjectile(spaceship, space.PhysicsFrameID)
+				projectile := NewProjectile(space.nextProjectileID(),
+					space.PhysicsFrameID, spaceship)
+				space.AddProjectile(projectile)
 				space.ShotsCh <- projectile
 				spaceship.LastShotTime = now
 			}
@@ -183,6 +205,17 @@ func (space *Space) updatePhysics() {
 	// koniec kodu przeciwzakrzepowego
 
 	space.PhysicsFrameID++
+}
+
+func (space *Space) updateProjectiles() {
+	for projectile := range space.Projectiles {
+		projectile.TTL--
+		if projectile.TTL > 0 {
+			projectile.Position = projectile.Position.Add(projectile.Velocity)
+		} else {
+			space.RemoveProjectile(projectile)
+		}
+	}
 }
 
 func (space *Space) toProto() *pb.Space {

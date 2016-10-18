@@ -120,32 +120,38 @@
                 {
                     "rule": "optional",
                     "type": "uint32",
-                    "name": "frameId",
+                    "name": "Id",
                     "id": 1
+                },
+                {
+                    "rule": "optional",
+                    "type": "uint32",
+                    "name": "frameId",
+                    "id": 2
                 },
                 {
                     "rule": "optional",
                     "type": "Point",
                     "name": "origin",
-                    "id": 2
+                    "id": 3
                 },
                 {
                     "rule": "optional",
                     "type": "Vector",
                     "name": "velocity",
-                    "id": 3
+                    "id": 4
                 },
                 {
                     "rule": "optional",
                     "type": "float",
                     "name": "facing",
-                    "id": 4
+                    "id": 5
                 },
                 {
                     "rule": "optional",
                     "type": "uint32",
                     "name": "ttl",
-                    "id": 5
+                    "id": 6
                 }
             ]
         },

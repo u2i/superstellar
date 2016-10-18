@@ -53,10 +53,11 @@ func (v *Vector) Radians() float64 {
 	return math.Atan2(-v.Y, v.X)
 }
 
+// Rotate returns rotated vector by give angle.
 func (v *Vector) Rotate(angle float64) *Vector {
 	return &Vector{
-		X: math.Cos(angle) * v.X - math.Sin(angle) * v.Y,
-		Y: math.Sin(angle) * v.X + math.Cos(angle) * v.Y,
+		X: math.Cos(angle)*v.X - math.Sin(angle)*v.Y,
+		Y: math.Sin(angle)*v.X + math.Cos(angle)*v.Y,
 	}
 }
 

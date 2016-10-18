@@ -30,11 +30,12 @@ message Spaceship {
 }
 
 message ProjectileFired {
-  uint32    frameId = 1;
-  Point     origin = 2;
-  Vector    velocity = 3;
-  float     facing = 4;
-  uint32    ttl = 5;
+  uint32    id = 1;
+  uint32    frameId = 2;
+  Point     origin = 3;
+  Vector    velocity = 4;
+  float     facing = 5;
+  uint32    ttl = 6;
 }
 
 message PlayerLeft {
