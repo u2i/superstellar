@@ -111,6 +111,18 @@
                     "type": "bool",
                     "name": "inputThrust",
                     "id": 5
+                },
+                {
+                    "rule": "optional",
+                    "type": "uint32",
+                    "name": "maxHp",
+                    "id": 6
+                },
+                {
+                    "rule": "optional",
+                    "type": "uint32",
+                    "name": "hp",
+                    "id": 7
                 }
             ]
         },
@@ -120,7 +132,7 @@
                 {
                     "rule": "optional",
                     "type": "uint32",
-                    "name": "Id",
+                    "name": "id",
                     "id": 1
                 },
                 {

@@ -29,12 +29,14 @@ export default class Spaceship {
     this.container.pivot.set(this.sprite.width / 2, this.sprite.height / 2);
   }
 
-  updateData ({ id, position, velocity, facing, inputThrust }) {
+  updateData ({ id, position, velocity, facing, inputThrust, hp, maxHp }) {
     this.id = id;
     this.position = position;
     this.velocity = velocity;
     this.facing = facing;
     this.inputThrust = inputThrust;
+    this.hp = hp;
+    this.maxHp = maxHp;
   }
 
   update (viewport) {
@@ -47,8 +49,8 @@ export default class Spaceship {
     }
 
     const translatedPosition = Utils.translateToViewport(
-      this.position.x / 100, 
-      this.position.y / 100, 
+      this.position.x / 100,
+      this.position.y / 100,
       viewport
     )
 

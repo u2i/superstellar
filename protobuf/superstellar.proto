@@ -27,6 +27,8 @@ message Spaceship {
   Vector    velocity = 3;
   float     facing = 4;
   bool      inputThrust = 5;
+  uint32    maxHp = 6;
+  uint32    hp = 7;
 }
 
 message ProjectileFired {

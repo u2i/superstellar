@@ -30,6 +30,9 @@ const (
 
 	// MinFireInterval is a minimum time between firing.
 	MinFireInterval = 500 * time.Millisecond
+
+	// InitialHP spaceship HP
+	InitialHP = 500
 )
 
 // Spaceship struct describes a spaceship.
@@ -42,6 +45,8 @@ type Spaceship struct {
 	InputDirection Direction
 	Fire           bool
 	LastShotTime   time.Time
+	HP             uint32
+	MaxHP          uint32
 }
 
 // NewSpaceship initializes new spaceship facing north with zero velocity.
@@ -55,6 +60,8 @@ func NewSpaceship(id uint32, position *types.Point) *Spaceship {
 		InputDirection: NONE,
 		Fire:           false,
 		LastShotTime:   time.Now(),
+		HP:             InitialHP,
+		MaxHP:          InitialHP,
 	}
 }
 
@@ -93,6 +100,8 @@ func (s *Spaceship) ToProto() *pb.Spaceship {
 		Velocity:    s.Velocity.ToProto(),
 		Facing:      float32(s.Facing.Radians()),
 		InputThrust: s.InputThrust,
+		MaxHp:       s.MaxHP,
+		Hp:          s.HP,
 	}
 }
 

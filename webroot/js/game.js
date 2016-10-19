@@ -108,7 +108,6 @@ var render = function () {
   let backgroundPos = Utils.translateToViewport(0, 0, viewport);
   tilingSprite.tilePosition.set(backgroundPos.x, backgroundPos.y);
 
-
   if (globalState.spaceshipMap.size > 0) {
     myShip = globalState.spaceshipMap.get(globalState.clientId);
     viewport = myShip.viewport();
