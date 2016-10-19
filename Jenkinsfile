@@ -108,7 +108,7 @@ masterBranchOnly {
 
                 node('docker') {
                     withCleanup {
-                        sh script: 'docker run --rm appropriate/curl --fail -I http://superstellar.u2i.is', returnStatus: true
+                        r = sh script: 'docker run --rm appropriate/curl --fail -I http://superstellar.u2i.is', returnStatus: true
                     }
                 }
 
