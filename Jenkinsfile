@@ -102,18 +102,17 @@ masterBranchOnly {
     }
 
     stage(name: 'Health Check') {
-        sleep 10
+        timeout(120) {
+            waitUntil {
+                def r = 0
 
-        retry(5) {
-            try {
                 node('docker') {
                     withCleanup {
-                        sh 'docker run --rm appropriate/curl --fail -I http://superstellar.u2i.is'
+                        sh script: 'docker run --rm appropriate/curl --fail -I http://superstellar.u2i.is', returnStatus: true
                     }
                 }
-            } catch(Exception e) {
-                sleep 10
-                throw e
+
+                return (r == 0);
             }
         }
     }
