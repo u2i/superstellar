@@ -19,6 +19,15 @@ func UpdatePhysics(space *space.Space) {
 func updateSpaceships(s *space.Space) {
 	now := time.Now()
 
+	for projectile := range s.Projectiles {
+		for clientID, spaceship := range s.Spaceships {
+			if projectile.ClientID != clientID && projectile.DetectCollision(spaceship) {
+				spaceship.CollideWithProjectile(projectile)
+				s.RemoveProjectile(projectile)
+			}
+		}
+	}
+
 	for _, spaceship := range s.Spaceships {
 		if spaceship.Fire {
 			timeSinceLastShot := now.Sub(spaceship.LastShotTime)

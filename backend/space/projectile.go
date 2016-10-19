@@ -53,3 +53,14 @@ func (projectile *Projectile) ToProto() *pb.ProjectileFired {
 		Velocity: projectile.Velocity.ToProto(),
 	}
 }
+
+func (projectile *Projectile) DetectCollision(spaceship *Spaceship) bool {
+	vA := types.Point{X: projectile.Position.X - spaceship.Position.X, Y: projectile.Position.Y - spaceship.Position.Y}
+	distA := vA.Length()
+
+	endPoint := projectile.Position.Add(projectile.Velocity)
+	vB := types.Point{X: endPoint.X - spaceship.Position.X, Y: endPoint.Y - spaceship.Position.Y}
+	distB := vB.Length()
+
+	return distA < ShipSize || distB < ShipSize
+}

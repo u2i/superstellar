@@ -28,6 +28,9 @@ const (
 	// MaxSpeed maximum speed of the spacecraft
 	MaxSpeed = 1999
 
+	// ShipSize is spaceship's radius
+	ShipSize = 2000
+
 	// MinFireInterval is a minimum time between firing.
 	MinFireInterval = 500 * time.Millisecond
 
@@ -112,7 +115,7 @@ func (s *Spaceship) DetectCollision(other *Spaceship) bool {
 	v := types.Point{X: s.Position.X - other.Position.X, Y: s.Position.Y - other.Position.Y}
 	dist := v.Length()
 
-	return dist < 4000
+	return dist < 2*ShipSize
 }
 
 // Collide transforms colliding ships' parameters.
@@ -131,4 +134,8 @@ func (s *Spaceship) Collide(other *Spaceship) {
 
 	s.Velocity = switchedV1.Rotate(-transformAngle)
 	other.Velocity = switchedV2.Rotate(-transformAngle)
+}
+
+func (s *Spaceship) CollideWithProjectile(projectile *Projectile) {
+	s.HP -= 100
 }

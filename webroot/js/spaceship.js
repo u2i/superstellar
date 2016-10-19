@@ -18,6 +18,16 @@ export default class Spaceship {
       this.collisionSphere.drawCircle(this.sprite.width / 2, this.sprite.height / 2, 20);
     }
 
+    this.hpTextStyle = {
+          fontFamily: 'Helvetica',
+          fontSize: '24px',
+          fill: '#FFFFFF',
+          align: 'left'
+        };
+
+    this.healthBar = new PIXI.Text('', this.hpTextStyle);
+	this.healthBar.y = -40
+
     stage.addChild(this.container);
     this.container.addChild(this.sprite);
     this.container.addChild(this.thrustAnimation);
@@ -25,6 +35,8 @@ export default class Spaceship {
     if (__DEBUG__) {
       this.container.addChild(this.collisionSphere);
     }
+
+	this.container.addChild(this.healthBar)
 
     this.container.pivot.set(this.sprite.width / 2, this.sprite.height / 2);
   }
@@ -56,6 +68,8 @@ export default class Spaceship {
 
     this.container.position.set(translatedPosition.x, translatedPosition.y);
     this.container.rotation = this.facing;
+
+    this.healthBar.text = this.hp;
   }
 
   remove () {
