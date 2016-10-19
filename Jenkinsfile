@@ -59,7 +59,7 @@ stage('Build & Test') {
 
                     dir('webroot') {
                         docker.image('node:6.7').inside("-e HOME=${pwd()}") {
-                            sh 'npm --quiet install'
+                            sh 'npm --quiet install && npm --quiet install babelify'
                             sh 'PATH=$PATH:node_modules/.bin npm --quiet run build'
                         }
 
