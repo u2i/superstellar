@@ -42,6 +42,7 @@ func NewProjectile(ID, frameID uint32, spaceship *Spaceship) *Projectile {
 	}
 }
 
+// ToProto returns protobuf representation
 func (projectile *Projectile) ToProto() *pb.ProjectileFired {
 	return &pb.ProjectileFired{
 		Id:       projectile.ID,

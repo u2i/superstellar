@@ -70,7 +70,8 @@ func (s *Spaceship) String() string {
 	return fmt.Sprintf("(%v, %v, %v)", s.Position, s.Velocity, s.Facing)
 }
 
-func (s *Spaceship) GetNormalizedFacing() *types.Vector {
+// NormalizedFacing return normalized facing vector.
+func (s *Spaceship) NormalizedFacing() *types.Vector {
 	return s.Facing.Normalize()
 }
 
@@ -93,6 +94,7 @@ func (s *Spaceship) updateUserInput(userInput *UserInput) {
 	}
 }
 
+// ToProto returns protobuf representation
 func (s *Spaceship) ToProto() *pb.Spaceship {
 	return &pb.Spaceship{
 		Id:          s.ID,
@@ -105,6 +107,7 @@ func (s *Spaceship) ToProto() *pb.Spaceship {
 	}
 }
 
+// DetectCollision returns true if receiver spaceship collides with other spaceship.
 func (s *Spaceship) DetectCollision(other *Spaceship) bool {
 	v := types.Point{X: s.Position.X - other.Position.X, Y: s.Position.Y - other.Position.Y}
 	dist := v.Length()
@@ -112,6 +115,7 @@ func (s *Spaceship) DetectCollision(other *Spaceship) bool {
 	return dist < 4000
 }
 
+// Collide transforms colliding ships' parameters.
 func (s *Spaceship) Collide(other *Spaceship) {
 	v := types.Point{
 		X: s.Position.X - other.Position.X,

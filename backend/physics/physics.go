@@ -32,7 +32,7 @@ func updateSpaceships(s *space.Space) {
 		}
 
 		if spaceship.InputThrust {
-			deltaVelocity := spaceship.GetNormalizedFacing().Multiply(space.Acceleration)
+			deltaVelocity := spaceship.NormalizedFacing().Multiply(space.Acceleration)
 			spaceship.Velocity = spaceship.Velocity.Add(deltaVelocity)
 		}
 

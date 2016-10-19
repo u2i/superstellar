@@ -62,6 +62,7 @@ func (space *Space) UpdateUserInput(userInput *UserInput) {
 	}
 }
 
+// NextProjectileID returns next unused projectile ID.
 func (space *Space) NextProjectileID() uint32 {
 	ID := space.NextProjectileIDValue
 	space.NextProjectileIDValue++
@@ -79,6 +80,7 @@ func (space *Space) randomUpdate() {
 	}
 }
 
+// ToProto returns protobuf representation
 func (space *Space) ToProto() *pb.Space {
 	protoSpaceships := make([]*pb.Spaceship, 0, len(space.Spaceships))
 	for _, spaceship := range space.Spaceships {
@@ -88,6 +90,7 @@ func (space *Space) ToProto() *pb.Space {
 	return &pb.Space{Spaceships: protoSpaceships, PhysicsFrameID: space.PhysicsFrameID}
 }
 
+// ToMessage returns protobuffer Message object with Space set.
 func (space *Space) ToMessage() *pb.Message {
 	return &pb.Message{
 		Content: &pb.Message_Space{
