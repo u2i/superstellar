@@ -4,7 +4,7 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
-	"superstellar/backend"
+	"superstellar/backend/server"
 	"time"
 )
 
@@ -15,7 +15,7 @@ func main() {
 
 	rand.Seed(time.Now().UTC().UnixNano())
 	// websocket server
-	server := backend.NewServer("/superstellar")
+	server := server.NewServer("/superstellar")
 	go server.Listen()
 
 	log.Fatal(http.ListenAndServe(":8080", nil))
