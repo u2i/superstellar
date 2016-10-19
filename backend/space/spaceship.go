@@ -52,22 +52,6 @@ type Spaceship struct {
 	MaxHP          uint32
 }
 
-// NewSpaceship initializes new spaceship facing north with zero velocity.
-func NewSpaceship(id uint32, position *types.Point) *Spaceship {
-	return &Spaceship{
-		ID:             id,
-		Position:       position,
-		Velocity:       types.ZeroVector(),
-		Facing:         types.NewVector(0.0, 1.0),
-		InputThrust:    false,
-		InputDirection: NONE,
-		Fire:           false,
-		LastShotTime:   time.Now(),
-		HP:             InitialHP,
-		MaxHP:          InitialHP,
-	}
-}
-
 // String function returns string representation.
 func (s *Spaceship) String() string {
 	return fmt.Sprintf("(%v, %v, %v)", s.Position, s.Velocity, s.Facing)

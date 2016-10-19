@@ -6,7 +6,6 @@ import (
 	"superstellar/backend/pb"
 	"superstellar/backend/physics"
 	"superstellar/backend/space"
-	"superstellar/backend/types"
 	"time"
 
 	"github.com/golang/protobuf/proto"
@@ -192,9 +191,7 @@ func (s *Server) handleAddNewClient(client *Client) {
 	log.Println("Added new client")
 
 	s.clients[client.id] = client
-	spaceship := space.NewSpaceship(client.id, types.NewPoint(0, 0))
-	s.space.AddSpaceship(client.id, spaceship)
-
+	s.space.NewSpaceship(client.id)
 	s.sendHelloMessage(client)
 
 	log.Println("Now", len(s.clients), "clients connected.")

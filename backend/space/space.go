@@ -1,8 +1,12 @@
 package space
 
 import (
+	"log"
+	"math"
 	"math/rand"
 	"superstellar/backend/pb"
+	"superstellar/backend/types"
+	"time"
 )
 
 const (
@@ -11,6 +15,10 @@ const (
 
 	// BoundaryAnnulusWidth is the width of boundary region (in .01 units), i.e. from WorldRadius till when no more movement is possible
 	BoundaryAnnulusWidth = 20000
+
+	// RandomPositionEmptyRadius describes the minimum radius around randomized
+	// initial position that needs to be free of any objects.
+	RandomPositionEmptyRadius = 5000.0
 )
 
 // Space struct holds entire game state.
@@ -31,6 +39,24 @@ func NewSpace(shotsCh chan *Projectile) *Space {
 		PhysicsFrameID:        0,
 		NextProjectileIDValue: 0,
 	}
+}
+
+// NewSpaceship creates a new spaceship and adds it to the space.
+func (space *Space) NewSpaceship(clientID uint32) {
+	spaceship := &Spaceship{
+		ID:             clientID,
+		Position:       space.randomEmptyPosition(),
+		Velocity:       types.ZeroVector(),
+		Facing:         types.NewVector(0.0, 1.0),
+		InputThrust:    false,
+		InputDirection: NONE,
+		Fire:           false,
+		LastShotTime:   time.Now(),
+		HP:             InitialHP,
+		MaxHP:          InitialHP,
+	}
+
+	space.AddSpaceship(clientID, spaceship)
 }
 
 // AddSpaceship adds new spaceship to the space.
@@ -69,17 +95,6 @@ func (space *Space) NextProjectileID() uint32 {
 	return ID
 }
 
-func (space *Space) randomUpdate() {
-	for _, e := range space.Spaceships {
-		if rand.Float64() < 0.05 {
-			e.InputThrust = !e.InputThrust
-		}
-		if rand.Float64() < 0.03 {
-			e.InputDirection = Direction(rand.Int() % 3)
-		}
-	}
-}
-
 // ToProto returns protobuf representation
 func (space *Space) ToProto() *pb.Space {
 	protoSpaceships := make([]*pb.Spaceship, 0, len(space.Spaceships))
@@ -97,4 +112,49 @@ func (space *Space) ToMessage() *pb.Message {
 			Space: space.ToProto(),
 		},
 	}
+}
+
+// RandomEmptyPosition return randomized position within the space that is
+// no closer to any object than given radius.
+func (space *Space) randomEmptyPosition() *types.Point {
+	for {
+		position := space.randomPoint()
+		if space.furtherFromAnyObject(position, RandomPositionEmptyRadius) {
+			return position
+		}
+	}
+}
+
+func (space *Space) randomPoint() *types.Point {
+	angle := rand.Float64() * 2 * math.Pi
+	radius := rand.Uint32() % (WorldRadius + 1)
+
+	return types.NewPointFromPolar(angle, radius)
+}
+
+func (space *Space) furtherFromAnyObject(position *types.Point, radius float64) bool {
+	objectsPositions := space.allObjectsPositions()
+	for _, objectPosition := range objectsPositions {
+		if objectPosition.Distance(position) < radius {
+			return false
+		}
+	}
+
+	return true
+}
+
+func (space *Space) allObjectsPositions() []*types.Point {
+	var positions []*types.Point
+
+	for _, spaceship := range space.Spaceships {
+		log.Printf("%d %d", spaceship.Position.X, spaceship.Position.Y)
+		positions = append(positions, spaceship.Position)
+	}
+
+	for projectile := range space.Projectiles {
+		log.Printf("%d %d", projectile.Position.X, projectile.Position.Y)
+		positions = append(positions, projectile.Position)
+	}
+
+	return positions
 }
