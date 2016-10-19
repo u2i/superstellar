@@ -82,7 +82,7 @@ stage('Build & Test') {
 
 masterBranchOnly {
     stage(name: 'Deploy') {
-        milestone label: 'deploy'
+        milestone
 
         node('docker') {
             withCleanup {
