@@ -1,4 +1,4 @@
-import { sendMessage, UserMessage } from './communicationLayer';
+import { sendMessage, UserAction } from './communicationLayer';
 
 const KEY_SPACE = 32;
 const KEY_UP    = 38;
@@ -42,9 +42,9 @@ const sendInput = (keyCode, isPressed) => {
       break;
   }
 
-  let userMessage = new UserMessage(userInput);
+  let userAction = new UserAction(userInput);
 
-  sendMessage(userMessage);
+  sendMessage(userAction);
 }
 
 export const initializeControls = () => {

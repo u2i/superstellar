@@ -34,6 +34,13 @@
                     "name": "projectileFired",
                     "id": 4,
                     "oneof": "content"
+                },
+                {
+                    "rule": "optional",
+                    "type": "PlayerJoined",
+                    "name": "playerJoined",
+                    "id": 5,
+                    "oneof": "content"
                 }
             ],
             "oneofs": {
@@ -41,7 +48,8 @@
                     1,
                     2,
                     3,
-                    4
+                    4,
+                    5
                 ]
             }
         },
@@ -179,6 +187,23 @@
             ]
         },
         {
+            "name": "PlayerJoined",
+            "fields": [
+                {
+                    "rule": "optional",
+                    "type": "uint32",
+                    "name": "id",
+                    "id": 1
+                },
+                {
+                    "rule": "optional",
+                    "type": "string",
+                    "name": "username",
+                    "id": 2
+                }
+            ]
+        },
+        {
             "name": "Space",
             "fields": [
                 {
@@ -203,11 +228,29 @@
                     "type": "uint32",
                     "name": "myId",
                     "id": 1
+                },
+                {
+                    "rule": "map",
+                    "type": "string",
+                    "keytype": "uint32",
+                    "name": "idToUsername",
+                    "id": 2
                 }
             ]
         },
         {
-            "name": "UserMessage",
+            "name": "JoinGame",
+            "fields": [
+                {
+                    "rule": "optional",
+                    "type": "string",
+                    "name": "username",
+                    "id": 1
+                }
+            ]
+        },
+        {
+            "name": "UserAction",
             "fields": [
                 {
                     "rule": "optional",
@@ -216,6 +259,31 @@
                     "id": 1
                 }
             ]
+        },
+        {
+            "name": "UserMessage",
+            "fields": [
+                {
+                    "rule": "optional",
+                    "type": "UserAction",
+                    "name": "userAction",
+                    "id": 1,
+                    "oneof": "content"
+                },
+                {
+                    "rule": "optional",
+                    "type": "JoinGame",
+                    "name": "joinGame",
+                    "id": 2,
+                    "oneof": "content"
+                }
+            ],
+            "oneofs": {
+                "content": [
+                    1,
+                    2
+                ]
+            }
         }
     ],
     "enums": [

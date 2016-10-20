@@ -16,12 +16,13 @@ const channelBufSize = 100
 
 // Client struct holds client-specific variables.
 type Client struct {
-	id      uint32
-	ws      *websocket.Conn
-	server  *Server
-	ch      chan *[]byte
-	doneCh  chan bool
-	monitor *Monitor
+	id       uint32
+	username string
+	ws       *websocket.Conn
+	server   *Server
+	ch       chan *[]byte
+	doneCh   chan bool
+	monitor  *Monitor
 }
 
 // NewClient initializes a new Client struct with given websocket and Server.
@@ -39,7 +40,7 @@ func NewClient(ws *websocket.Conn, server *Server) *Client {
 	id := server.GenerateID()
 	monitor := server.monitor
 
-	return &Client{id, ws, server, ch, doneCh, monitor}
+	return &Client{id, "", ws, server, ch, doneCh, monitor}
 }
 
 // Conn returns client's websocket.Conn struct.
@@ -127,6 +128,14 @@ func (c *Client) unmarshalUserInput(data []byte) {
 		log.Fatalln("Failed to unmarshal UserInput:", err)
 	}
 
-	userInput := space.UserInputFromProto(protoUserMessage.UserInput, c.id)
-	c.server.UserInput(userInput)
+	switch x := protoUserMessage.Content.(type) {
+	case *pb.UserMessage_UserAction:
+		userInput := space.UserInputFromProto(protoUserMessage.GetUserAction().UserInput, c.id)
+		c.server.UserInput(userInput)
+	case *pb.UserMessage_JoinGame:
+		c.username = protoUserMessage.GetJoinGame().Username
+		c.server.JoinGame(c)
+	default:
+		log.Fatalln("Unknown message type %T", x)
+	}
 }

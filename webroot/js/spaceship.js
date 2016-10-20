@@ -1,5 +1,5 @@
 import * as Utils from './utils.js';
-import { renderer, stage } from './globals.js';
+import { globalState, renderer, stage } from './globals.js';
 
 export default class Spaceship {
   constructor (shipTexture, thrustAnimationFrames, data) {
@@ -19,14 +19,16 @@ export default class Spaceship {
     }
 
     this.hpTextStyle = {
-          fontFamily: 'Helvetica',
-          fontSize: '24px',
-          fill: '#FFFFFF',
-          align: 'left'
-        };
+      fontFamily: 'Helvetica',
+      fontSize: '15px',
+      fill: '#FFFFFF',
+      align: 'center'
+    };
+
+    this.label = new PIXI.Text('', this.hpTextStyle);
 
     this.healthBar = new PIXI.Text('', this.hpTextStyle);
-	this.healthBar.y = -40
+    this.healthBar.y = -30;
 
     stage.addChild(this.container);
     this.container.addChild(this.sprite);
@@ -36,7 +38,8 @@ export default class Spaceship {
       this.container.addChild(this.collisionSphere);
     }
 
-	this.container.addChild(this.healthBar)
+    stage.addChild(this.label);
+    this.container.addChild(this.healthBar);
 
     this.container.pivot.set(this.sprite.width / 2, this.sprite.height / 2);
   }
@@ -60,20 +63,24 @@ export default class Spaceship {
       this.thrustAnimation.stop();
     }
 
-    const translatedPosition = Utils.translateToViewport(
+    const { x, y } = Utils.translateToViewport(
       this.position.x / 100,
       this.position.y / 100,
       viewport
     )
 
-    this.container.position.set(translatedPosition.x, translatedPosition.y);
+    this.container.position.set(x, y);
     this.container.rotation = this.facing;
+
+    this.label.text = globalState.clientIdToName.get(this.id);
+    this.label.position.set(x - (this.label.text.length * 8) / 2, y - this.sprite.height);
 
     this.healthBar.text = this.hp;
   }
 
   remove () {
     stage.removeChild(this.container);
+    stage.removeChild(this.label);
   }
 
   viewport () {

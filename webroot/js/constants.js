@@ -12,13 +12,15 @@ export const PROJECTILE_SPRITESHEET_FRAME_NAMES = [1, 2, 3].map((i) => `bullet${
 // ********** PROTOBUFS **********
 export const PROTOBUF_DEFINITION      = "js/superstellar_proto.json";
 export const SPACE_DEFINITION         = "superstellar.Space";
-export const USER_INPUT_DEFINITION    = "superstellar.UserInput";
+export const JOIN_GAME_DEFINITION     = "superstellar.JoinGame";
+export const USER_ACTION_DEFINITION   = "superstellar.UserAction";
 export const USER_MESSAGE_DEFINITION  = "superstellar.UserMessage";
 export const PLAYER_LEFT_DEFINITION   = "superstellar.PlayerLeft";
 export const SHOT_DEFINITION          = "superstellar.Shot";
 export const MESSAGE_DEFINITION       = "superstellar.Message";
 
-export const HELLO_MESSAGE       = "hello";
-export const SPACE_MESSAGE       = "space";
-export const PLAYER_LEFT_MESSAGE = "playerLeft";
+export const HELLO_MESSAGE             = "hello";
+export const SPACE_MESSAGE             = "space";
+export const PLAYER_LEFT_MESSAGE       = "playerLeft";
+export const PLAYER_JOINED_MESSAGE     = "playerJoined";
 export const PROJECTILE_FIRED_MESSAGE  = "projectileFired";

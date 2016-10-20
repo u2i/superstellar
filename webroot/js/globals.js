@@ -1,3 +1,4 @@
+import UsernameDialog from './usernameDialog';
 import { getCurrentWindowSize } from './utils';
 
 const windowSize = getCurrentWindowSize();
@@ -9,7 +10,10 @@ export const stage = new PIXI.Container();
 
 export const globalState = {
   clientId: null,
+  clientIdToName: new Map(),
   spaceshipMap: new Map(),
   physicsFrameID: 0,
   projectiles: []
 };
+
+export const usernameDialog = new UsernameDialog();

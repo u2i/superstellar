@@ -34,11 +34,11 @@ export const handleProtoBufMessage = (protoBufMsg) => {
   }
 };
 
-export const sendUserMessage = (userInput) => {
-};
-
 export const sendMessage = (protobufMsg) => {
-  let buffer = protobufMsg.encode();
+  const message = new UserMessage();
+  message.set(getMessageName(protobufMsg), protobufMsg);
+
+  const buffer = message.encode();
 
   // TODO: we can probably handle this a bit better
   if (ws.readyState == WebSocket.OPEN) {
@@ -46,13 +46,23 @@ export const sendMessage = (protobufMsg) => {
   }
 }
 
-const builder    = ProtoBuf.loadJsonFile(Constants.PROTOBUF_DEFINITION);
-export const Message    = builder.build(Constants.MESSAGE_DEFINITION);
-export const Space      = builder.build(Constants.SPACE_DEFINITION);
-export const UserMessage  = builder.build(Constants.USER_MESSAGE_DEFINITION);
-export const PlayerLeft = builder.build(Constants.PLAYER_LEFT_DEFINITION);
-export const UserEvent = builder.build(Constants.USER_EVENT_DEFINITION);
+const getMessageName = (protobufMsg) => {
+  const splitMessageName = protobufMsg.toString().split(".");
 
+  const messageType = splitMessageName[splitMessageName.length - 1];
+
+  return messageType.charAt(0).toLowerCase() + messageType.slice(1);
+};
+
+const builder = ProtoBuf.loadJsonFile(Constants.PROTOBUF_DEFINITION);
+
+export const JoinGame    = builder.build(Constants.JOIN_GAME_DEFINITION);
+export const Message     = builder.build(Constants.MESSAGE_DEFINITION);
+export const Space       = builder.build(Constants.SPACE_DEFINITION);
+export const UserMessage = builder.build(Constants.USER_MESSAGE_DEFINITION);
+export const PlayerLeft  = builder.build(Constants.PLAYER_LEFT_DEFINITION);
+export const UserEvent   = builder.build(Constants.USER_EVENT_DEFINITION);
+export const UserAction  = builder.build(Constants.USER_ACTION_DEFINITION);
 
 const messageHandlers = new Map();
 

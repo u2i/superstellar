@@ -2,10 +2,9 @@ import * as PIXI from "pixi.js";
 import Assets from './assets';
 import * as Constants from './constants';
 import * as Utils from './utils';
-import { renderer, stage, globalState } from './globals';
+import { renderer, stage, globalState, usernameDialog } from './globals';
 import { initializeConnection, sendMessage, UserMessage } from './communicationLayer';
 import { initializeHandlers } from './messageHandlers';
-import { initializeControls } from './controls';
 import Hud from './hud';
 
 const HOST = window.location.hostname;
@@ -67,7 +66,7 @@ let hud;
 function setup() {
   initializeHandlers();
   initializeConnection(HOST, PORT, PATH);
-  initializeControls();
+
 
   const bgTexture = Assets.getTexture(Constants.BACKGROUND_TEXTURE);
 
@@ -83,6 +82,7 @@ function setup() {
   hud = new Hud();
   hud.setPosition(renderer.width - Hud.rightOffset);
 
+  usernameDialog.show();
   main();
 }
 
@@ -98,20 +98,20 @@ window.addEventListener("resize", () => {
   fogShader.dimensions[1] = windowSize.height;
 });
 
-var viewport = {vx: 0, vy: 0, width: renderer.width, height: renderer.height}
+const defaultViewport = { vx: 0, vy: 0, width: renderer.width, height: renderer.height };
 
 // Draw everything
 var render = function () {
-  if (!globalState.clientId) { return }
   let myShip;
-
-  let backgroundPos = Utils.translateToViewport(0, 0, viewport);
-  tilingSprite.tilePosition.set(backgroundPos.x, backgroundPos.y);
 
   if (globalState.spaceshipMap.size > 0) {
     myShip = globalState.spaceshipMap.get(globalState.clientId);
-    viewport = myShip.viewport();
   }
+
+  let viewport = myShip ? myShip.viewport() : defaultViewport;
+
+  let backgroundPos = Utils.translateToViewport(0, 0, viewport);
+  tilingSprite.tilePosition.set(backgroundPos.x, backgroundPos.y);
 
   globalState.spaceshipMap.forEach((spaceship) => spaceship.update(viewport));
   globalState.projectiles.forEach((projectile) => projectile.update(viewport));

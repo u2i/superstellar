@@ -191,16 +191,51 @@ func (s *Server) handleAddNewClient(client *Client) {
 	log.Println("Added new client")
 
 	s.clients[client.id] = client
-	s.space.NewSpaceship(client.id)
-	s.sendHelloMessage(client)
 
 	log.Println("Now", len(s.clients), "clients connected.")
 }
 
+func (s *Server) JoinGame(client *Client) {
+	s.space.NewSpaceship(client.id)
+
+	s.sendHelloMessage(client)
+	s.SendPlayerJoinedMessage(client)
+}
+
+func (s *Server) SendPlayerJoinedMessage(client *Client) {
+	message := &pb.Message{
+		Content: &pb.Message_PlayerJoined{
+			PlayerJoined: &pb.PlayerJoined{
+				Id:       client.id,
+				Username: client.username,
+			},
+		},
+	}
+
+	bytes, err := proto.Marshal(message)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	for _, c := range s.clients {
+		c.SendMessage(&bytes)
+	}
+}
+
 func (s *Server) sendHelloMessage(client *Client) {
+	idToUsername := make(map[uint32]string)
+
+	for id, client := range s.clients {
+		idToUsername[id] = client.username
+	}
+
 	message := &pb.Message{
 		Content: &pb.Message_Hello{
-			Hello: &pb.Hello{MyId: client.id},
+			Hello: &pb.Hello{
+				MyId:         client.id,
+				IdToUsername: idToUsername,
+			},
 		},
 	}
 
