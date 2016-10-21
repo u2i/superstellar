@@ -41,6 +41,13 @@
                     "name": "playerJoined",
                     "id": 5,
                     "oneof": "content"
+                },
+                {
+                    "rule": "optional",
+                    "type": "JoinGameAck",
+                    "name": "joinGameAck",
+                    "id": 6,
+                    "oneof": "content"
                 }
             ],
             "oneofs": {
@@ -49,7 +56,8 @@
                     2,
                     3,
                     4,
-                    5
+                    5,
+                    6
                 ]
             }
         },
@@ -246,6 +254,23 @@
                     "type": "string",
                     "name": "username",
                     "id": 1
+                }
+            ]
+        },
+        {
+            "name": "JoinGameAck",
+            "fields": [
+                {
+                    "rule": "optional",
+                    "type": "bool",
+                    "name": "success",
+                    "id": 1
+                },
+                {
+                    "rule": "optional",
+                    "type": "string",
+                    "name": "error",
+                    "id": 2
                 }
             ]
         },

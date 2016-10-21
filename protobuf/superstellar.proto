@@ -9,6 +9,7 @@ message Message {
     PlayerLeft      playerLeft        = 3;
     ProjectileFired projectileFired   = 4;
     PlayerJoined    playerJoined      = 5;
+    JoinGameAck     joinGameAck       = 6;
   }
 }
 
@@ -62,6 +63,11 @@ message Hello {
 
 message JoinGame {
   string username = 1;
+}
+
+message JoinGameAck {
+  bool   success = 1;
+  string error   = 2;
 }
 
 enum UserInput {

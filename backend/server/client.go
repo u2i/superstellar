@@ -1,6 +1,7 @@
 package server
 
 import (
+	"errors"
 	"io"
 	"log"
 	"superstellar/backend/pb"
@@ -126,6 +127,7 @@ func (c *Client) unmarshalUserInput(data []byte) {
 	protoUserMessage := &pb.UserMessage{}
 	if err := proto.Unmarshal(data, protoUserMessage); err != nil {
 		log.Fatalln("Failed to unmarshal UserInput:", err)
+		return
 	}
 
 	switch x := protoUserMessage.Content.(type) {
@@ -133,9 +135,37 @@ func (c *Client) unmarshalUserInput(data []byte) {
 		userInput := space.UserInputFromProto(protoUserMessage.GetUserAction().UserInput, c.id)
 		c.server.UserInput(userInput)
 	case *pb.UserMessage_JoinGame:
-		c.username = protoUserMessage.GetJoinGame().Username
-		c.server.JoinGame(c)
+		c.tryToJoinGame(protoUserMessage.GetJoinGame())
 	default:
 		log.Fatalln("Unknown message type %T", x)
 	}
+}
+
+func (c *Client) tryToJoinGame(joinGameMsg *pb.JoinGame) {
+	username := joinGameMsg.Username
+	ok, err := validateUsername(username)
+
+	if !ok {
+		c.server.SendJoinGameAckMessage(
+			c, &pb.JoinGameAck{Success: ok, Error: err.Error()},
+		)
+		return
+	}
+
+	c.username = username
+	c.server.JoinGame(c)
+}
+
+func validateUsername(username string) (bool, error) {
+	length := len(username)
+
+	if length < 3 {
+		return false, errors.New("I doubt your name is shorter than 3 characters, Captain.")
+	}
+
+	if length > 25 {
+		return false, errors.New("Space fleet doesn't allow names longer than 25 characters!")
+	}
+
+	return true, nil
 }

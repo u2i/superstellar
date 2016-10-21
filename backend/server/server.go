@@ -191,6 +191,7 @@ func (s *Server) handleAddNewClient(client *Client) {
 	log.Println("Added new client")
 
 	s.clients[client.id] = client
+	s.sendHelloMessage(client)
 
 	log.Println("Now", len(s.clients), "clients connected.")
 }
@@ -198,8 +199,25 @@ func (s *Server) handleAddNewClient(client *Client) {
 func (s *Server) JoinGame(client *Client) {
 	s.space.NewSpaceship(client.id)
 
-	s.sendHelloMessage(client)
+	s.SendJoinGameAckMessage(client, &pb.JoinGameAck{Success: true})
 	s.SendPlayerJoinedMessage(client)
+}
+
+func (s *Server) SendJoinGameAckMessage(client *Client, joinGameAck *pb.JoinGameAck) {
+	message := &pb.Message{
+		Content: &pb.Message_JoinGameAck{
+			JoinGameAck: joinGameAck,
+		},
+	}
+
+	bytes, err := proto.Marshal(message)
+
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	client.SendMessage(&bytes)
 }
 
 func (s *Server) SendPlayerJoinedMessage(client *Client) {

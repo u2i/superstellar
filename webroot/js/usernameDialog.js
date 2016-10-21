@@ -21,7 +21,7 @@ export default class UsernameDialog {
     this._updatePosition(); 
     this.domNode.innerHTML = `
     <div class="dialog-content">
-      <p>Welcome Captain... errhm... what was your name again?</p>
+      <p class="dialog-message">Welcome Captain... errhm... what was your name again?</p>
       <form id="submit-username-form">
 	<input autofocus class="underline-input" id="insert-name-input" type="text" />
 	<input class="action-button" type="submit" value="Blast'em Off!" />
@@ -39,6 +39,13 @@ export default class UsernameDialog {
 	ev.preventDefault();
 	this._sendJoinGame();
     });
+  }
+
+  showError (errorMsg) {
+    const dialog = document.getElementsByClassName("dialog-message")[0];
+    dialog.innerText = errorMsg;
+
+    this.domNode.classList.add("error");
   }
 
   hide () {

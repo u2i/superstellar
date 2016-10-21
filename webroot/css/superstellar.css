@@ -26,11 +26,20 @@ canvas {
 }
 
 .dialog-content {
-    margin: 10px;
-    font-size: 22px;
-    color: #eee;
-    text-align: center;
-    text-shadow: 0 0 0.2em #292727, 0 0 0.2em #292727;
+  margin: 10px;
+  font-size: 22px;
+  color: #eee;
+  text-align: center;
+  text-shadow: 0 0 0.2em #292727, 0 0 0.2em #292727;
+}
+
+.game-dialog.error .underline-input {
+  border-bottom: solid 2px #b93535;
+  color: #b93535;
+}
+.game-dialog.error .underline-input:focus {
+  border-bottom: solid 2px #ccc;
+  color: #ccc;
 }
 
 .underline-input {

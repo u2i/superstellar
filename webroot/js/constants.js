@@ -20,6 +20,7 @@ export const SHOT_DEFINITION          = "superstellar.Shot";
 export const MESSAGE_DEFINITION       = "superstellar.Message";
 
 export const HELLO_MESSAGE             = "hello";
+export const JOIN_GAME_ACK_MESSAGE     = "joinGameAck";
 export const SPACE_MESSAGE             = "space";
 export const PLAYER_LEFT_MESSAGE       = "playerLeft";
 export const PLAYER_JOINED_MESSAGE     = "playerJoined";
