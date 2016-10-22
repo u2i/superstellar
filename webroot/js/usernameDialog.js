@@ -15,7 +15,7 @@ export default class UsernameDialog {
     <div class="dialog-content">
       <p class="dialog-message">Welcome Captain... errhm... what was your name again?</p>
       <form id="submit-username-form">
-	<input autofocus class="underline-input" id="insert-name-input" type="text" />
+	<input autofocus class="underline-input" id="insert-name-input" type="text" minlength="3" maxlength="25" required/>
 	<input class="action-button" type="submit" value="Blast'em Off!" />
       </form>
     </div>
