@@ -1,5 +1,6 @@
 import UsernameDialog from './usernameDialog';
 import { getCurrentWindowSize } from './utils';
+import LeaderboardDialog from "./leaderboardDialog";
 
 const windowSize = getCurrentWindowSize();
 
@@ -17,3 +18,4 @@ export const globalState = {
 };
 
 export const usernameDialog = new UsernameDialog();
+export const leaderboardDialog = new LeaderboardDialog();

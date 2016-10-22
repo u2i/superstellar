@@ -121,5 +121,9 @@ func (s *Spaceship) Collide(other *Spaceship) {
 }
 
 func (s *Spaceship) CollideWithProjectile(projectile *Projectile) {
-	s.HP -= 100
+	if (s.HP < 100) {
+		s.HP = 0
+	} else {
+		s.HP -= 100
+	}
 }

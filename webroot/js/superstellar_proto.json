@@ -48,6 +48,13 @@
                     "name": "joinGameAck",
                     "id": 6,
                     "oneof": "content"
+                },
+                {
+                    "rule": "optional",
+                    "type": "Leaderboard",
+                    "name": "leaderboard",
+                    "id": 7,
+                    "oneof": "content"
                 }
             ],
             "oneofs": {
@@ -57,7 +64,8 @@
                     3,
                     4,
                     5,
-                    6
+                    6,
+                    7
                 ]
             }
         },
@@ -309,6 +317,34 @@
                     2
                 ]
             }
+        },
+        {
+            "name": "Rank",
+            "fields": [
+                {
+                    "rule": "optional",
+                    "type": "uint32",
+                    "name": "id",
+                    "id": 1
+                },
+                {
+                    "rule": "optional",
+                    "type": "uint32",
+                    "name": "score",
+                    "id": 2
+                }
+            ]
+        },
+        {
+            "name": "Leaderboard",
+            "fields": [
+                {
+                    "rule": "repeated",
+                    "type": "Rank",
+                    "name": "ranks",
+                    "id": 1
+                }
+            ]
         }
     ],
     "enums": [

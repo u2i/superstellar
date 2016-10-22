@@ -10,6 +10,7 @@ message Message {
     ProjectileFired projectileFired   = 4;
     PlayerJoined    playerJoined      = 5;
     JoinGameAck     joinGameAck       = 6;
+    Leaderboard     leaderboard       = 7;
   }
 }
 
@@ -89,4 +90,13 @@ message UserMessage {
     UserAction userAction = 1;
     JoinGame   joinGame   = 2;
   }
+}
+
+message Rank {
+  uint32 id = 1;
+  uint32 score = 2;
+}
+
+message Leaderboard {
+  repeated Rank ranks = 1;
 }

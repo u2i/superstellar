@@ -11,27 +11,32 @@ import (
 	"github.com/golang/protobuf/proto"
 
 	"golang.org/x/net/websocket"
+	"sort"
 )
 
 // Server struct holds server variables.
 type Server struct {
-	pattern      string
-	space        *space.Space
-	clients      map[uint32]*Client
-	monitor      *Monitor
-	addCh        chan *Client
-	delCh        chan *Client
-	inputCh      chan *space.UserInput
-	shotsCh      chan *space.Projectile
-	doneCh       chan bool
-	errCh        chan error
-	updateCh     chan bool
-	physicsCh    chan bool
-	generateIDCh chan chan uint32
-	clientID     uint32
+	pattern       string
+	space         *space.Space
+	clients       map[uint32]*Client
+	monitor       *Monitor
+	addCh         chan *Client
+	delCh         chan *Client
+	inputCh       chan *space.UserInput
+	shotsCh       chan *space.Projectile
+	doneCh        chan bool
+	errCh         chan error
+	updateCh      chan bool
+	physicsCh     chan bool
+	leaderboardCh chan bool
+	generateIDCh  chan chan uint32
+	clientID      uint32
 }
 
 const (
+	// LeaderboardTickInterval defines frequency of updating Leaderboard
+	LeaderboardTickInterval = 50 * PhysicsTickInterval
+
 	// PhysicsTickInterval equals how often the physics is updated
 	PhysicsTickInterval = 20 * time.Millisecond
 
@@ -58,6 +63,7 @@ func NewServer(pattern string) *Server {
 		errCh:        make(chan error),
 		updateCh:     make(chan bool),
 		physicsCh:    make(chan bool),
+		leaderboardCh: make(chan bool),
 		generateIDCh: make(chan chan uint32),
 		clientID:     0,
 	}
@@ -102,12 +108,25 @@ func (s *Server) Listen() {
 	s.addNewClientHandler()
 	s.runSenderTicker()
 	s.runPhysicsTicker()
+	s.runLeaderboardTicker()
 	s.monitor.run()
 	s.mainGameLoop()
 }
 
 func (s *Server) sendSpace() {
 	bytes, err := proto.Marshal(s.space.ToMessage())
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	for _, c := range s.clients {
+		c.SendMessage(&bytes)
+	}
+}
+
+func (s *Server) sendLeaderboard(leaderboard *Leaderboard) {
+	bytes, err := proto.Marshal(leaderboard.ToMessage())
 	if err != nil {
 		log.Println(err)
 		return
@@ -153,6 +172,15 @@ func (s *Server) runPhysicsTicker() {
 	}()
 }
 
+func (s *Server) runLeaderboardTicker() {
+	ticker := time.NewTicker(LeaderboardTickInterval)
+	go func() {
+		for _ = range ticker.C {
+			s.leaderboardCh <- true
+		}
+	}()
+}
+
 func (s *Server) mainGameLoop() {
 	for {
 		select {
@@ -174,6 +202,9 @@ func (s *Server) mainGameLoop() {
 
 		case <-s.physicsCh:
 			s.handlePhysicsUpdate()
+
+		case <-s.leaderboardCh:
+			s.handleLeaderboardUpdate()
 
 		case ch := <-s.generateIDCh:
 			s.handleGenerateIDCh(ch)
@@ -327,6 +358,18 @@ func (s *Server) handlePhysicsUpdate() {
 
 	elapsed := time.Since(before)
 	s.monitor.addPhysicsTime(elapsed)
+}
+
+func (s *Server) handleLeaderboardUpdate() {
+	size := len(s.space.Spaceships)
+	ranks := make([]Rank, 0, size)
+	for _, spaceship := range s.space.Spaceships  {
+		// TODO: change to MaxHP?
+		ranks = append(ranks, Rank{spaceship.ID,spaceship.HP})
+	}
+	sort.Stable(sort.Reverse(SortableByScore(ranks)))
+
+	s.sendLeaderboard(&Leaderboard{ranks})
 }
 
 func (s *Server) handleGenerateIDCh(ch chan uint32) {

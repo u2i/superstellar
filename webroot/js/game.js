@@ -4,7 +4,7 @@ import * as PIXI from "pixi.js";
 import Assets from './assets';
 import * as Constants from './constants';
 import * as Utils from './utils';
-import { renderer, stage, globalState, usernameDialog } from './globals';
+import { renderer, stage, globalState, usernameDialog, leaderboardDialog } from './globals';
 import { initializeConnection } from './communicationLayer';
 import { initializeHandlers } from './messageHandlers';
 import Hud from './hud';
@@ -50,7 +50,7 @@ AnnulusFilter.prototype.apply = function (filterManager, input, output)
 let shaderContent = require('raw!../shaders/annulus_fog.frag');
 let fogShader = new AnnulusFilter();
 
-document.body.appendChild(renderer.view);
+document.getElementById('game').appendChild(renderer.view);
 
 const loadProgressHandler = (loader) => {
   console.log(`progress: ${loader.progress}%`);
@@ -85,6 +85,8 @@ function setup() {
   hud.setPosition(renderer.width - Hud.rightOffset);
 
   usernameDialog.show();
+  leaderboardDialog.show();
+
   main();
 }
 

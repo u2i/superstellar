@@ -1,0 +1,46 @@
+div.leaderboard-dialog {
+  padding: 3px;
+  margin: 10px;
+  display: none;
+  background: transparentize($color-background, 0.9);
+  color: $color-primary;
+  position: absolute;
+  z-index: 4000;
+  width: 300px;
+}
+
+table.leaderboard {
+  table-layout: fixed;
+  width: 100%;
+
+  tbody tr.current {
+    font-weight: bolder; // Why u no work?
+  }
+
+  tbody tr td {
+    &.rank {
+      text-align: right;
+      width: 10%;
+      font-family: $font-mono;
+    }
+    &.name {
+      font-family: $font-secondary;
+
+      text-align: left;
+      width: 70%;
+
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+    &.score {
+      font-family: $font-mono;
+      text-align: right;
+      width: 20%;
+    }
+
+    padding: 5px;
+    font-size: 8pt;
+    color: transparentize($color-primary, 0.2);
+  }
+}
