@@ -4,14 +4,6 @@ import * as Utils from "./utils";
 const WIDTH = 300;
 const HEIGHT = 150;
 
-const TEXT_STYLE = {
-  fontFamily: 'Helvetica',
-  fontSize: '8px',
-  fill: '#FFFFFF',
-  align: 'left',
-  textBaseline: 'top'
-};
-
 export default class UsernameDialog {
   constructor () {
     this.domNode = document.createElement("div");
@@ -36,9 +28,9 @@ export default class UsernameDialog {
     this.submitListenerID  = document.
       getElementById("submit-username-form").
       addEventListener("submit", (ev) => {
-	ev.preventDefault();
-	this._sendJoinGame();
-    });
+        ev.preventDefault();
+        this._sendJoinGame();
+      });
   }
 
   showError (errorMsg) {

@@ -18,6 +18,8 @@
     "brfs": "^1.4.1",
     "compass-mixins": "^0.12.10",
     "css-loader": "^0.25.0",
+    "eslint": "^3.8.1",
+    "eslint-loader": "^1.6.0",
     "ify-loader": "^1.0.3",
     "node-sass": "^3.10.1",
     "raw-loader": "^0.5.1",

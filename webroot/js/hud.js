@@ -4,9 +4,9 @@ import { globalState, stage } from './globals';
 const rightOffset = 150;
 
 export default class Hud {
-    static get rightOffset() {
-      return rightOffset;
-    }
+  static get rightOffset() {
+    return rightOffset;
+  }
 
   constructor () {
     this.hudTextStyle = {

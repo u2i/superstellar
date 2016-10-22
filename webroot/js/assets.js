@@ -1,12 +1,10 @@
-import {loader, Texture} from "pixi.js";
-
 const Assets = {
   getTexture: (texturePath) => {
-	return PIXI.loader.resources[texturePath].texture;
+    return PIXI.loader.resources[texturePath].texture;
   },
 
   getTextureFromFrame: (frameName) => {
-	return PIXI.Texture.fromFrame(frameName);
+    return PIXI.Texture.fromFrame(frameName);
   }
 };
 

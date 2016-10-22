@@ -41,7 +41,7 @@ export const sendMessage = (protobufMsg) => {
   const buffer = message.encode();
 
   // TODO: we can probably handle this a bit better
-  if (ws.readyState == WebSocket.OPEN) {
+  if (ws.readyState === WebSocket.OPEN) {
     ws.send(buffer.toArrayBuffer());
   }
 }

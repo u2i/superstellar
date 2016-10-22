@@ -91,4 +91,4 @@ export default class Spaceship {
       height: renderer.height
     };
   }
-};
+}

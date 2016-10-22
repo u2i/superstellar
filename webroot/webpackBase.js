@@ -10,20 +10,28 @@ module.exports = {
         filename: "[name].js"
     },
     module: {
-        loaders: [{
-            test: /\.json$/,
-            loader: 'json'
-        }, {
-            test: /\.js$/,
-            exclude: /node_modules/,
-            loader: 'babel'
-        }, {
-            test: path.resolve(__dirname, 'node_modules', 'pixi.js'),
-            loader: 'ify'
-        }, {
-            test: /\.scss$/,
-            loader: "style!css!sass?outputStyle=expanded&includePaths[]=" + path.resolve(__dirname, "./node_modules/compass-mixins/lib")
-        }]
+        preLoaders: [
+            {
+                test: /\.js$/,
+                loader: "eslint-loader",
+                exclude: /node_modules/
+            }
+        ],
+        loaders: [
+            {
+                test: /\.json$/,
+                loader: 'json'
+            }, {
+                test: /\.js$/,
+                exclude: /node_modules/,
+                loader: 'babel'
+            }, {
+                test: path.resolve(__dirname, 'node_modules', 'pixi.js'),
+                loader: 'ify'
+            }, {
+                test: /\.scss$/,
+                loader: "style!css!sass?outputStyle=expanded&includePaths[]=" + path.resolve(__dirname, "./node_modules/compass-mixins/lib")
+            }]
     },
     plugins: [
         new webpack.optimize.CommonsChunkPlugin("vendor", "vendor.js"),

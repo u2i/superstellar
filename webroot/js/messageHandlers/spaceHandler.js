@@ -14,7 +14,7 @@ const spaceHandler = (space) => {
     shipThrustFrames.push(Assets.getTextureFromFrame(frameName));
   });
 
-  for (var i in ships) {
+  for (let i in ships) {
     let shipId = ships[i].id;
 
     if (!globalState.spaceshipMap.has(shipId)) {

@@ -5,7 +5,7 @@ import Assets from './assets';
 import * as Constants from './constants';
 import * as Utils from './utils';
 import { renderer, stage, globalState, usernameDialog } from './globals';
-import { initializeConnection, sendMessage, UserMessage } from './communicationLayer';
+import { initializeConnection } from './communicationLayer';
 import { initializeHandlers } from './messageHandlers';
 import Hud from './hud';
 
@@ -27,24 +27,24 @@ AnnulusFilter.prototype = Object.create(PIXI.Filter.prototype);
 AnnulusFilter.prototype.constructor = AnnulusFilter;
 
 Object.defineProperties(AnnulusFilter.prototype,
-{
-  worldCoordinates: {
-    get: function () {return this.uniforms.worldCoordinates;},
-    set: function (value) {this.uniforms.worldCoordinates = value;}
-  },
-  worldSize: {
-    get: function () {return this.uniforms.worldSize;},
-    set: function (value) {this.uniforms.worldSize = value;}
-  },
-  dimensions: {
-    get: function () {return this.uniforms.dimensions;}
-  }
-});
+  {
+    worldCoordinates: {
+      get: function () {return this.uniforms.worldCoordinates;},
+      set: function (value) {this.uniforms.worldCoordinates = value;}
+    },
+    worldSize: {
+      get: function () {return this.uniforms.worldSize;},
+      set: function (value) {this.uniforms.worldSize = value;}
+    },
+    dimensions: {
+      get: function () {return this.uniforms.dimensions;}
+    }
+  });
 
 AnnulusFilter.prototype.apply = function (filterManager, input, output)
 {
-    filterManager.calculateNormalizedScreenSpaceMatrix(this.uniforms.magicMatrix);
-    filterManager.applyFilter(this, input, output);
+  filterManager.calculateNormalizedScreenSpaceMatrix(this.uniforms.magicMatrix);
+  filterManager.applyFilter(this, input, output);
 };
 
 let shaderContent = require('raw!../shaders/annulus_fog.frag');
@@ -52,7 +52,7 @@ let fogShader = new AnnulusFilter();
 
 document.body.appendChild(renderer.view);
 
-const loadProgressHandler = (loader, resource) => {
+const loadProgressHandler = (loader) => {
   console.log(`progress: ${loader.progress}%`);
 };
 
@@ -103,7 +103,7 @@ window.addEventListener("resize", () => {
 const defaultViewport = { vx: 0, vy: 0, width: renderer.width, height: renderer.height };
 
 // Draw everything
-var render = function () {
+const render = function () {
   let myShip;
 
   if (globalState.spaceshipMap.size > 0) {
@@ -130,7 +130,7 @@ var render = function () {
 };
 
 // The main game loop
-var main = function () {
+const main = function () {
   render();
   // Request to do this again ASAP
   requestAnimationFrame(main);
