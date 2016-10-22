@@ -11,6 +11,7 @@ import (
 	"github.com/golang/protobuf/proto"
 
 	"golang.org/x/net/websocket"
+	"fmt"
 )
 
 func main() {
@@ -40,16 +41,16 @@ func main() {
 
 	ch := make(chan bool)
 
-	for i := 0; i < int(clients); i++ {
+	for i := uint(0); i < uint(clients); i++ {
 		log.Printf("Running client %d\n", i+1)
-		go runClient(host)
+		go runClient(i, host)
 		time.Sleep(sleepTime)
 	}
 
 	<-ch
 }
 
-func runClient(host string) {
+func runClient(botId uint, host string) {
 	origin := "http://" + host
 	url := "ws://" + host + ":8080/superstellar"
 	ws, err := websocket.Dial(url, "", origin)
@@ -57,6 +58,12 @@ func runClient(host string) {
 		log.Fatal(err)
 	}
 	var msg = make([]byte, 1024)
+
+	botName := fmt.Sprintf("bot %v", botId)
+
+	joinGame := pb.JoinGame{Username: botName}
+
+	sendJoinGame(ws, &joinGame)
 
 	thrust := false
 	fire := false
@@ -92,13 +99,27 @@ func runClient(host string) {
 			}
 		}
 
-		send(ws, userInput)
+		sendUserAction(ws, userInput)
 	}
 }
 
-func send(ws *websocket.Conn, userInput pb.UserInput) {
-	userMessage := &pb.UserMessage{UserInput: userInput}
-	bytes, err := proto.Marshal(userMessage)
+func sendUserAction(ws *websocket.Conn, userInput pb.UserInput) {
+	userAction := &pb.UserAction{UserInput: userInput}
+	userMessage := &pb.UserMessage_UserAction{UserAction: userAction}
+	message := &pb.UserMessage{Content: userMessage}
+
+	sendUserMessage(ws, message)
+}
+
+func sendJoinGame(ws *websocket.Conn, joinGame *pb.JoinGame) {
+	userMessage := &pb.UserMessage_JoinGame{JoinGame: joinGame}
+	message := &pb.UserMessage{Content: userMessage}
+
+	sendUserMessage(ws, message)
+}
+
+func sendUserMessage(ws *websocket.Conn, message *pb.UserMessage) {
+	bytes, err := proto.Marshal(message)
 	if err == nil {
 		websocket.Message.Send(ws, bytes)
 	}
