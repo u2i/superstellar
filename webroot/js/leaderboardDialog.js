@@ -1,8 +1,3 @@
-import * as Utils from "./utils";
-
-const WIDTH = 300;
-const HEIGHT = 150;
-
 export default class LeaderboardDialog {
   constructor () {
     this.domNode = document.getElementById('leaderboard');
