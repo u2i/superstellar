@@ -1,0 +1,73 @@
+.game-dialog {
+  @include box-shadow(inset 0px 0px 14px 2px rgba(242,242,242,0.58));
+  @include box-shadow(0px 0px 14px 2px rgba(130,126,130,1));
+  @include border-radius(5px);
+
+  background: $color-background;
+  position: absolute;
+  z-index: 5000;
+}
+
+.dialog-content {
+  @include text-shadow(0 0 0.2em #292727, 0 0 0.2em #292727);
+  margin: 10px;
+  font-size: 22px;
+  color: $color-primary;
+  text-align: center;
+}
+
+.game-dialog.error {
+  .underline-input {
+    border-bottom: solid 2px #b93535;
+    color: #b93535;
+
+    &:focus {
+      border-bottom: solid 2px #ccc;
+      color: #ccc;
+    }
+  }
+}
+
+.underline-input {
+  padding: 10px;
+  border: none;
+  border-bottom: solid 2px #fff;
+  transition: border 0.3s;
+  background: $color-background;
+  color: $color-primary;
+  font-size: 15px;
+  width: 50%;
+  margin-left: 5px;
+  float: left;
+
+  &:focus, .focus {
+    border-bottom: solid 2px #ccc;
+    outline: none;
+  }
+}
+
+.action-button {
+  @include box-shadow(0px 0px 0px 2px #454b55);
+  @include border-radius(10px);
+  @include background-image(linear-gradient(to bottom, #8d9aae 5%, #c1d2ee 100%));
+  @include text-shadow(0px 1px 0px #454b55);
+  border:1px solid #788395;
+  background-color:#8d9aae;
+  display:inline-block;
+  cursor:pointer;
+  color: $color-secondary;
+  font-family: $font-secondary;
+  font-size:15px;
+  padding: 10px;
+  text-decoration:none;
+
+  &:hover {
+    @include background-image(linear-gradient(to bottom, #c1d2ee 5%, #8d9aae 100%));
+    background-color:#c1d2ee;
+  }
+
+  &:active {
+    position:relative;
+    top:1px;
+  }
+}

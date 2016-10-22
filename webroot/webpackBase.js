@@ -20,6 +20,9 @@ module.exports = {
         }, {
             test: path.resolve(__dirname, 'node_modules', 'pixi.js'),
             loader: 'ify'
+        }, {
+            test: /\.scss$/,
+            loader: "style!css!sass?outputStyle=expanded&includePaths[]=" + path.resolve(__dirname, "./node_modules/compass-mixins/lib")
         }]
     },
     plugins: [

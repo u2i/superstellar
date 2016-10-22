@@ -1,3 +1,5 @@
+require("../css/superstellar.scss");
+
 import * as PIXI from "pixi.js";
 import Assets from './assets';
 import * as Constants from './constants';
