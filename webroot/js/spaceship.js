@@ -18,17 +18,23 @@ export default class Spaceship {
       this.collisionSphere.drawCircle(this.sprite.width / 2, this.sprite.height / 2, 20);
     }
 
-    this.hpTextStyle = {
-      fontFamily: 'Helvetica',
-      fontSize: '15px',
+    this.labelTextStyle = {
+      fontFamily: 'Roboto',
+      fontSize: '12px',
       fill: '#FFFFFF',
       align: 'center'
     };
 
-    this.label = new PIXI.Text('', this.hpTextStyle);
+    this.hpTextStyle = {
+      fontFamily: 'Roboto Mono',
+      fontSize: '10px',
+      fill: '#FFFFFF',
+      align: 'center'
+    };
+
+    this.label = new PIXI.Text('', this.labelTextStyle);
 
     this.healthBar = new PIXI.Text('', this.hpTextStyle);
-    this.healthBar.y = -30;
 
     stage.addChild(this.container);
     this.container.addChild(this.sprite);
@@ -39,7 +45,7 @@ export default class Spaceship {
     }
 
     stage.addChild(this.label);
-    this.container.addChild(this.healthBar);
+    stage.addChild(this.healthBar);
 
     this.container.pivot.set(this.sprite.width / 2, this.sprite.height / 2);
   }
@@ -70,11 +76,13 @@ export default class Spaceship {
     );
 
     this.container.position.set(x, y);
+    this.healthBar.position.set(x - (this.healthBar.text.length * 8) / 2, y + this.sprite.height * 2 / 3);
+
     this.container.rotation = this.facing;
 
     if (globalState.clientId !== this.id) {
       this.label.text = globalState.clientIdToName.get(this.id);
-      this.label.position.set(x - (this.label.text.length * 8) / 2, y - this.sprite.height);
+      this.label.position.set(x - (this.label.text.length * 6) / 2, y - this.sprite.height);
     }
 
     this.healthBar.text = this.hp;
