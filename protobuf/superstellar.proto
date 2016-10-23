@@ -15,8 +15,8 @@ message Message {
 }
 
 message Point {
-  int32 x = 1;
-  int32 y = 2;
+  sint32 x = 1;
+  sint32 y = 2;
 }
 
 message Vector {

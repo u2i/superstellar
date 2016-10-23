@@ -74,13 +74,13 @@
             "fields": [
                 {
                     "rule": "optional",
-                    "type": "int32",
+                    "type": "sint32",
                     "name": "x",
                     "id": 1
                 },
                 {
                     "rule": "optional",
-                    "type": "int32",
+                    "type": "sint32",
                     "name": "y",
                     "id": 2
                 }
