@@ -14,6 +14,8 @@ import (
 	"fmt"
 )
 
+const botEmoji = '🤖'
+
 func main() {
 	log.SetFlags(log.Lshortfile)
 	rand.Seed(time.Now().UTC().UnixNano())
@@ -59,7 +61,7 @@ func runClient(botId uint, host string) {
 	}
 	var msg = make([]byte, 1024)
 
-	botName := fmt.Sprintf("bot %v", botId)
+	botName := fmt.Sprintf("%c %v", botEmoji, botId)
 
 	joinGame := pb.JoinGame{Username: botName}
 
