@@ -1,4 +1,4 @@
-div.leaderboard-dialog {
+div.hud-leaderboard {
   padding: 3px;
   margin: 10px;
   display: none;
@@ -12,6 +12,8 @@ div.leaderboard-dialog {
 table.leaderboard {
   table-layout: fixed;
   width: 100%;
+  font-size: 8pt;
+  color: transparentize($color-primary, 0.2);
 
   tbody tr.current {
     font-weight: bolder; // Why u no work?
@@ -40,7 +42,5 @@ table.leaderboard {
     }
 
     padding: 5px;
-    font-size: 8pt;
-    color: transparentize($color-primary, 0.2);
   }
 }

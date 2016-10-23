@@ -1,0 +1,33 @@
+.hud-debug {
+  right: 0px;
+  padding: 3px;
+  margin: 10px;
+  display: none;
+  background: transparentize($color-background, 0.9);
+  color: $color-primary;
+  position: absolute;
+  z-index: 4000;
+}
+
+dl.dl-horizontal {
+  font-size: 12pt;
+  font-family: $font-secondary;
+  color: $color-primary;
+
+  dt {
+    float: left;
+    clear: left;
+    width: 60px;
+    text-align: right;
+    font-weight: bold;
+  }
+  dt:after {
+    content: ":";
+  }
+  dd {
+    width: 50px;
+    margin: 0 0 0 70px;
+    padding: 0 0.25em 0.25em 0;
+    font-family: $font-mono;
+  }
+}

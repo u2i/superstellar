@@ -16,14 +16,18 @@ export default class LeaderboardDialog {
     tbody.innerHTML = '';
 
     for(let rank of ranks) {
-      let tr = document.createElement("tr");
-
-      tr.appendChild(this.buildCell(rank.rank, 'rank'));
-      tr.appendChild(this.buildCell(rank.name, 'name'));
-      tr.appendChild(this.buildCell(rank.score, 'score'));
-
+      let tr = this.buildRow(rank);
       tbody.appendChild(tr);
     }
+  }
+
+  buildRow(rank) {
+    let tr = document.createElement("tr");
+
+    tr.appendChild(this.buildCell(rank.rank, 'rank'));
+    tr.appendChild(this.buildCell(rank.name, 'name'));
+    tr.appendChild(this.buildCell(rank.score, 'score'));
+    return tr;
   }
 
   buildCell(html, className) {

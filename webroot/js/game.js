@@ -82,7 +82,7 @@ function setup() {
   stage.addChild(overlay);
 
   hud = new Hud();
-  hud.setPosition(renderer.width - Hud.rightOffset);
+  hud.show();
 
   usernameDialog.show();
   leaderboardDialog.show();

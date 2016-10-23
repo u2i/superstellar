@@ -1,5 +1,5 @@
 import * as PIXI from "pixi.js";
-import { globalState, stage } from './globals';
+import {globalState, stage} from './globals';
 
 const rightOffset = 150;
 
@@ -8,25 +8,23 @@ export default class Hud {
     return rightOffset;
   }
 
-  constructor () {
-    this.hudTextStyle = {
-      fontFamily: 'Helvetica',
-      fontSize: '24px',
-      fill: '#FFFFFF',
-      align: 'left',
-      textBaseline: 'top'
-    };
-
-    this.text = new PIXI.Text('', this.hudTextStyle);
+  constructor() {
+    this.domNode = document.getElementById('hud-debug');
 
     this.frameCounter = 0;
     this.fps = 0;
     this.lastTime = Date.now();
-
-    stage.addChild(this.text);
   }
 
-  update () {
+  show() {
+    this.domNode.style.display = 'block'
+  }
+
+  hide() {
+    this.domNode.style.display = 'none'
+  }
+
+  update() {
     this.frameCounter++;
 
     if (this.frameCounter === 100) {
@@ -37,19 +35,15 @@ export default class Hud {
       this.lastTime = now;
     }
 
-    this.text.text = this._updateHudText();
+    this._updateHtml()
   }
 
-  setPosition(width, height = 0) {
-    this.text.x = width;
-    this.text.y = height;
-  }
-
-  _updateHudText () {
+  _updateHtml() {
     const playerShip = globalState.spaceshipMap.get(globalState.clientId);
 
-    let text = "FPS: " + this.fps + "\n";
-    text += "Ships: " + globalState.spaceshipMap.size + "\n";
+    this.getFpsNode().innerHTML = this.fps;
+    this.getShipsNode().innerHTML = globalState.spaceshipMap.size;
+    this.getSpeedNode().innerHTML = this.getSpeed();
 
     if (__DEBUG__) {
       let x = playerShip ? Math.floor(playerShip.position.x / 100) : '?';
@@ -58,7 +52,28 @@ export default class Hud {
       text += "X: " + x + "\n";
       text += "Y: " + y + "\n";
     }
+  }
 
-    return text;
+  getSpeed() {
+    let currentShip = globalState.spaceshipMap.get(globalState.clientId);
+    if (currentShip !== undefined) {
+      let x2 = currentShip.velocity.x * currentShip.velocity.x;
+      var y2 = currentShip.velocity.y * currentShip.velocity.y;
+      let v = Math.sqrt(x2 + y2);
+      return v.toFixed(0)
+    }
+    return 'n/a';
+  }
+
+  getFpsNode() {
+    return this.domNode.querySelector('[data-type="fps"]');
+  }
+
+  getShipsNode() {
+    return this.domNode.querySelector('[data-type="ships"]');
+  }
+
+  getSpeedNode() {
+    return this.domNode.querySelector('[data-type="speed"]');
   }
 }

@@ -3,9 +3,10 @@
 <head>
     <meta charset="utf-8">
     <title>Superstellar</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto+Mono|Roboto:400,700" rel="stylesheet">
 </head>
 <body>
-<div id="leaderboard" class="leaderboard-dialog" style="display: none;">
+<div id="leaderboard" class="hud-leaderboard" style="display: none;">
     <table class="leaderboard">
         <tbody>
         <!--
@@ -32,6 +33,16 @@
         -->
         </tbody>
     </table>
+</div>
+<div id="hud-debug" class="hud-debug" style="display: none;">
+    <dl class="dl-horizontal">
+        <dt>FPS</dt>
+        <dd data-type="fps"></dd>
+        <dt>Ships</dt>
+        <dd data-type="ships"></dd>
+        <dt>Speed</dt>
+        <dd data-type="speed"></dd>
+    </dl>
 </div>
 <div id="game"></div>
 <script src="vendor.js"></script>
