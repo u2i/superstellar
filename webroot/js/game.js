@@ -97,7 +97,6 @@ window.addEventListener("resize", () => {
   tilingSprite.height = windowSize.height;
   overlay.filterArea.width = windowSize.width;
   overlay.filterArea.height = windowSize.height;
-  hud.setPosition(windowSize.width - Hud.rightOffset);
   fogShader.dimensions[0] = windowSize.width;
   fogShader.dimensions[1] = windowSize.height;
 });

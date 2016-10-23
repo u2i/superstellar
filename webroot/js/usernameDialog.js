@@ -1,4 +1,5 @@
 import { sendMessage, JoinGame } from './communicationLayer';
+import Cookie from 'js-cookie';
 import * as Utils from "./utils";
 
 const WIDTH = 300;
@@ -10,12 +11,14 @@ export default class UsernameDialog {
 
     this.domNode.className = 'game-dialog';
 
-    this._updatePosition(); 
+    let previousNickname = Cookie.get('nickname') || '';
+
+    this._updatePosition();
     this.domNode.innerHTML = `
     <div class="dialog-content">
       <p class="dialog-message">Welcome Captain... errhm... what was your name again?</p>
       <form id="submit-username-form">
-	<input autofocus class="underline-input" id="insert-name-input" type="text" minlength="3" maxlength="25" required/>
+	<input autofocus class="underline-input" id="insert-name-input" type="text" minlength="3" maxlength="25" value="${previousNickname}" required/>
 	<input class="action-button" type="submit" value="Blast'em Off!" />
       </form>
     </div>
@@ -60,6 +63,7 @@ export default class UsernameDialog {
 
   _sendJoinGame () {
     const nickname = document.getElementById("insert-name-input").value;
+    Cookie.set('nickname', nickname, {expires: 7});
     sendMessage(new JoinGame(nickname));
   }
 }
