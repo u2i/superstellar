@@ -67,13 +67,15 @@ export default class Spaceship {
       this.position.x / 100,
       this.position.y / 100,
       viewport
-    )
+    );
 
     this.container.position.set(x, y);
     this.container.rotation = this.facing;
 
-    this.label.text = globalState.clientIdToName.get(this.id);
-    this.label.position.set(x - (this.label.text.length * 8) / 2, y - this.sprite.height);
+    if (globalState.clientId !== this.id) {
+      this.label.text = globalState.clientIdToName.get(this.id);
+      this.label.position.set(x - (this.label.text.length * 8) / 2, y - this.sprite.height);
+    }
 
     this.healthBar.text = this.hp;
   }
