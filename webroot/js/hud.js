@@ -1,13 +1,6 @@
-import * as PIXI from "pixi.js";
-import {globalState, stage} from './globals';
-
-const rightOffset = 150;
+import {globalState} from './globals';
 
 export default class Hud {
-  static get rightOffset() {
-    return rightOffset;
-  }
-
   constructor() {
     this.domNode = document.getElementById('hud-debug');
 
@@ -17,7 +10,12 @@ export default class Hud {
   }
 
   show() {
-    this.domNode.style.display = 'block'
+    this.domNode.style.display = 'block';
+    if (__DEBUG__) {
+      for (let definition of this.domNode.querySelectorAll('[class="debug"]')) {
+        definition.className = '';
+      }
+    }
   }
 
   hide() {
@@ -43,14 +41,13 @@ export default class Hud {
 
     this.getFpsNode().innerHTML = this.fps;
     this.getShipsNode().innerHTML = globalState.spaceshipMap.size;
-    this.getSpeedNode().innerHTML = this.getSpeed();
 
     if (__DEBUG__) {
-      let x = playerShip ? Math.floor(playerShip.position.x / 100) : '?';
-      let y = playerShip ? Math.floor(playerShip.position.y / 100) : '?';
+      this.getSpeedNode().innerHTML = this.getSpeed();
 
-      text += "X: " + x + "\n";
-      text += "Y: " + y + "\n";
+      let [x, y] = this.getPosition(playerShip);
+      this.getPositionNode('x').innerHTML = x;
+      this.getPositionNode('y').innerHTML = y;
     }
   }
 
@@ -58,11 +55,11 @@ export default class Hud {
     let currentShip = globalState.spaceshipMap.get(globalState.clientId);
     if (currentShip !== undefined) {
       let x2 = currentShip.velocity.x * currentShip.velocity.x;
-      var y2 = currentShip.velocity.y * currentShip.velocity.y;
+      let y2 = currentShip.velocity.y * currentShip.velocity.y;
       let v = Math.sqrt(x2 + y2);
       return v.toFixed(0)
     }
-    return 'n/a';
+    return '?';
   }
 
   getFpsNode() {
@@ -75,5 +72,16 @@ export default class Hud {
 
   getSpeedNode() {
     return this.domNode.querySelector('[data-type="speed"]');
+  }
+
+  getPosition(playerShip) {
+    let x = playerShip ? Math.floor(playerShip.position.x / 100) : '?';
+    let y = playerShip ? Math.floor(playerShip.position.y / 100) : '?';
+
+    return [x, y];
+  }
+
+  getPositionNode(dimension) {
+    return this.domNode.querySelector(`[data-type="coordinate-${dimension}"]`);
   }
 }
