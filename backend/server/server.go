@@ -12,25 +12,28 @@ import (
 
 	"golang.org/x/net/websocket"
 	"sort"
+	"superstellar/backend/events"
 )
 
 // Server struct holds server variables.
 type Server struct {
-	pattern       string
-	space         *space.Space
-	clients       map[uint32]*Client
-	monitor       *Monitor
-	addCh         chan *Client
-	delCh         chan *Client
-	inputCh       chan *space.UserInput
-	shotsCh       chan *space.Projectile
-	doneCh        chan bool
-	errCh         chan error
-	updateCh      chan bool
-	physicsCh     chan bool
-	leaderboardCh chan bool
-	generateIDCh  chan chan uint32
-	clientID      uint32
+	pattern         string
+	space           *space.Space
+	clients         map[uint32]*Client
+	monitor         *Monitor
+	addCh           chan *Client
+	delCh           chan *Client
+	inputCh         chan *space.UserInput
+	shotsCh         chan *space.Projectile
+	projectileHitCh chan *events.ProjectileHitEvent
+	doneCh          chan bool
+	errCh           chan error
+	updateCh        chan bool
+	physicsCh       chan bool
+	leaderboardCh   chan bool
+	generateIDCh    chan chan uint32
+	clientID        uint32
+	eventProcessor  *events.EventProcessor
 }
 
 const (
@@ -50,9 +53,11 @@ const (
 // NewServer initializes a new server.
 func NewServer(pattern string) *Server {
 	shotsCh := make(chan *space.Projectile, ShotsChannelSize)
+	x := space.NewSpace(shotsCh)
+
 	return &Server{
 		pattern:      pattern,
-		space:        space.NewSpace(shotsCh),
+		space:        x,
 		clients:      make(map[uint32]*Client),
 		monitor:      newMonitor(),
 		addCh:        make(chan *Client),
@@ -66,6 +71,7 @@ func NewServer(pattern string) *Server {
 		leaderboardCh: make(chan bool),
 		generateIDCh: make(chan chan uint32),
 		clientID:     0,
+		eventProcessor: events.NewEventProcessor(x),
 	}
 }
 
@@ -183,6 +189,8 @@ func (s *Server) runLeaderboardTicker() {
 
 func (s *Server) mainGameLoop() {
 	for {
+		s.eventProcessor.ProcessEvents()
+
 		select {
 
 		case c := <-s.addCh:
@@ -354,7 +362,7 @@ func (s *Server) handleUpdate() {
 func (s *Server) handlePhysicsUpdate() {
 	before := time.Now()
 
-	physics.UpdatePhysics(s.space)
+	physics.UpdatePhysics(s.space, s.eventProcessor)
 
 	elapsed := time.Since(before)
 	s.monitor.addPhysicsTime(elapsed)
@@ -363,9 +371,9 @@ func (s *Server) handlePhysicsUpdate() {
 func (s *Server) handleLeaderboardUpdate() {
 	size := len(s.space.Spaceships)
 	ranks := make([]Rank, 0, size)
-	for _, spaceship := range s.space.Spaceships  {
+	for _, spaceship := range s.space.Spaceships {
 		// TODO: change to MaxHP?
-		ranks = append(ranks, Rank{spaceship.ID,spaceship.HP})
+		ranks = append(ranks, Rank{spaceship.ID, spaceship.HP})
 	}
 	sort.Stable(sort.Reverse(SortableByScore(ranks)))
 
