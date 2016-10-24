@@ -28,7 +28,6 @@ type Server struct {
 	shotsCh          chan *space.Projectile
 	doneCh           chan bool
 	errCh            chan error
-	updateCh         chan bool
 	physicsCh        chan bool
 	leaderboardCh    chan bool
 	generateIDCh     chan chan uint32
@@ -42,9 +41,6 @@ const (
 
 	// PhysicsTickInterval equals how often the physics is updated
 	PhysicsTickInterval = 20 * time.Millisecond
-
-	// BroadcastStateTickInterval equals how often we broadcast state to clients
-	BroadcastStateTickInterval = 20 * time.Millisecond
 
 	// ShotsChannelSize defines the size of UserEvents channel.
 	ShotsChannelSize = 100
@@ -65,7 +61,6 @@ func NewServer(pattern string, eventDispatcher *event_dispatcher.EventDispatcher
 		shotsCh:      shotsCh,
 		doneCh:       make(chan bool),
 		errCh:        make(chan error),
-		updateCh:     make(chan bool),
 		leaderboardCh: make(chan bool),
 		generateIDCh: make(chan chan uint32),
 		clientID:     0,
@@ -110,12 +105,10 @@ func (s *Server) Listen() {
 	log.Println("Listening server...")
 
 	s.addNewClientHandler()
-	s.runSenderTicker()
 	s.runLeaderboardTicker()
 	s.monitor.run()
 	s.eventsDispatcher.RegisterTimeTickListener(s)
 	s.eventsDispatcher.RegisterProjectileFiredListener(s)
-	s.mainGameLoop()
 }
 
 func (s *Server) sendSpace() {
@@ -159,15 +152,6 @@ func (s *Server) addNewClientHandler() {
 	http.Handle(s.pattern, websocket.Handler(onConnected))
 }
 
-func (s *Server) runSenderTicker() {
-	ticker := time.NewTicker(BroadcastStateTickInterval)
-	go func() {
-		for _ = range ticker.C {
-			s.updateCh <- true
-		}
-	}()
-}
-
 func (s *Server) runLeaderboardTicker() {
 	ticker := time.NewTicker(LeaderboardTickInterval)
 	go func() {
@@ -190,9 +174,6 @@ func (s *Server) mainGameLoop() {
 	case input := <-s.inputCh:
 		s.handleUserInput(input)
 
-	case <-s.updateCh:
-		s.handleUpdate()
-
 	case <-s.leaderboardCh:
 		s.handleLeaderboardUpdate()
 
@@ -204,12 +185,14 @@ func (s *Server) mainGameLoop() {
 
 	case <-s.doneCh:
 		return
+	default:
 	}
 }
 
 func (s *Server) HandleTimeTick(e *events.TimeTick) {
 	s.handlePhysicsUpdate()
 	s.mainGameLoop()
+	s.sendSpace()
 }
 
 func (s *Server) HandleProjectileFired(e *events.ProjectileFired) {
@@ -343,10 +326,6 @@ func (s *Server) sendUserLeftMessage(userID uint32) {
 
 func (s *Server) handleUserInput(userInput *space.UserInput) {
 	s.space.UpdateUserInput(userInput)
-}
-
-func (s *Server) handleUpdate() {
-	s.sendSpace()
 }
 
 func (s *Server) handlePhysicsUpdate() {
