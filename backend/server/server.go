@@ -29,39 +29,23 @@ type Server struct {
 	doneCh           chan bool
 	errCh            chan error
 	physicsCh        chan bool
-	leaderboardCh    chan bool
 	generateIDCh     chan chan uint32
 	clientID         uint32
 	eventsDispatcher *event_dispatcher.EventDispatcher
 }
 
-const (
-	// LeaderboardTickInterval defines frequency of updating Leaderboard
-	LeaderboardTickInterval = 50 * PhysicsTickInterval
-
-	// PhysicsTickInterval equals how often the physics is updated
-	PhysicsTickInterval = 20 * time.Millisecond
-
-	// ShotsChannelSize defines the size of UserEvents channel.
-	ShotsChannelSize = 100
-)
-
 // NewServer initializes a new server.
 func NewServer(pattern string, eventDispatcher *event_dispatcher.EventDispatcher) *Server {
-	shotsCh := make(chan *space.Projectile, ShotsChannelSize)
-
 	return &Server{
 		pattern:      pattern,
-		space:        space.NewSpace(shotsCh),
+		space:        space.NewSpace(),
 		clients:      make(map[uint32]*Client),
 		monitor:      newMonitor(),
 		addCh:        make(chan *Client),
 		delCh:        make(chan *Client),
 		inputCh:      make(chan *space.UserInput),
-		shotsCh:      shotsCh,
 		doneCh:       make(chan bool),
 		errCh:        make(chan error),
-		leaderboardCh: make(chan bool),
 		generateIDCh: make(chan chan uint32),
 		clientID:     0,
 		eventsDispatcher: eventDispatcher,
@@ -105,7 +89,6 @@ func (s *Server) Listen() {
 	log.Println("Listening server...")
 
 	s.addNewClientHandler()
-	s.runLeaderboardTicker()
 	s.monitor.run()
 	s.eventsDispatcher.RegisterTimeTickListener(s)
 	s.eventsDispatcher.RegisterProjectileFiredListener(s)
@@ -152,15 +135,6 @@ func (s *Server) addNewClientHandler() {
 	http.Handle(s.pattern, websocket.Handler(onConnected))
 }
 
-func (s *Server) runLeaderboardTicker() {
-	ticker := time.NewTicker(LeaderboardTickInterval)
-	go func() {
-		for _ = range ticker.C {
-			s.leaderboardCh <- true
-		}
-	}()
-}
-
 func (s *Server) mainGameLoop() {
 	// TODO: not a loop anymore ;)
 	select {
@@ -173,9 +147,6 @@ func (s *Server) mainGameLoop() {
 
 	case input := <-s.inputCh:
 		s.handleUserInput(input)
-
-	case <-s.leaderboardCh:
-		s.handleLeaderboardUpdate()
 
 	case ch := <-s.generateIDCh:
 		s.handleGenerateIDCh(ch)
@@ -193,6 +164,9 @@ func (s *Server) HandleTimeTick(e *events.TimeTick) {
 	s.handlePhysicsUpdate()
 	s.mainGameLoop()
 	s.sendSpace()
+	if (e.FrameId % 50 == 0) {
+		s.handleLeaderboardUpdate()
+	}
 }
 
 func (s *Server) HandleProjectileFired(e *events.ProjectileFired) {

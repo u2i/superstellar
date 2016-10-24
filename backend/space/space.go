@@ -20,9 +20,8 @@ type Space struct {
 }
 
 // NewSpace initializes new Space.
-func NewSpace(shotsCh chan *Projectile) *Space {
+func NewSpace() *Space {
 	return &Space{
-		ShotsCh:               shotsCh,
 		Spaceships:            make(map[uint32]*Spaceship),
 		Projectiles:           make(map[*Projectile]bool),
 		PhysicsFrameID:        0,
