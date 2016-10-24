@@ -9,12 +9,14 @@ import (
 	"superstellar/backend/space"
 	"superstellar/backend/types"
 	"time"
+	"superstellar/backend/event_dispatcher"
+	"superstellar/backend/events"
 )
 
 // UpdatePhysics updates world physics for the next simulation step
-func UpdatePhysics(space *space.Space) {
+func UpdatePhysics(space *space.Space, eventDispatcher *event_dispatcher.EventDispatcher) {
 	detectProjectileCollisions(space)
-	updateSpaceships(space)
+	updateSpaceships(space, eventDispatcher)
 	updateProjectiles(space)
 }
 
@@ -29,7 +31,7 @@ func detectProjectileCollisions(space *space.Space) {
 	}
 }
 
-func updateSpaceships(s *space.Space) {
+func updateSpaceships(s *space.Space, eventDispatcher *event_dispatcher.EventDispatcher) {
 	now := time.Now()
 
 	for _, spaceship := range s.Spaceships {
@@ -39,8 +41,12 @@ func updateSpaceships(s *space.Space) {
 				projectile := space.NewProjectile(s.NextProjectileID(),
 					s.PhysicsFrameID, spaceship)
 				s.AddProjectile(projectile)
-				s.ShotsCh <- projectile
 				spaceship.LastShotTime = now
+
+				shotEvent := &events.ProjectileFired{
+					Projectile: projectile,
+				}
+				eventDispatcher.FireProjectileFired(shotEvent)
 			}
 		}
 

@@ -114,6 +114,7 @@ func (s *Server) Listen() {
 	s.runLeaderboardTicker()
 	s.monitor.run()
 	s.eventsDispatcher.RegisterTimeTickListener(s)
+	s.eventsDispatcher.RegisterProjectileFiredListener(s)
 	s.mainGameLoop()
 }
 
@@ -189,9 +190,6 @@ func (s *Server) mainGameLoop() {
 	case input := <-s.inputCh:
 		s.handleUserInput(input)
 
-	case shot := <-s.shotsCh:
-		s.sendShot(shot)
-
 	case <-s.updateCh:
 		s.handleUpdate()
 
@@ -212,6 +210,10 @@ func (s *Server) mainGameLoop() {
 func (s *Server) HandleTimeTick(e *events.TimeTick) {
 	s.handlePhysicsUpdate()
 	s.mainGameLoop()
+}
+
+func (s *Server) HandleProjectileFired(e *events.ProjectileFired) {
+	s.sendShot(e.Projectile)
 }
 
 func (s *Server) handleAddNewClient(client *Client) {
@@ -350,7 +352,7 @@ func (s *Server) handleUpdate() {
 func (s *Server) handlePhysicsUpdate() {
 	before := time.Now()
 
-	physics.UpdatePhysics(s.space)
+	physics.UpdatePhysics(s.space, s.eventsDispatcher)
 
 	elapsed := time.Since(before)
 	s.monitor.addPhysicsTime(elapsed)
