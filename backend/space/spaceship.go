@@ -3,6 +3,7 @@ package space
 import (
 	"fmt"
 	"math"
+	"superstellar/backend/constants"
 	"superstellar/backend/pb"
 	"superstellar/backend/types"
 	"time"
@@ -16,26 +17,6 @@ const (
 	NONE Direction = iota
 	RIGHT
 	LEFT
-)
-
-const (
-	// Acceleration is spaceship's linear acceleration on thruster.
-	Acceleration = 20.0
-
-	// AngularVelocity is an angular velocity added on user input.
-	AngularVelocity = 0.1
-
-	// MaxSpeed maximum speed of the spacecraft
-	MaxSpeed = 1999
-
-	// ShipSize is spaceship's radius
-	ShipSize = 2000
-
-	// MinFireInterval is a minimum time between firing.
-	MinFireInterval = 500 * time.Millisecond
-
-	// InitialHP spaceship HP
-	InitialHP = 500
 )
 
 // Spaceship struct describes a spaceship.
@@ -99,7 +80,7 @@ func (s *Spaceship) DetectCollision(other *Spaceship) bool {
 	v := types.Point{X: s.Position.X - other.Position.X, Y: s.Position.Y - other.Position.Y}
 	dist := v.Length()
 
-	return dist < 2*ShipSize
+	return dist < 2*constants.SpaceshipSize
 }
 
 // Collide transforms colliding ships' parameters.
@@ -121,7 +102,7 @@ func (s *Spaceship) Collide(other *Spaceship) {
 }
 
 func (s *Spaceship) CollideWithProjectile(projectile *Projectile) {
-	if (s.HP < 100) {
+	if s.HP < 100 {
 		s.HP = 0
 	} else {
 		s.HP -= 100

@@ -5,10 +5,11 @@ import (
 	"log"
 	"math"
 	"math/rand"
+	"superstellar/backend/constants"
+	"superstellar/backend/events"
 	"superstellar/backend/space"
 	"superstellar/backend/types"
 	"time"
-	"superstellar/backend/events"
 )
 
 // UpdatePhysics updates world physics for the next simulation step
@@ -24,7 +25,7 @@ func detectProjectileCollisions(space *space.Space, eventProcessor *events.Event
 			if projectile.ClientID != clientID && projectile.DetectCollision(spaceship) {
 				event := &events.ProjectileHitEvent{
 					Projectile: projectile,
-					Spaceship: spaceship,
+					Spaceship:  spaceship,
 				}
 				eventProcessor.AddEvent(event)
 			}
@@ -38,7 +39,7 @@ func updateSpaceships(s *space.Space) {
 	for _, spaceship := range s.Spaceships {
 		if spaceship.Fire {
 			timeSinceLastShot := now.Sub(spaceship.LastShotTime)
-			if timeSinceLastShot >= space.MinFireInterval {
+			if timeSinceLastShot >= constants.MinFireInterval {
 				projectile := space.NewProjectile(s.NextProjectileID(),
 					s.PhysicsFrameID, spaceship)
 				s.AddProjectile(projectile)
@@ -48,19 +49,19 @@ func updateSpaceships(s *space.Space) {
 		}
 
 		if spaceship.InputThrust {
-			deltaVelocity := spaceship.NormalizedFacing().Multiply(space.Acceleration)
+			deltaVelocity := spaceship.NormalizedFacing().Multiply(constants.SpaceshipAcceleration)
 			spaceship.Velocity = spaceship.Velocity.Add(deltaVelocity)
 		}
 
-		if spaceship.Position.Add(spaceship.Velocity).Length() > space.WorldRadius {
-			outreachLength := spaceship.Position.Length() - space.WorldRadius
-			gravityAcceleration := -(outreachLength / space.BoundaryAnnulusWidth) * space.Acceleration
+		if spaceship.Position.Add(spaceship.Velocity).Length() > constants.WorldRadius {
+			outreachLength := spaceship.Position.Length() - constants.WorldRadius
+			gravityAcceleration := -(outreachLength / constants.BoundaryAnnulusWidth) * constants.SpaceshipAcceleration
 			deltaVelocity := spaceship.Position.Normalize().Multiply(gravityAcceleration)
 			spaceship.Velocity = spaceship.Velocity.Add(deltaVelocity)
 		}
 
-		if spaceship.Velocity.Length() > space.MaxSpeed {
-			spaceship.Velocity = spaceship.Velocity.Normalize().Multiply(space.MaxSpeed)
+		if spaceship.Velocity.Length() > constants.SpaceshipMaxSpeed {
+			spaceship.Velocity = spaceship.Velocity.Normalize().Multiply(constants.SpaceshipMaxSpeed)
 		}
 
 		spaceship.Position = spaceship.Position.Add(spaceship.Velocity)
@@ -68,9 +69,9 @@ func updateSpaceships(s *space.Space) {
 		angle := math.Atan2(spaceship.Facing.Y, spaceship.Facing.X)
 		switch spaceship.InputDirection {
 		case space.LEFT:
-			angle += space.AngularVelocity
+			angle += constants.SpaceshipAngularVelocity
 		case space.RIGHT:
-			angle -= space.AngularVelocity
+			angle -= constants.SpaceshipAngularVelocity
 		}
 
 		spaceship.Facing = types.NewVector(math.Cos(angle), math.Sin(angle))

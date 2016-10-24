@@ -4,21 +4,10 @@ import (
 	"log"
 	"math"
 	"math/rand"
+	"superstellar/backend/constants"
 	"superstellar/backend/pb"
 	"superstellar/backend/types"
 	"time"
-)
-
-const (
-	// WorldRadius is the radius of playable world (in .01 units)
-	WorldRadius = 100000
-
-	// BoundaryAnnulusWidth is the width of boundary region (in .01 units), i.e. from WorldRadius till when no more movement is possible
-	BoundaryAnnulusWidth = 20000
-
-	// RandomPositionEmptyRadius describes the minimum radius around randomized
-	// initial position that needs to be free of any objects.
-	RandomPositionEmptyRadius = 5000.0
 )
 
 // Space struct holds entire game state.
@@ -52,8 +41,8 @@ func (space *Space) NewSpaceship(clientID uint32) {
 		InputDirection: NONE,
 		Fire:           false,
 		LastShotTime:   time.Now(),
-		HP:             InitialHP,
-		MaxHP:          InitialHP,
+		HP:             constants.SpaceshipInitialHP,
+		MaxHP:          constants.SpaceshipInitialHP,
 	}
 
 	space.AddSpaceship(clientID, spaceship)
@@ -119,7 +108,7 @@ func (space *Space) ToMessage() *pb.Message {
 func (space *Space) randomEmptyPosition() *types.Point {
 	for {
 		position := space.randomPoint()
-		if space.furtherFromAnyObject(position, RandomPositionEmptyRadius) {
+		if space.furtherFromAnyObject(position, constants.RandomPositionEmptyRadius) {
 			return position
 		}
 	}
@@ -127,7 +116,7 @@ func (space *Space) randomEmptyPosition() *types.Point {
 
 func (space *Space) randomPoint() *types.Point {
 	angle := rand.Float64() * 2 * math.Pi
-	radius := rand.Uint32() % (WorldRadius + 1)
+	radius := rand.Uint32() % (constants.WorldRadius + 1)
 
 	return types.NewPointFromPolar(angle, radius)
 }

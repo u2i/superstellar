@@ -2,6 +2,7 @@ package space
 
 import (
 	"math"
+	"superstellar/backend/constants"
 	"superstellar/backend/pb"
 	"superstellar/backend/types"
 )
@@ -62,5 +63,5 @@ func (projectile *Projectile) DetectCollision(spaceship *Spaceship) bool {
 	vB := types.Point{X: endPoint.X - spaceship.Position.X, Y: endPoint.Y - spaceship.Position.Y}
 	distB := vB.Length()
 
-	return distA < ShipSize || distB < ShipSize
+	return distA < constants.SpaceshipSize || distB < constants.SpaceshipSize
 }
