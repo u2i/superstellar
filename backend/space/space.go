@@ -12,7 +12,6 @@ import (
 
 // Space struct holds entire game state.
 type Space struct {
-	ShotsCh               chan *Projectile
 	Spaceships            map[uint32]*Spaceship `json:"spaceships"`
 	Projectiles           map[*Projectile]bool
 	PhysicsFrameID        uint32

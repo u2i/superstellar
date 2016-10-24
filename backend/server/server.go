@@ -25,7 +25,6 @@ type Server struct {
 	addCh            chan *Client
 	delCh            chan *Client
 	inputCh          chan *space.UserInput
-	shotsCh          chan *space.Projectile
 	doneCh           chan bool
 	errCh            chan error
 	physicsCh        chan bool
