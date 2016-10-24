@@ -13,27 +13,27 @@ import (
 	"golang.org/x/net/websocket"
 	"sort"
 	"superstellar/backend/events"
+	"superstellar/backend/event_dispatcher"
 )
 
 // Server struct holds server variables.
 type Server struct {
-	pattern         string
-	space           *space.Space
-	clients         map[uint32]*Client
-	monitor         *Monitor
-	addCh           chan *Client
-	delCh           chan *Client
-	inputCh         chan *space.UserInput
-	shotsCh         chan *space.Projectile
-	projectileHitCh chan *events.ProjectileHitEvent
-	doneCh          chan bool
-	errCh           chan error
-	updateCh        chan bool
-	physicsCh       chan bool
-	leaderboardCh   chan bool
-	generateIDCh    chan chan uint32
-	clientID        uint32
-	eventProcessor  *events.EventProcessor
+	pattern          string
+	space            *space.Space
+	clients          map[uint32]*Client
+	monitor          *Monitor
+	addCh            chan *Client
+	delCh            chan *Client
+	inputCh          chan *space.UserInput
+	shotsCh          chan *space.Projectile
+	doneCh           chan bool
+	errCh            chan error
+	updateCh         chan bool
+	physicsCh        chan bool
+	leaderboardCh    chan bool
+	generateIDCh     chan chan uint32
+	clientID         uint32
+	eventsDispatcher *event_dispatcher.EventDispatcher
 }
 
 const (
@@ -51,13 +51,12 @@ const (
 )
 
 // NewServer initializes a new server.
-func NewServer(pattern string) *Server {
+func NewServer(pattern string, eventDispatcher *event_dispatcher.EventDispatcher) *Server {
 	shotsCh := make(chan *space.Projectile, ShotsChannelSize)
-	x := space.NewSpace(shotsCh)
 
 	return &Server{
 		pattern:      pattern,
-		space:        x,
+		space:        space.NewSpace(shotsCh),
 		clients:      make(map[uint32]*Client),
 		monitor:      newMonitor(),
 		addCh:        make(chan *Client),
@@ -67,11 +66,10 @@ func NewServer(pattern string) *Server {
 		doneCh:       make(chan bool),
 		errCh:        make(chan error),
 		updateCh:     make(chan bool),
-		physicsCh:    make(chan bool),
 		leaderboardCh: make(chan bool),
 		generateIDCh: make(chan chan uint32),
 		clientID:     0,
-		eventProcessor: events.NewEventProcessor(x),
+		eventsDispatcher: eventDispatcher,
 	}
 }
 
@@ -113,9 +111,9 @@ func (s *Server) Listen() {
 
 	s.addNewClientHandler()
 	s.runSenderTicker()
-	s.runPhysicsTicker()
 	s.runLeaderboardTicker()
 	s.monitor.run()
+	s.eventsDispatcher.RegisterTimeTickListener(s)
 	s.mainGameLoop()
 }
 
@@ -169,15 +167,6 @@ func (s *Server) runSenderTicker() {
 	}()
 }
 
-func (s *Server) runPhysicsTicker() {
-	ticker := time.NewTicker(PhysicsTickInterval)
-	go func() {
-		for _ = range ticker.C {
-			s.physicsCh <- true
-		}
-	}()
-}
-
 func (s *Server) runLeaderboardTicker() {
 	ticker := time.NewTicker(LeaderboardTickInterval)
 	go func() {
@@ -188,42 +177,41 @@ func (s *Server) runLeaderboardTicker() {
 }
 
 func (s *Server) mainGameLoop() {
-	for {
-		s.eventProcessor.ProcessEvents()
+	// TODO: not a loop anymore ;)
+	select {
 
-		select {
+	case c := <-s.addCh:
+		s.handleAddNewClient(c)
 
-		case c := <-s.addCh:
-			s.handleAddNewClient(c)
+	case c := <-s.delCh:
+		s.handleDelClient(c)
 
-		case c := <-s.delCh:
-			s.handleDelClient(c)
+	case input := <-s.inputCh:
+		s.handleUserInput(input)
 
-		case input := <-s.inputCh:
-			s.handleUserInput(input)
+	case shot := <-s.shotsCh:
+		s.sendShot(shot)
 
-		case shot := <-s.shotsCh:
-			s.sendShot(shot)
+	case <-s.updateCh:
+		s.handleUpdate()
 
-		case <-s.updateCh:
-			s.handleUpdate()
+	case <-s.leaderboardCh:
+		s.handleLeaderboardUpdate()
 
-		case <-s.physicsCh:
-			s.handlePhysicsUpdate()
+	case ch := <-s.generateIDCh:
+		s.handleGenerateIDCh(ch)
 
-		case <-s.leaderboardCh:
-			s.handleLeaderboardUpdate()
+	case err := <-s.errCh:
+		log.Println("Error:", err.Error())
 
-		case ch := <-s.generateIDCh:
-			s.handleGenerateIDCh(ch)
-
-		case err := <-s.errCh:
-			log.Println("Error:", err.Error())
-
-		case <-s.doneCh:
-			return
-		}
+	case <-s.doneCh:
+		return
 	}
+}
+
+func (s *Server) HandleTimeTick(e *events.TimeTick) {
+	s.handlePhysicsUpdate()
+	s.mainGameLoop()
 }
 
 func (s *Server) handleAddNewClient(client *Client) {
@@ -362,7 +350,7 @@ func (s *Server) handleUpdate() {
 func (s *Server) handlePhysicsUpdate() {
 	before := time.Now()
 
-	physics.UpdatePhysics(s.space, s.eventProcessor)
+	physics.UpdatePhysics(s.space)
 
 	elapsed := time.Since(before)
 	s.monitor.addPhysicsTime(elapsed)

@@ -6,28 +6,24 @@ import (
 	"math"
 	"math/rand"
 	"superstellar/backend/constants"
-	"superstellar/backend/events"
 	"superstellar/backend/space"
 	"superstellar/backend/types"
 	"time"
 )
 
 // UpdatePhysics updates world physics for the next simulation step
-func UpdatePhysics(space *space.Space, eventProcessor *events.EventProcessor) {
-	detectProjectileCollisions(space, eventProcessor)
+func UpdatePhysics(space *space.Space) {
+	detectProjectileCollisions(space)
 	updateSpaceships(space)
 	updateProjectiles(space)
 }
 
-func detectProjectileCollisions(space *space.Space, eventProcessor *events.EventProcessor) {
+func detectProjectileCollisions(space *space.Space) {
 	for projectile := range space.Projectiles {
 		for clientID, spaceship := range space.Spaceships {
 			if projectile.ClientID != clientID && projectile.DetectCollision(spaceship) {
-				event := &events.ProjectileHitEvent{
-					Projectile: projectile,
-					Spaceship:  spaceship,
-				}
-				eventProcessor.AddEvent(event)
+				spaceship.CollideWithProjectile(projectile)
+				space.RemoveProjectile(projectile)
 			}
 		}
 	}
