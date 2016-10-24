@@ -4,6 +4,7 @@ import (
 	"superstellar/backend/events"
 	"superstellar/backend/event_dispatcher"
 	"time"
+	"superstellar/backend/constants"
 )
 
 type PhysicsTicker struct {
@@ -21,7 +22,7 @@ func NewPhysicsTicker(eventDispatcher *event_dispatcher.EventDispatcher) *Physic
 func (ticker *PhysicsTicker) Run() {
 	var i uint32
 	i = 0
-	for range time.Tick(20 * time.Millisecond) {
+	for range time.Tick(constants.PhysicsFrameDuration) {
 		event := &events.TimeTick{
 			FrameId: i,
 		}
