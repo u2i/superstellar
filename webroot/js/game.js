@@ -8,47 +8,13 @@ import { renderer, stage, globalState, usernameDialog, leaderboardDialog } from 
 import { initializeConnection } from './communicationLayer';
 import { initializeHandlers } from './messageHandlers';
 import Hud from './hud';
+import AnnulusFilter from './annulusFilter';
 
 const HOST = window.location.hostname;
 const PORT = BACKEND_PORT;
 const PATH = '/superstellar';
 
-let overlay;
-
-function AnnulusFilter() {
-  PIXI.Filter.call(this, null, shaderContent);
-  this.uniforms.worldCoordinates = new Float32Array([0.0, 0.0]);
-  this.uniforms.worldSize = new Float32Array([1000.0, 1400.0]);
-  this.uniforms.dimensions = new Float32Array([renderer.width, renderer.height, 0, 0]);
-  this.uniforms.magicMatrix = new PIXI.Matrix;
-}
-
-AnnulusFilter.prototype = Object.create(PIXI.Filter.prototype);
-AnnulusFilter.prototype.constructor = AnnulusFilter;
-
-Object.defineProperties(AnnulusFilter.prototype,
-  {
-    worldCoordinates: {
-      get: function () {return this.uniforms.worldCoordinates;},
-      set: function (value) {this.uniforms.worldCoordinates = value;}
-    },
-    worldSize: {
-      get: function () {return this.uniforms.worldSize;},
-      set: function (value) {this.uniforms.worldSize = value;}
-    },
-    dimensions: {
-      get: function () {return this.uniforms.dimensions;}
-    }
-  });
-
-AnnulusFilter.prototype.apply = function (filterManager, input, output)
-{
-  filterManager.calculateNormalizedScreenSpaceMatrix(this.uniforms.magicMatrix);
-  filterManager.applyFilter(this, input, output);
-};
-
-let shaderContent = require('raw!../shaders/annulus_fog.frag');
-let fogShader = new AnnulusFilter();
+const fogShader = new AnnulusFilter();
 
 document.getElementById('game').appendChild(renderer.view);
 
@@ -62,7 +28,7 @@ PIXI.loader.
   load(setup);
 
 let tilingSprite;
-
+let overlay;
 let hud;
 
 function setup() {
