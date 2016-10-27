@@ -90,6 +90,7 @@ export default class Spaceship {
 
   remove () {
     stage.removeChild(this.container);
+    stage.removeChild(this.healthBar);
     stage.removeChild(this.label);
   }
 
