@@ -63,8 +63,6 @@ window.addEventListener("resize", () => {
   tilingSprite.height = windowSize.height;
   overlay.filterArea.width = windowSize.width;
   overlay.filterArea.height = windowSize.height;
-  fogShader.dimensions[0] = windowSize.width;
-  fogShader.dimensions[1] = windowSize.height;
 });
 
 const defaultViewport = { vx: 0, vy: 0, width: renderer.width, height: renderer.height };

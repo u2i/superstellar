@@ -1,14 +1,19 @@
-import { renderer } from './globals';
+import * as Utils from './utils';
 
 const shaderContent = require('raw!../shaders/annulus_fog.frag');
 
-export default class AnnulusFilter {
+export default class AnnulusFilter extends PIXI.Filter {
   constructor () {
-    PIXI.Filter.call(this, null, shaderContent);
+    super(null, shaderContent);
+    this._setWindowSize();
+
     this.uniforms.worldCoordinates = new Float32Array([0.0, 0.0]);
-    this.uniforms.worldSize = new Float32Array([1000, 1400]);
-    this.uniforms.dimensions = new Float32Array([renderer.width, renderer.height, 0, 0]);
+    this.uniforms.interpolationStep = new Float32Array([1000.0, 1400.0]);
     this.uniforms.magicMatrix = new PIXI.Matrix;
+
+    window.addEventListener("resize", () => {
+      this._setWindowSize();
+    });
   }
 
   apply (filterManager, input, output) {
@@ -24,15 +29,21 @@ export default class AnnulusFilter {
     this.uniforms.worldCoordinates = value;
   }
 
-  get worldSize () {
-    return this.uniforms.worldSize;
+  get interpolationStep () {
+    return this.uniforms.interpolationStep;
   }
 
-  set worldSize (value) {
-    this.uniforms.worldSize = value;
+  set interpolationStep (value) {
+    this.uniforms.interpolationStep = value;
   }
 
-  get dimensions () {
-    return this.uniforms.dimensions;
+  get windowSize () {
+    return this.uniforms.windowSize;
+  }
+
+  _setWindowSize() {
+    const { width, height } = Utils.getCurrentWindowSize();
+
+    this.uniforms.windowSize = new Float32Array([width, height]);
   }
 }
