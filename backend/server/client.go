@@ -5,7 +5,7 @@ import (
 	"io"
 	"log"
 	"superstellar/backend/pb"
-	"superstellar/backend/space"
+	"superstellar/backend/events"
 	"time"
 
 	"github.com/golang/protobuf/proto"
@@ -24,6 +24,7 @@ type Client struct {
 	ch       chan *[]byte
 	doneCh   chan bool
 	monitor  *Monitor
+	eventDispatcher *events.EventDispatcher
 }
 
 // NewClient initializes a new Client struct with given websocket and Server.
@@ -41,7 +42,7 @@ func NewClient(ws *websocket.Conn, server *Server) *Client {
 	id := server.GenerateID()
 	monitor := server.monitor
 
-	return &Client{id, "", ws, server, ch, doneCh, monitor}
+	return &Client{id, "", ws, server, ch, doneCh, monitor, server.eventsDispatcher}
 }
 
 // Conn returns client's websocket.Conn struct.
@@ -132,8 +133,9 @@ func (c *Client) unmarshalUserInput(data []byte) {
 
 	switch x := protoUserMessage.Content.(type) {
 	case *pb.UserMessage_UserAction:
-		userInput := space.UserInputFromProto(protoUserMessage.GetUserAction().UserInput, c.id)
-		c.server.UserInput(userInput)
+		userInputEvent := events.UserInputFromProto(protoUserMessage.GetUserAction().UserInput, c.id)
+		c.eventDispatcher.FireUserInput(userInputEvent)
+		log.Print("dupa")
 	case *pb.UserMessage_JoinGame:
 		c.tryToJoinGame(protoUserMessage.GetJoinGame())
 	default:

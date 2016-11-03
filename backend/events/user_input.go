@@ -1,4 +1,4 @@
-package space
+package events
 
 import "superstellar/backend/pb"
 
@@ -22,4 +22,8 @@ func UserInputFromProto(userInput pb.UserInput, clientID uint32) *UserInput {
 		ClientID:  clientID,
 		UserInput: userInput,
 	}
+}
+
+type UserInputListener interface {
+	HandleUserInput(*UserInput)
 }

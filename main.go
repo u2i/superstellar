@@ -10,8 +10,10 @@ import (
 
 import (
 	_ "net/http/pprof"
-	"superstellar/backend/event_dispatcher"
+	"superstellar/backend/events"
 	"superstellar/backend/game"
+	"superstellar/backend/state"
+	"superstellar/backend/simulation"
 )
 
 func main() {
@@ -19,10 +21,15 @@ func main() {
 
 	rand.Seed(time.Now().UTC().UnixNano())
 
-	eventDispatcher := event_dispatcher.Instance()
+	eventDispatcher := events.Instance()
 	physicsTicker := game.NewPhysicsTicker(eventDispatcher)
 
-	server := server.NewServer("/superstellar", eventDispatcher)
+	space := state.NewSpace()
+	updater := simulation.NewUpdater(space, eventDispatcher)
+	eventDispatcher.RegisterUserInputListener(updater)
+	eventDispatcher.RegisterTimeTickListener(updater)
+
+	server := server.NewServer("/superstellar", eventDispatcher, space)
 	go server.Listen()
 
 	go eventDispatcher.RunEventLoop()

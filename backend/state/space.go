@@ -1,4 +1,4 @@
-package space
+package state
 
 import (
 	"log"
@@ -12,7 +12,7 @@ import (
 
 // Space struct holds entire game state.
 type Space struct {
-	Spaceships            map[uint32]*Spaceship `json:"spaceships"`
+	Spaceships            map[uint32]*Spaceship
 	Projectiles           map[*Projectile]bool
 	PhysicsFrameID        uint32
 	NextProjectileIDValue uint32
@@ -66,14 +66,14 @@ func (space *Space) RemoveProjectile(projectile *Projectile) {
 	delete(space.Projectiles, projectile)
 }
 
-// UpdateUserInput updates user input in correct spaceship
-func (space *Space) UpdateUserInput(userInput *UserInput) {
-	spaceship, found := space.Spaceships[userInput.ClientID]
-
-	if found {
-		spaceship.updateUserInput(userInput)
-	}
-}
+//// UpdateUserInput updates user input in correct spaceship
+//func (space *Space) UpdateUserInput(userInput *UserInput) {
+//	spaceship, found := space.Spaceships[userInput.ClientID]
+//
+//	if found {
+//		spaceship.updateUserInput(userInput)
+//	}
+//}
 
 // NextProjectileID returns next unused projectile ID.
 func (space *Space) NextProjectileID() uint32 {

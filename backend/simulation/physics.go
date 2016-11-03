@@ -1,4 +1,4 @@
-package physics
+package simulation
 
 import (
 	"container/list"
@@ -6,21 +6,20 @@ import (
 	"math"
 	"math/rand"
 	"superstellar/backend/constants"
-	"superstellar/backend/space"
 	"superstellar/backend/types"
 	"time"
-	"superstellar/backend/event_dispatcher"
+	"superstellar/backend/state"
 	"superstellar/backend/events"
 )
 
 // UpdatePhysics updates world physics for the next simulation step
-func UpdatePhysics(space *space.Space, eventDispatcher *event_dispatcher.EventDispatcher) {
+func UpdatePhysics(space *state.Space, eventDispatcher *events.EventDispatcher) {
 	detectProjectileCollisions(space)
 	updateSpaceships(space, eventDispatcher)
 	updateProjectiles(space)
 }
 
-func detectProjectileCollisions(space *space.Space) {
+func detectProjectileCollisions(space *state.Space) {
 	for projectile := range space.Projectiles {
 		for clientID, spaceship := range space.Spaceships {
 			if projectile.ClientID != clientID && projectile.DetectCollision(spaceship) {
@@ -31,14 +30,14 @@ func detectProjectileCollisions(space *space.Space) {
 	}
 }
 
-func updateSpaceships(s *space.Space, eventDispatcher *event_dispatcher.EventDispatcher) {
+func updateSpaceships(s *state.Space, eventDispatcher *events.EventDispatcher) {
 	now := time.Now()
 
 	for _, spaceship := range s.Spaceships {
 		if spaceship.Fire {
 			timeSinceLastShot := now.Sub(spaceship.LastShotTime)
 			if timeSinceLastShot >= constants.MinFireInterval {
-				projectile := space.NewProjectile(s.NextProjectileID(),
+				projectile := state.NewProjectile(s.NextProjectileID(),
 					s.PhysicsFrameID, spaceship)
 				s.AddProjectile(projectile)
 				spaceship.LastShotTime = now
@@ -70,17 +69,17 @@ func updateSpaceships(s *space.Space, eventDispatcher *event_dispatcher.EventDis
 
 		angle := math.Atan2(spaceship.Facing.Y, spaceship.Facing.X)
 		switch spaceship.InputDirection {
-		case space.LEFT:
+		case state.LEFT:
 			angle += constants.SpaceshipAngularVelocity
-		case space.RIGHT:
+		case state.RIGHT:
 			angle -= constants.SpaceshipAngularVelocity
 		}
 
 		spaceship.Facing = types.NewVector(math.Cos(angle), math.Sin(angle))
 	}
 
-	collided := make(map[*space.Spaceship]bool)
-	oldVelocity := make(map[*space.Spaceship]*types.Vector)
+	collided := make(map[*state.Spaceship]bool)
+	oldVelocity := make(map[*state.Spaceship]*types.Vector)
 
 	for _, spaceship := range s.Spaceships {
 
@@ -102,8 +101,8 @@ func updateSpaceships(s *space.Space, eventDispatcher *event_dispatcher.EventDis
 	}
 
 	queue := list.New()
-	collidedThisTurn := make(map[*space.Spaceship]bool)
-	visited := make(map[*space.Spaceship]bool)
+	collidedThisTurn := make(map[*state.Spaceship]bool)
+	visited := make(map[*state.Spaceship]bool)
 
 	for spaceship := range oldVelocity {
 		queue.PushBack(spaceship)
@@ -112,7 +111,7 @@ func updateSpaceships(s *space.Space, eventDispatcher *event_dispatcher.EventDis
 	}
 
 	for e := queue.Front(); e != nil; e = e.Next() {
-		spaceship := e.Value.(*space.Spaceship)
+		spaceship := e.Value.(*state.Spaceship)
 		collidedThisTurn[spaceship] = true
 		spaceship.Position = spaceship.Position.Add(oldVelocity[spaceship])
 
@@ -130,7 +129,7 @@ func updateSpaceships(s *space.Space, eventDispatcher *event_dispatcher.EventDis
 	}
 
 	// TODO kod przeciwzakrzepowy - wywalic jak zrobimy losowe spawnowanie
-	collided2 := make(map[*space.Spaceship]bool)
+	collided2 := make(map[*state.Spaceship]bool)
 
 	for _, spaceship := range s.Spaceships {
 		collided2[spaceship] = true
@@ -159,7 +158,7 @@ func updateSpaceships(s *space.Space, eventDispatcher *event_dispatcher.EventDis
 	s.PhysicsFrameID++
 }
 
-func updateProjectiles(space *space.Space) {
+func updateProjectiles(space *state.Space) {
 	for projectile := range space.Projectiles {
 		projectile.TTL--
 		if projectile.TTL > 0 {

@@ -4,8 +4,8 @@ import (
 	"log"
 	"net/http"
 	"superstellar/backend/pb"
-	"superstellar/backend/physics"
-	"superstellar/backend/space"
+	"superstellar/backend/simulation"
+	"superstellar/backend/state"
 	"time"
 
 	"github.com/golang/protobuf/proto"
@@ -13,34 +13,31 @@ import (
 	"golang.org/x/net/websocket"
 	"sort"
 	"superstellar/backend/events"
-	"superstellar/backend/event_dispatcher"
 )
 
 // Server struct holds server variables.
 type Server struct {
 	pattern          string
-	space            *space.Space
+	space            *state.Space
 	clients          map[uint32]*Client
 	monitor          *Monitor
 	delCh            chan *Client
-	inputCh          chan *space.UserInput
 	doneCh           chan bool
 	errCh            chan error
-	physicsCh        chan bool
 	generateIDCh     chan chan uint32
 	clientID         uint32
-	eventsDispatcher *event_dispatcher.EventDispatcher
+	eventsDispatcher *events.EventDispatcher
 }
 
 // NewServer initializes a new server.
-func NewServer(pattern string, eventDispatcher *event_dispatcher.EventDispatcher) *Server {
+// TODO remove space
+func NewServer(pattern string, eventDispatcher *events.EventDispatcher, space *state.Space) *Server {
 	return &Server{
 		pattern:      pattern,
-		space:        space.NewSpace(),
+		space:        space,
 		clients:      make(map[uint32]*Client),
 		monitor:      newMonitor(),
 		delCh:        make(chan *Client),
-		inputCh:      make(chan *space.UserInput),
 		doneCh:       make(chan bool),
 		errCh:        make(chan error),
 		generateIDCh: make(chan chan uint32),
@@ -52,11 +49,6 @@ func NewServer(pattern string, eventDispatcher *event_dispatcher.EventDispatcher
 // Del sends client delete command to the server.
 func (s *Server) Del(c *Client) {
 	s.delCh <- c
-}
-
-// UserInput sends new move command to the server.
-func (s *Server) UserInput(userInput *space.UserInput) {
-	s.inputCh <- userInput
 }
 
 // Done sends done command to the server.
@@ -127,15 +119,11 @@ func (s *Server) addNewClientHandler() {
 	http.Handle(s.pattern, websocket.Handler(onConnected))
 }
 
-func (s *Server) mainGameLoop() {
-	// TODO: not a loop anymore ;)
+func (s *Server) readChannels() {
 	select {
 
 	case c := <-s.delCh:
 		s.handleDelClient(c)
-
-	case input := <-s.inputCh:
-		s.handleUserInput(input)
 
 	case ch := <-s.generateIDCh:
 		s.handleGenerateIDCh(ch)
@@ -150,8 +138,7 @@ func (s *Server) mainGameLoop() {
 }
 
 func (s *Server) HandleTimeTick(e *events.TimeTick) {
-	s.handlePhysicsUpdate()
-	s.mainGameLoop()
+	s.readChannels()
 	s.sendSpace()
 	if (e.FrameId % 50 == 0) {
 		s.handleLeaderboardUpdate()
@@ -241,7 +228,7 @@ func (s *Server) sendHelloMessage(client *Client) {
 	client.SendMessage(&bytes)
 }
 
-func (s *Server) sendShot(shot *space.Projectile) {
+func (s *Server) sendShot(shot *state.Projectile) {
 	message := &pb.Message{
 		Content: &pb.Message_ProjectileFired{
 			ProjectileFired: shot.ToProto(),
@@ -287,14 +274,10 @@ func (s *Server) sendUserLeftMessage(userID uint32) {
 	}
 }
 
-func (s *Server) handleUserInput(userInput *space.UserInput) {
-	s.space.UpdateUserInput(userInput)
-}
-
 func (s *Server) handlePhysicsUpdate() {
 	before := time.Now()
 
-	physics.UpdatePhysics(s.space, s.eventsDispatcher)
+	simulation.UpdatePhysics(s.space, s.eventsDispatcher)
 
 	elapsed := time.Since(before)
 	s.monitor.addPhysicsTime(elapsed)
@@ -303,9 +286,9 @@ func (s *Server) handlePhysicsUpdate() {
 func (s *Server) handleLeaderboardUpdate() {
 	size := len(s.space.Spaceships)
 	ranks := make([]Rank, 0, size)
-	for _, spaceship := range s.space.Spaceships {
+	for _, stateship := range s.space.Spaceships {
 		// TODO: change to MaxHP?
-		ranks = append(ranks, Rank{spaceship.ID, spaceship.HP})
+		ranks = append(ranks, Rank{stateship.ID, stateship.HP})
 	}
 	sort.Stable(sort.Reverse(SortableByScore(ranks)))
 

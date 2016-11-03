@@ -2,17 +2,16 @@ package game
 
 import (
 	"superstellar/backend/events"
-	"superstellar/backend/event_dispatcher"
 	"time"
 	"superstellar/backend/constants"
 )
 
 type PhysicsTicker struct {
 	currentFrameId  uint32
-	eventDispatcher *event_dispatcher.EventDispatcher
+	eventDispatcher *events.EventDispatcher
 }
 
-func NewPhysicsTicker(eventDispatcher *event_dispatcher.EventDispatcher) *PhysicsTicker {
+func NewPhysicsTicker(eventDispatcher *events.EventDispatcher) *PhysicsTicker {
 	return &PhysicsTicker{
 		currentFrameId: 1,
 		eventDispatcher: eventDispatcher,

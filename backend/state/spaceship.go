@@ -1,4 +1,4 @@
-package space
+package state
 
 import (
 	"fmt"
@@ -43,8 +43,8 @@ func (s *Spaceship) NormalizedFacing() *types.Vector {
 	return s.Facing.Normalize()
 }
 
-func (s *Spaceship) updateUserInput(userInput *UserInput) {
-	switch userInput.UserInput {
+func (s *Spaceship) UpdateUserInput(userInput pb.UserInput) {
+	switch userInput {
 	case pb.UserInput_CENTER:
 		s.InputDirection = NONE
 	case pb.UserInput_LEFT:

@@ -1,7 +1,11 @@
 package events
 
-import "superstellar/backend/space"
+import "superstellar/backend/state"
 
 type ProjectileFired struct {
-	Projectile *space.Projectile
+	Projectile *state.Projectile
+}
+
+type ProjectileFiredListener interface {
+	HandleProjectileFired(*ProjectileFired)
 }
