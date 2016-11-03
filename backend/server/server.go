@@ -22,7 +22,6 @@ type Server struct {
 	space            *space.Space
 	clients          map[uint32]*Client
 	monitor          *Monitor
-	addCh            chan *Client
 	delCh            chan *Client
 	inputCh          chan *space.UserInput
 	doneCh           chan bool
@@ -40,7 +39,6 @@ func NewServer(pattern string, eventDispatcher *event_dispatcher.EventDispatcher
 		space:        space.NewSpace(),
 		clients:      make(map[uint32]*Client),
 		monitor:      newMonitor(),
-		addCh:        make(chan *Client),
 		delCh:        make(chan *Client),
 		inputCh:      make(chan *space.UserInput),
 		doneCh:       make(chan bool),
@@ -49,11 +47,6 @@ func NewServer(pattern string, eventDispatcher *event_dispatcher.EventDispatcher
 		clientID:     0,
 		eventsDispatcher: eventDispatcher,
 	}
-}
-
-// Add sends client add command to the server.
-func (s *Server) Add(c *Client) {
-	s.addCh <- c
 }
 
 // Del sends client delete command to the server.
@@ -127,7 +120,7 @@ func (s *Server) addNewClientHandler() {
 		}()
 
 		client := NewClient(ws, s)
-		s.Add(client)
+		s.handleAddNewClient(client)
 		client.Listen()
 	}
 
@@ -137,9 +130,6 @@ func (s *Server) addNewClientHandler() {
 func (s *Server) mainGameLoop() {
 	// TODO: not a loop anymore ;)
 	select {
-
-	case c := <-s.addCh:
-		s.handleAddNewClient(c)
 
 	case c := <-s.delCh:
 		s.handleDelClient(c)
