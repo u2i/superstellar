@@ -1,5 +1,7 @@
 package main
 
+//go:generate go run backend/code_generation/generate_event_dispatcher.go
+
 import (
 	"log"
 	"math/rand"

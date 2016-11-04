@@ -23,7 +23,3 @@ func UserInputFromProto(userInput pb.UserInput, clientID uint32) *UserInput {
 		UserInput: userInput,
 	}
 }
-
-type UserInputListener interface {
-	HandleUserInput(*UserInput)
-}
