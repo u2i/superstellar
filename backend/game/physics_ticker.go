@@ -8,10 +8,10 @@ import (
 
 type PhysicsTicker struct {
 	currentFrameId  uint32
-	eventDispatcher *events.EventDispatcher
+	eventDispatcher events.EventDispatcher
 }
 
-func NewPhysicsTicker(eventDispatcher *events.EventDispatcher) *PhysicsTicker {
+func NewPhysicsTicker(eventDispatcher events.EventDispatcher) *PhysicsTicker {
 	return &PhysicsTicker{
 		currentFrameId: 1,
 		eventDispatcher: eventDispatcher,

@@ -26,12 +26,12 @@ type Server struct {
 	errCh            chan error
 	generateIDCh     chan chan uint32
 	clientID         uint32
-	eventsDispatcher *events.EventDispatcher
+	eventsDispatcher events.EventDispatcher
 }
 
 // NewServer initializes a new server.
 // TODO remove space
-func NewServer(pattern string, eventDispatcher *events.EventDispatcher, space *state.Space) *Server {
+func NewServer(pattern string, eventDispatcher events.EventDispatcher, space *state.Space) *Server {
 	return &Server{
 		pattern:      pattern,
 		space:        space,

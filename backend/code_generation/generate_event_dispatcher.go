@@ -47,8 +47,10 @@ func (et *EventType) FireMethodName() string {
 }
 
 type Metadata struct {
-	TypeName   string
-	EventTypes []EventType
+	TypeName               string
+	ImplementationTypeName string
+	EventLoopMethodName    string
+	EventTypes             []EventType
 }
 
 func checkError(err error) {
@@ -79,7 +81,17 @@ func main() {
 			}
 		{{ end }}
 
-		type {{ .TypeName }} struct {
+		type {{ .TypeName }} interface {
+			{{ .EventLoopMethodName }}()
+			{{ range .EventTypes }}
+				// {{ .TypeName }}
+
+				{{ .RegisterMethodName }}(listener {{ .ListenerTypeName }})
+				{{ .FireMethodName }}(e *{{ .TypeName }})
+			{{ end }}
+		}
+
+		type {{ .ImplementationTypeName }} struct {
 			{{ range .EventTypes }}
 				// {{ .TypeName }}
 				{{ .EventsQueueName }} chan *{{ .TypeName }}
@@ -87,8 +99,8 @@ func main() {
 			{{ end }}
 		}
 
-		func New{{ .TypeName }}() *{{ .TypeName }} {
-			return &{{ .TypeName }}{
+		func New{{ .TypeName }}() {{ .TypeName }} {
+			return &{{ .ImplementationTypeName }}{
 				{{ range .EventTypes }}
 					// {{ .TypeName }}
 					{{ .EventsQueueName }}: make(chan *{{ .TypeName }}, buffersLength),
@@ -97,7 +109,7 @@ func main() {
 			}
 		}
 
-		func (d *{{ .TypeName }}) RunEventLoop() {
+		func (d *{{ .ImplementationTypeName }}) {{ .EventLoopMethodName }}() {
 			for {
 				select {
 					{{ range .EventTypes }}
@@ -118,11 +130,11 @@ func main() {
 		{{ range .EventTypes }}
 			// {{ .TypeName }}
 
-			func (d *{{ $.TypeName }}) {{ .RegisterMethodName }}(listener {{ .ListenerTypeName }}) {
+			func (d *{{ $.ImplementationTypeName }}) {{ .RegisterMethodName }}(listener {{ .ListenerTypeName }}) {
 				d.{{ .ListenerListName }} = append(d.{{ .ListenerListName }}, listener)
 			}
 
-			func (d *{{ $.TypeName }}) {{ .FireMethodName }}(e *{{ .TypeName }}) {
+			func (d *{{ $.ImplementationTypeName }}) {{ .FireMethodName }}(e *{{ .TypeName }}) {
 				d.{{ .EventsQueueName }} <- e
 			}
 		{{ end }}
@@ -134,6 +146,8 @@ func main() {
 	var buffer bytes.Buffer
 	err = tpl.Execute(&buffer, Metadata{
 		TypeName: "EventDispatcher",
+		ImplementationTypeName: "EventDispatcherImpl",
+		EventLoopMethodName: "RunEventLoop",
 
 		// TODO: load this list automatically
 		EventTypes: []EventType{
