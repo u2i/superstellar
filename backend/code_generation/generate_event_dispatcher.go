@@ -81,30 +81,31 @@ func main() {
 
 		type {{ .TypeName }} struct {
 			{{ range .EventTypes }}
+				// {{ .TypeName }}
 				{{ .EventsQueueName }} chan *{{ .TypeName }}
 				{{ .ListenerListName }} []{{ .ListenerTypeName }}
 			{{ end }}
 		}
 
-		var instance = &{{ .TypeName }}{
-			{{ range .EventTypes }}
-				{{ .EventsQueueName }}: make(chan *{{ .TypeName }}, buffersLength),
-				{{ .ListenerListName }}: []{{ .ListenerTypeName }}{},
-			{{ end }}
-		}
-
-		func Instance() *{{ .TypeName }} {
-			return instance
+		func New{{ .TypeName }}() *{{ .TypeName }} {
+			return &{{ .TypeName }}{
+				{{ range .EventTypes }}
+					// {{ .TypeName }}
+					{{ .EventsQueueName }}: make(chan *{{ .TypeName }}, buffersLength),
+					{{ .ListenerListName }}: []{{ .ListenerTypeName }}{},
+				{{ end }}
+			}
 		}
 
 		func (d *{{ .TypeName }}) RunEventLoop() {
 			for {
 				select {
 					{{ range .EventTypes }}
-					case event := <-d.{{ .EventsQueueName }}:
-						for _, listener := range d.{{ .ListenerListName }} {
-							listener.{{ .ListenerHandleMethodName }}(event)
-						}
+						// {{ .TypeName }}
+						case event := <-d.{{ .EventsQueueName }}:
+							for _, listener := range d.{{ .ListenerListName }} {
+								listener.{{ .ListenerHandleMethodName }}(event)
+							}
 					{{ end }}
 				default:
 					time.Sleep(idleDispatcherSleepTime)
@@ -112,7 +113,11 @@ func main() {
 			}
 		}
 
+		// EVENT METHODS
+
 		{{ range .EventTypes }}
+			// {{ .TypeName }}
+
 			func (d *{{ $.TypeName }}) {{ .RegisterMethodName }}(listener {{ .ListenerTypeName }}) {
 				d.{{ .ListenerListName }} = append(d.{{ .ListenerListName }}, listener)
 			}

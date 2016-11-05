@@ -23,7 +23,7 @@ func main() {
 
 	rand.Seed(time.Now().UTC().UnixNano())
 
-	eventDispatcher := events.Instance()
+	eventDispatcher := events.NewEventDispatcher()
 	physicsTicker := game.NewPhysicsTicker(eventDispatcher)
 
 	space := state.NewSpace()

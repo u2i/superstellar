@@ -25,46 +25,54 @@ type UserInputListener interface {
 }
 
 type EventDispatcher struct {
+
+	// TimeTick
 	timeTickQueue     chan *TimeTick
 	timeTickListeners []TimeTickListener
 
+	// ProjectileFired
 	projectileFiredQueue     chan *ProjectileFired
 	projectileFiredListeners []ProjectileFiredListener
 
+	// UserInput
 	userInputQueue     chan *UserInput
 	userInputListeners []UserInputListener
 }
 
-var instance = &EventDispatcher{
+func NewEventDispatcher() *EventDispatcher {
+	return &EventDispatcher{
 
-	timeTickQueue:     make(chan *TimeTick, buffersLength),
-	timeTickListeners: []TimeTickListener{},
+		// TimeTick
+		timeTickQueue:     make(chan *TimeTick, buffersLength),
+		timeTickListeners: []TimeTickListener{},
 
-	projectileFiredQueue:     make(chan *ProjectileFired, buffersLength),
-	projectileFiredListeners: []ProjectileFiredListener{},
+		// ProjectileFired
+		projectileFiredQueue:     make(chan *ProjectileFired, buffersLength),
+		projectileFiredListeners: []ProjectileFiredListener{},
 
-	userInputQueue:     make(chan *UserInput, buffersLength),
-	userInputListeners: []UserInputListener{},
-}
-
-func Instance() *EventDispatcher {
-	return instance
+		// UserInput
+		userInputQueue:     make(chan *UserInput, buffersLength),
+		userInputListeners: []UserInputListener{},
+	}
 }
 
 func (d *EventDispatcher) RunEventLoop() {
 	for {
 		select {
 
+		// TimeTick
 		case event := <-d.timeTickQueue:
 			for _, listener := range d.timeTickListeners {
 				listener.HandleTimeTick(event)
 			}
 
+		// ProjectileFired
 		case event := <-d.projectileFiredQueue:
 			for _, listener := range d.projectileFiredListeners {
 				listener.HandleProjectileFired(event)
 			}
 
+		// UserInput
 		case event := <-d.userInputQueue:
 			for _, listener := range d.userInputListeners {
 				listener.HandleUserInput(event)
@@ -76,6 +84,10 @@ func (d *EventDispatcher) RunEventLoop() {
 	}
 }
 
+// EVENT METHODS
+
+// TimeTick
+
 func (d *EventDispatcher) RegisterTimeTickListener(listener TimeTickListener) {
 	d.timeTickListeners = append(d.timeTickListeners, listener)
 }
@@ -84,6 +96,8 @@ func (d *EventDispatcher) FireTimeTick(e *TimeTick) {
 	d.timeTickQueue <- e
 }
 
+// ProjectileFired
+
 func (d *EventDispatcher) RegisterProjectileFiredListener(listener ProjectileFiredListener) {
 	d.projectileFiredListeners = append(d.projectileFiredListeners, listener)
 }
@@ -91,6 +105,8 @@ func (d *EventDispatcher) RegisterProjectileFiredListener(listener ProjectileFir
 func (d *EventDispatcher) FireProjectileFired(e *ProjectileFired) {
 	d.projectileFiredQueue <- e
 }
+
+// UserInput
 
 func (d *EventDispatcher) RegisterUserInputListener(listener UserInputListener) {
 	d.userInputListeners = append(d.userInputListeners, listener)
