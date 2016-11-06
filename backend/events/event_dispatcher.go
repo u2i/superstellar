@@ -24,26 +24,7 @@ type UserInputListener interface {
 	HandleUserInput(*UserInput)
 }
 
-type EventDispatcher interface {
-	RunEventLoop()
-
-	// TimeTick
-
-	RegisterTimeTickListener(listener TimeTickListener)
-	FireTimeTick(e *TimeTick)
-
-	// ProjectileFired
-
-	RegisterProjectileFiredListener(listener ProjectileFiredListener)
-	FireProjectileFired(e *ProjectileFired)
-
-	// UserInput
-
-	RegisterUserInputListener(listener UserInputListener)
-	FireUserInput(e *UserInput)
-}
-
-type EventDispatcherImpl struct {
+type EventDispatcher struct {
 
 	// TimeTick
 	timeTickQueue     chan *TimeTick
@@ -58,8 +39,8 @@ type EventDispatcherImpl struct {
 	userInputListeners []UserInputListener
 }
 
-func NewEventDispatcher() EventDispatcher {
-	return &EventDispatcherImpl{
+func NewEventDispatcher() *EventDispatcher {
+	return &EventDispatcher{
 
 		// TimeTick
 		timeTickQueue:     make(chan *TimeTick, buffersLength),
@@ -75,7 +56,7 @@ func NewEventDispatcher() EventDispatcher {
 	}
 }
 
-func (d *EventDispatcherImpl) RunEventLoop() {
+func (d *EventDispatcher) RunEventLoop() {
 	for {
 		select {
 
@@ -107,30 +88,30 @@ func (d *EventDispatcherImpl) RunEventLoop() {
 
 // TimeTick
 
-func (d *EventDispatcherImpl) RegisterTimeTickListener(listener TimeTickListener) {
+func (d *EventDispatcher) RegisterTimeTickListener(listener TimeTickListener) {
 	d.timeTickListeners = append(d.timeTickListeners, listener)
 }
 
-func (d *EventDispatcherImpl) FireTimeTick(e *TimeTick) {
+func (d *EventDispatcher) FireTimeTick(e *TimeTick) {
 	d.timeTickQueue <- e
 }
 
 // ProjectileFired
 
-func (d *EventDispatcherImpl) RegisterProjectileFiredListener(listener ProjectileFiredListener) {
+func (d *EventDispatcher) RegisterProjectileFiredListener(listener ProjectileFiredListener) {
 	d.projectileFiredListeners = append(d.projectileFiredListeners, listener)
 }
 
-func (d *EventDispatcherImpl) FireProjectileFired(e *ProjectileFired) {
+func (d *EventDispatcher) FireProjectileFired(e *ProjectileFired) {
 	d.projectileFiredQueue <- e
 }
 
 // UserInput
 
-func (d *EventDispatcherImpl) RegisterUserInputListener(listener UserInputListener) {
+func (d *EventDispatcher) RegisterUserInputListener(listener UserInputListener) {
 	d.userInputListeners = append(d.userInputListeners, listener)
 }
 
-func (d *EventDispatcherImpl) FireUserInput(e *UserInput) {
+func (d *EventDispatcher) FireUserInput(e *UserInput) {
 	d.userInputQueue <- e
 }

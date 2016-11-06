@@ -13,7 +13,7 @@ import (
 )
 
 // UpdatePhysics updates world physics for the next simulation step
-func UpdatePhysics(space *state.Space, eventDispatcher events.EventDispatcher) {
+func UpdatePhysics(space *state.Space, eventDispatcher *events.EventDispatcher) {
 	detectProjectileCollisions(space)
 	updateSpaceships(space, eventDispatcher)
 	updateProjectiles(space)
@@ -30,7 +30,7 @@ func detectProjectileCollisions(space *state.Space) {
 	}
 }
 
-func updateSpaceships(s *state.Space, eventDispatcher events.EventDispatcher) {
+func updateSpaceships(s *state.Space, eventDispatcher *events.EventDispatcher) {
 	now := time.Now()
 
 	for _, spaceship := range s.Spaceships {

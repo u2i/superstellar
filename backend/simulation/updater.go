@@ -7,10 +7,10 @@ import (
 
 type Updater struct {
 	space *state.Space
-	eventDispatcher events.EventDispatcher
+	eventDispatcher *events.EventDispatcher
 }
 
-func NewUpdater(space *state.Space, eventDispatcher events.EventDispatcher) *Updater {
+func NewUpdater(space *state.Space, eventDispatcher *events.EventDispatcher) *Updater {
 	return &Updater{space, eventDispatcher}
 }
 

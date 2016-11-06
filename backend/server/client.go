@@ -24,7 +24,7 @@ type Client struct {
 	ch       chan *[]byte
 	doneCh   chan bool
 	monitor  *Monitor
-	eventDispatcher events.EventDispatcher
+	eventDispatcher *events.EventDispatcher
 }
 
 // NewClient initializes a new Client struct with given websocket and Server.
