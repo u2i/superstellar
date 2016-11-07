@@ -142,6 +142,7 @@ func main() {
 			{"TimeTick"},
 			{"ProjectileFired"},
 			{"UserInput"},
+			{"UserJoined"},
 		},
 	})
 	checkError(err)

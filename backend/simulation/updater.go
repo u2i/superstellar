@@ -25,3 +25,7 @@ func (updater *Updater) HandleUserInput(userInputEvent *events.UserInput) {
 func (updater *Updater) HandleTimeTick(*events.TimeTick) {
 	UpdatePhysics(updater.space, updater.eventDispatcher)
 }
+
+func (updater *Updater) HandleUserJoined(userJoinedEvent *events.UserJoined) {
+	updater.space.NewSpaceship(userJoinedEvent.ClientID)
+}

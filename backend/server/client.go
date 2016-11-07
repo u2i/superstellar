@@ -135,7 +135,6 @@ func (c *Client) unmarshalUserInput(data []byte) {
 	case *pb.UserMessage_UserAction:
 		userInputEvent := events.UserInputFromProto(protoUserMessage.GetUserAction().UserInput, c.id)
 		c.eventDispatcher.FireUserInput(userInputEvent)
-		log.Print("dupa")
 	case *pb.UserMessage_JoinGame:
 		c.tryToJoinGame(protoUserMessage.GetJoinGame())
 	default:
@@ -155,7 +154,11 @@ func (c *Client) tryToJoinGame(joinGameMsg *pb.JoinGame) {
 	}
 
 	c.username = username
-	c.server.JoinGame(c)
+
+	c.eventDispatcher.FireUserJoined(&events.UserJoined{ClientID: c.id})
+
+	c.server.SendJoinGameAckMessage(c, &pb.JoinGameAck{Success: true})
+	c.server.SendPlayerJoinedMessage(c)
 }
 
 func validateUsername(username string) (bool, error) {

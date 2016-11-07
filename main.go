@@ -30,6 +30,7 @@ func main() {
 	updater := simulation.NewUpdater(space, eventDispatcher)
 	eventDispatcher.RegisterUserInputListener(updater)
 	eventDispatcher.RegisterTimeTickListener(updater)
+	eventDispatcher.RegisterUserJoinedListener(updater)
 
 	server := server.NewServer("/superstellar", eventDispatcher, space)
 	go server.Listen()

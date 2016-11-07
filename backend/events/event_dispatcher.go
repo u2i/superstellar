@@ -24,6 +24,10 @@ type UserInputListener interface {
 	HandleUserInput(*UserInput)
 }
 
+type UserJoinedListener interface {
+	HandleUserJoined(*UserJoined)
+}
+
 type EventDispatcher struct {
 
 	// TimeTick
@@ -37,6 +41,10 @@ type EventDispatcher struct {
 	// UserInput
 	userInputQueue     chan *UserInput
 	userInputListeners []UserInputListener
+
+	// UserJoined
+	userJoinedQueue     chan *UserJoined
+	userJoinedListeners []UserJoinedListener
 }
 
 func NewEventDispatcher() *EventDispatcher {
@@ -53,6 +61,10 @@ func NewEventDispatcher() *EventDispatcher {
 		// UserInput
 		userInputQueue:     make(chan *UserInput, buffersLength),
 		userInputListeners: []UserInputListener{},
+
+		// UserJoined
+		userJoinedQueue:     make(chan *UserJoined, buffersLength),
+		userJoinedListeners: []UserJoinedListener{},
 	}
 }
 
@@ -76,6 +88,12 @@ func (d *EventDispatcher) RunEventLoop() {
 		case event := <-d.userInputQueue:
 			for _, listener := range d.userInputListeners {
 				listener.HandleUserInput(event)
+			}
+
+		// UserJoined
+		case event := <-d.userJoinedQueue:
+			for _, listener := range d.userJoinedListeners {
+				listener.HandleUserJoined(event)
 			}
 
 		default:
@@ -114,4 +132,14 @@ func (d *EventDispatcher) RegisterUserInputListener(listener UserInputListener) 
 
 func (d *EventDispatcher) FireUserInput(e *UserInput) {
 	d.userInputQueue <- e
+}
+
+// UserJoined
+
+func (d *EventDispatcher) RegisterUserJoinedListener(listener UserJoinedListener) {
+	d.userJoinedListeners = append(d.userJoinedListeners, listener)
+}
+
+func (d *EventDispatcher) FireUserJoined(e *UserJoined) {
+	d.userJoinedQueue <- e
 }

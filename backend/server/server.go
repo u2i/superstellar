@@ -158,13 +158,6 @@ func (s *Server) handleAddNewClient(client *Client) {
 	log.Println("Now", len(s.clients), "clients connected.")
 }
 
-func (s *Server) JoinGame(client *Client) {
-	s.space.NewSpaceship(client.id)
-
-	s.SendJoinGameAckMessage(client, &pb.JoinGameAck{Success: true})
-	s.SendPlayerJoinedMessage(client)
-}
-
 func (s *Server) SendJoinGameAckMessage(client *Client, joinGameAck *pb.JoinGameAck) {
 	message := &pb.Message{
 		Content: &pb.Message_JoinGameAck{
