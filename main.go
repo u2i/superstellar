@@ -37,6 +37,7 @@ func main() {
 
 	sender := server.NewSender(srv, space)
 	eventDispatcher.RegisterTimeTickListener(sender)
+	eventDispatcher.RegisterProjectileFiredListener(sender)
 
 	go eventDispatcher.RunEventLoop()
 

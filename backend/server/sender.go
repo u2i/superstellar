@@ -21,15 +21,20 @@ func NewSender(server *Server, space *state.Space) *Sender {
 func (sender *Sender) HandleTimeTick(timeTickEvent *events.TimeTick) {
 	sender.sendSpace()
 	if (timeTickEvent.FrameId % 50 == 0) {
-		sender.handleLeaderboardUpdate()
+		sender.sendLeaderboard()
 	}
 }
+
+func (sender *Sender) HandleProjectileFired(projectileFiredEvent *events.ProjectileFired) {
+	sender.server.SendToAll(projectileFiredEvent.Projectile.ToMessage())
+}
+
 
 func (sender *Sender) sendSpace() {
 	sender.server.SendToAll(sender.space.ToMessage())
 }
 
-func (sender *Sender) handleLeaderboardUpdate() {
+func (sender *Sender) sendLeaderboard() {
 	leaderboard := leaderboard.LeaderboardFromSpace(sender.space)
 	sender.server.SendToAll(leaderboard.ToMessage())
 }

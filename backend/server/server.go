@@ -74,7 +74,6 @@ func (s *Server) Listen() {
 	s.addNewClientHandler()
 	s.monitor.run()
 	s.eventsDispatcher.RegisterTimeTickListener(s)
-	s.eventsDispatcher.RegisterProjectileFiredListener(s)
 }
 
 func (s *Server) SendToAll(message proto.Message) {
@@ -130,9 +129,7 @@ func (s *Server) HandleTimeTick(e *events.TimeTick) {
 	s.readChannels()
 }
 
-func (s *Server) HandleProjectileFired(e *events.ProjectileFired) {
-	s.sendShot(e.Projectile)
-}
+
 
 func (s *Server) handleAddNewClient(client *Client) {
 	log.Println("Added new client")
@@ -204,24 +201,6 @@ func (s *Server) sendHelloMessage(client *Client) {
 	}
 
 	client.SendMessage(&bytes)
-}
-
-func (s *Server) sendShot(shot *state.Projectile) {
-	message := &pb.Message{
-		Content: &pb.Message_ProjectileFired{
-			ProjectileFired: shot.ToProto(),
-		},
-	}
-
-	bytes, err := proto.Marshal(message)
-	if err != nil {
-		log.Println(err)
-		return
-	}
-
-	for _, c := range s.clients {
-		c.SendMessage(&bytes)
-	}
 }
 
 func (s *Server) handleDelClient(c *Client) {
