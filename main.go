@@ -32,8 +32,11 @@ func main() {
 	eventDispatcher.RegisterTimeTickListener(updater)
 	eventDispatcher.RegisterUserJoinedListener(updater)
 
-	server := server.NewServer("/superstellar", eventDispatcher, space)
-	go server.Listen()
+	srv := server.NewServer("/superstellar", eventDispatcher, space)
+	go srv.Listen()
+
+	sender := server.NewSender(srv, space)
+	eventDispatcher.RegisterTimeTickListener(sender)
 
 	go eventDispatcher.RunEventLoop()
 

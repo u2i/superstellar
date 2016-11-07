@@ -78,8 +78,8 @@ func (s *Server) Listen() {
 	s.eventsDispatcher.RegisterProjectileFiredListener(s)
 }
 
-func (s *Server) sendSpace() {
-	bytes, err := proto.Marshal(s.space.ToMessage())
+func (s *Server) SendToAll(message proto.Message) {
+	bytes, err := proto.Marshal(message)
 	if err != nil {
 		log.Println(err)
 		return
@@ -139,7 +139,6 @@ func (s *Server) readChannels() {
 
 func (s *Server) HandleTimeTick(e *events.TimeTick) {
 	s.readChannels()
-	s.sendSpace()
 	if (e.FrameId % 50 == 0) {
 		s.handleLeaderboardUpdate()
 	}
