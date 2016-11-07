@@ -11,7 +11,6 @@ import (
 	"github.com/golang/protobuf/proto"
 
 	"golang.org/x/net/websocket"
-	"sort"
 	"superstellar/backend/events"
 )
 
@@ -90,17 +89,7 @@ func (s *Server) SendToAll(message proto.Message) {
 	}
 }
 
-func (s *Server) sendLeaderboard(leaderboard *Leaderboard) {
-	bytes, err := proto.Marshal(leaderboard.ToMessage())
-	if err != nil {
-		log.Println(err)
-		return
-	}
 
-	for _, c := range s.clients {
-		c.SendMessage(&bytes)
-	}
-}
 
 func (s *Server) addNewClientHandler() {
 	onConnected := func(ws *websocket.Conn) {
@@ -139,9 +128,6 @@ func (s *Server) readChannels() {
 
 func (s *Server) HandleTimeTick(e *events.TimeTick) {
 	s.readChannels()
-	if (e.FrameId % 50 == 0) {
-		s.handleLeaderboardUpdate()
-	}
 }
 
 func (s *Server) HandleProjectileFired(e *events.ProjectileFired) {
@@ -275,17 +261,7 @@ func (s *Server) handlePhysicsUpdate() {
 	s.monitor.addPhysicsTime(elapsed)
 }
 
-func (s *Server) handleLeaderboardUpdate() {
-	size := len(s.space.Spaceships)
-	ranks := make([]Rank, 0, size)
-	for _, stateship := range s.space.Spaceships {
-		// TODO: change to MaxHP?
-		ranks = append(ranks, Rank{stateship.ID, stateship.HP})
-	}
-	sort.Stable(sort.Reverse(SortableByScore(ranks)))
 
-	s.sendLeaderboard(&Leaderboard{ranks})
-}
 
 func (s *Server) handleGenerateIDCh(ch chan uint32) {
 	s.clientID++

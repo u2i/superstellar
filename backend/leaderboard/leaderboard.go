@@ -1,7 +1,9 @@
-package server
+package leaderboard
 
 import (
 	"superstellar/backend/pb"
+	"superstellar/backend/state"
+	"sort"
 )
 
 const LeaderboardLength = 10
@@ -10,31 +12,15 @@ type Leaderboard struct {
 	ranks []Rank
 }
 
-type Rank struct {
-	clientId uint32
-	score    uint32
-}
-
-type SortableByScore []Rank
-
-func (a SortableByScore) Len() int {
-	return len(a)
-}
-
-func (a SortableByScore) Swap(i, j int) {
-	a[i], a[j] = a[j], a[i]
-}
-
-func (a SortableByScore) Less(i, j int) bool {
-	if (a[i].score == a[j].score) {
-		return a[i].clientId > a[j].clientId
+func LeaderboardFromSpace(space *state.Space) *Leaderboard{
+	size := len(space.Spaceships)
+	ranks := make([]Rank, 0, size)
+	for _, stateship := range space.Spaceships {
+		// TODO: change to MaxHP?
+		ranks = append(ranks, Rank{stateship.ID, stateship.HP})
 	}
-	return a[i].score < a[j].score
-}
-
-// ToProto returns protobuf representation
-func (rank *Rank) ToProto() *pb.Rank {
-	return &pb.Rank{Id: rank.clientId, Score: rank.score}
+	sort.Stable(sort.Reverse(SortableByScore(ranks)))
+	return &Leaderboard{ranks: ranks}
 }
 
 // ToProto returns protobuf representation
