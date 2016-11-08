@@ -6,7 +6,6 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
-	"superstellar/backend/server"
 	"time"
 )
 
@@ -17,6 +16,7 @@ import (
 	"superstellar/backend/simulation"
 	"superstellar/backend/state"
 	"superstellar/backend/monitor"
+	"superstellar/backend/communication"
 )
 
 func main() {
@@ -36,9 +36,9 @@ func main() {
 	eventDispatcher.RegisterUserJoinedListener(updater)
 	eventDispatcher.RegisterUserLeftListener(updater)
 
-	srv := server.NewServer("/superstellar", monitor, eventDispatcher)
+	srv := communication.NewServer("/superstellar", monitor, eventDispatcher)
 
-	sender := server.NewSender(srv, space)
+	sender := communication.NewSender(srv, space)
 	eventDispatcher.RegisterTimeTickListener(sender)
 	eventDispatcher.RegisterProjectileFiredListener(sender)
 	eventDispatcher.RegisterUserLeftListener(sender)

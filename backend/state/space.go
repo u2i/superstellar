@@ -66,15 +66,6 @@ func (space *Space) RemoveProjectile(projectile *Projectile) {
 	delete(space.Projectiles, projectile)
 }
 
-//// UpdateUserInput updates user input in correct spaceship
-//func (space *Space) UpdateUserInput(userInput *UserInput) {
-//	spaceship, found := space.Spaceships[userInput.ClientID]
-//
-//	if found {
-//		spaceship.updateUserInput(userInput)
-//	}
-//}
-
 // NextProjectileID returns next unused projectile ID.
 func (space *Space) NextProjectileID() uint32 {
 	ID := space.NextProjectileIDValue
