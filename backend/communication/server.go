@@ -17,8 +17,6 @@ type Server struct {
 	pattern          string
 	clients          map[uint32]*Client
 	monitor          *monitor.Monitor
-	delCh            chan *Client
-	doneCh           chan bool
 	clientID         uint32
 	eventsDispatcher *events.EventDispatcher
 }
@@ -29,8 +27,6 @@ func NewServer(pattern string, monitor *monitor.Monitor, eventDispatcher *events
 		pattern:      pattern,
 		clients:      make(map[uint32]*Client),
 		monitor:      monitor,
-		delCh:        make(chan *Client),
-		doneCh:       make(chan bool),
 		clientID:     0,
 		eventsDispatcher: eventDispatcher,
 	}
