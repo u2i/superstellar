@@ -37,11 +37,14 @@ func main() {
 	eventDispatcher.RegisterUserLeftListener(updater)
 
 	srv := communication.NewServer("/superstellar", monitor, eventDispatcher)
+	eventDispatcher.RegisterUserLeftListener(srv)
 
 	sender := communication.NewSender(srv, space)
 	eventDispatcher.RegisterTimeTickListener(sender)
 	eventDispatcher.RegisterProjectileFiredListener(sender)
 	eventDispatcher.RegisterUserLeftListener(sender)
+	eventDispatcher.RegisterUserJoinedListener(sender)
+
 
 	monitor.Run()
 	go srv.Listen()

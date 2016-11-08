@@ -31,17 +31,9 @@ func (sender *Sender) HandleProjectileFired(projectileFiredEvent *events.Project
 }
 
 
-func (sender *Sender) HandleUserJoin(userJoinedEvent *events.UserJoined) {
-	message := &pb.Message{
-		Content: &pb.Message_PlayerJoined{
-			PlayerJoined: &pb.PlayerJoined{
-				Id:       userJoinedEvent.ClientID,
-				Username: userJoinedEvent.UserName,
-			},
-		},
-	}
-
-	sender.server.SendToAllClients(message)
+func (sender *Sender) HandleUserJoined(userJoinedEvent *events.UserJoined) {
+	sender.sendHelloMessage(userJoinedEvent.ClientID)
+	sender.sendUserJoinedMessage(userJoinedEvent.ClientID, userJoinedEvent.UserName)
 }
 
 func (sender *Sender) HandleUserLeft(userLeftEvent *events.UserLeft) {
@@ -62,4 +54,36 @@ func (sender *Sender) sendSpace() {
 func (sender *Sender) sendLeaderboard() {
 	leaderboard := leaderboard.LeaderboardFromSpace(sender.space)
 	sender.server.SendToAllClients(leaderboard.ToMessage())
+}
+
+func (sender *Sender) sendUserJoinedMessage(clientID uint32, userName string) {
+	message := &pb.Message{
+		Content: &pb.Message_PlayerJoined{
+			PlayerJoined: &pb.PlayerJoined{
+				Id:       clientID,
+				Username: userName,
+			},
+		},
+	}
+
+	sender.server.SendToAllClients(message)
+}
+
+func (sender *Sender) sendHelloMessage(clientID uint32) {
+	idToUsername := make(map[uint32]string)
+
+	for id, client := range sender.server.clients {
+		idToUsername[id] = client.username
+	}
+
+	message := &pb.Message{
+		Content: &pb.Message_Hello{
+			Hello: &pb.Hello{
+				MyId:         clientID,
+				IdToUsername: idToUsername,
+			},
+		},
+	}
+
+	sender.server.SendToClient(clientID, message)
 }

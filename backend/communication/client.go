@@ -20,7 +20,6 @@ type Client struct {
 	id       uint32
 	username string
 	ws       *websocket.Conn
-	server   *Server
 	ch       chan *[]byte
 	doneCh   chan bool
 	monitor  *monitor.Monitor
@@ -28,20 +27,15 @@ type Client struct {
 }
 
 // NewClient initializes a new Client struct with given websocket and Server.
-func NewClient(ws *websocket.Conn, server *Server, clientID uint32) *Client {
+func NewClient(ws *websocket.Conn, monitor *monitor.Monitor, eventsDispatcher *events.EventDispatcher, clientID uint32) *Client {
 	if ws == nil {
 		panic("ws cannot be nil")
 	}
 
-	if server == nil {
-		panic("server cannot be nil")
-	}
-
 	ch := make(chan *[]byte, channelBufSize)
 	doneCh := make(chan bool)
-	monitor := server.monitor
 
-	return &Client{clientID, "", ws, server, ch, doneCh, monitor, server.eventsDispatcher}
+	return &Client{clientID, "", ws, ch, doneCh, monitor, eventsDispatcher}
 }
 
 // Conn returns client's websocket.Conn struct.
@@ -116,7 +110,6 @@ func (c *Client) readFromWebSocket() {
 		log.Println(err)
 
 		c.doneCh <- true
-		c.server.deleteClient(c)
 		c.eventDispatcher.FireUserLeft(&events.UserLeft{ClientID: c.id})
 	} else {
 		c.unmarshalUserInput(data)
@@ -145,17 +138,15 @@ func (c *Client) tryToJoinGame(joinGameMsg *pb.JoinGame) {
 	username := joinGameMsg.Username
 	ok, err := validateUsername(username)
 
-	if !ok {
+	if ok {
+		c.username = username
+		c.sendJoinGameAckMessage(&pb.JoinGameAck{Success: true})
+		c.eventDispatcher.FireUserJoined(&events.UserJoined{ClientID: c.id, UserName: username})
+	} else {
 		c.sendJoinGameAckMessage(
-			&pb.JoinGameAck{Success: ok, Error: err.Error()},
+			&pb.JoinGameAck{Success: false, Error: err.Error()},
 		)
-		return
 	}
-
-	c.username = username
-	c.eventDispatcher.FireUserJoined(&events.UserJoined{ClientID: c.id, UserName: username})
-	c.sendJoinGameAckMessage(&pb.JoinGameAck{Success: true})
-	c.sendHelloMessage()
 }
 
 func validateUsername(username string) (bool, error) {
@@ -179,24 +170,6 @@ func (c *Client) sendJoinGameAckMessage(joinGameAck *pb.JoinGameAck) {
 		},
 	}
 
-	c.server.SendToClient(c.id, message)
+	c.SendMessage(marshalMessage(message))
 }
 
-func (c *Client) sendHelloMessage() {
-	idToUsername := make(map[uint32]string)
-
-	for id, client := range c.server.clients {
-		idToUsername[id] = client.username
-	}
-
-	message := &pb.Message{
-		Content: &pb.Message_Hello{
-			Hello: &pb.Hello{
-				MyId:         c.id,
-				IdToUsername: idToUsername,
-			},
-		},
-	}
-
-	c.server.SendToClient(c.id, message)
-}

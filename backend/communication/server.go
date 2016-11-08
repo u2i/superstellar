@@ -44,7 +44,7 @@ func (s *Server) Listen() {
 			}
 		}()
 
-		client := NewClient(ws, s, s.nextClientID())
+		client := NewClient(ws, s.monitor, s.eventsDispatcher, s.nextClientID())
 		s.clients[client.id] = client
 
 		log.Println("Added new client. Now", len(s.clients), "clients connected.")
@@ -55,37 +55,26 @@ func (s *Server) Listen() {
 }
 
 func (s *Server) SendToAllClients(message proto.Message) {
-	bytes, err := proto.Marshal(message)
-	if err != nil {
-		log.Println(err)
-		return
-	}
-
+	bytes := marshalMessage(message)
 	for _, c := range s.clients {
-		c.SendMessage(&bytes)
+		c.SendMessage(bytes)
 	}
 }
 
 func (s *Server) SendToClient(clientID uint32, message proto.Message) {
-	bytes, err := proto.Marshal(message)
-	if err != nil {
-		log.Println(err)
-		return
-	}
+	bytes := marshalMessage(message)
 
 	client, ok := s.clients[clientID]
 	if ok {
-		client.SendMessage(&bytes)
+		client.SendMessage(bytes)
 	} else {
 		log.Println("Client %i not found", clientID)
 		return
 	}
 }
 
-func (s *Server) deleteClient(c *Client) {
-	log.Println("Delete client")
-
-	delete(s.clients, c.id)
+func (s *Server) HandleUserLeft(userLeftEvent *events.UserLeft) {
+	delete(s.clients, userLeftEvent.ClientID)
 }
 
 func (s *Server) nextClientID() uint32 {
