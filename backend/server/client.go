@@ -146,18 +146,16 @@ func (c *Client) tryToJoinGame(joinGameMsg *pb.JoinGame) {
 	ok, err := validateUsername(username)
 
 	if !ok {
-		c.server.SendJoinGameAckMessage(
-			c, &pb.JoinGameAck{Success: ok, Error: err.Error()},
+		c.sendJoinGameAckMessage(
+			&pb.JoinGameAck{Success: ok, Error: err.Error()},
 		)
 		return
 	}
 
 	c.username = username
-
-	c.eventDispatcher.FireUserJoined(&events.UserJoined{ClientID: c.id})
-
-	c.server.SendJoinGameAckMessage(c, &pb.JoinGameAck{Success: true})
-	c.server.SendPlayerJoinedMessage(c)
+	c.eventDispatcher.FireUserJoined(&events.UserJoined{ClientID: c.id, UserName: username})
+	c.sendJoinGameAckMessage(&pb.JoinGameAck{Success: true})
+	c.sendHelloMessage()
 }
 
 func validateUsername(username string) (bool, error) {
@@ -172,4 +170,33 @@ func validateUsername(username string) (bool, error) {
 	}
 
 	return true, nil
+}
+
+func (c *Client) sendJoinGameAckMessage(joinGameAck *pb.JoinGameAck) {
+	message := &pb.Message{
+		Content: &pb.Message_JoinGameAck{
+			JoinGameAck: joinGameAck,
+		},
+	}
+
+	c.server.SendToClient(c.id, message)
+}
+
+func (c *Client) sendHelloMessage() {
+	idToUsername := make(map[uint32]string)
+
+	for id, client := range c.server.clients {
+		idToUsername[id] = client.username
+	}
+
+	message := &pb.Message{
+		Content: &pb.Message_Hello{
+			Hello: &pb.Hello{
+				MyId:         c.id,
+				IdToUsername: idToUsername,
+			},
+		},
+	}
+
+	c.server.SendToClient(c.id, message)
 }

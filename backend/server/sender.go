@@ -31,6 +31,19 @@ func (sender *Sender) HandleProjectileFired(projectileFiredEvent *events.Project
 }
 
 
+func (sender *Sender) HandleUserJoin(userJoinedEvent *events.UserJoined) {
+	message := &pb.Message{
+		Content: &pb.Message_PlayerJoined{
+			PlayerJoined: &pb.PlayerJoined{
+				Id:       userJoinedEvent.ClientID,
+				Username: userJoinedEvent.UserName,
+			},
+		},
+	}
+
+	sender.server.SendToAllClients(message)
+}
+
 func (sender *Sender) HandleUserLeft(userLeftEvent *events.UserLeft) {
 	message := &pb.Message{
 		Content: &pb.Message_PlayerLeft{
