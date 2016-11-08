@@ -10,6 +10,7 @@ import (
 	"github.com/golang/protobuf/proto"
 
 	"golang.org/x/net/websocket"
+	"superstellar/backend/monitor"
 )
 
 const channelBufSize = 100
@@ -22,7 +23,7 @@ type Client struct {
 	server   *Server
 	ch       chan *[]byte
 	doneCh   chan bool
-	monitor  *Monitor
+	monitor  *monitor.Monitor
 	eventDispatcher *events.EventDispatcher
 }
 
@@ -53,7 +54,7 @@ func (c *Client) SendMessage(bytes *[]byte) {
 	select {
 	case c.ch <- bytes:
 	default:
-		c.monitor.addDroppedMessage()
+		c.monitor.AddDroppedMessage()
 	}
 }
 
@@ -83,7 +84,7 @@ func (c *Client) listenWrite() {
 				log.Println(err)
 			} else {
 				elapsed := after.Sub(before)
-				c.monitor.addSendTime(elapsed)
+				c.monitor.AddSendTime(elapsed)
 			}
 
 		case <-c.doneCh:

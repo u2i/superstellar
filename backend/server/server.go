@@ -4,23 +4,20 @@ import (
 	"log"
 	"net/http"
 	"superstellar/backend/pb"
-	"superstellar/backend/simulation"
-	"superstellar/backend/state"
-	"time"
 
 	"github.com/golang/protobuf/proto"
 
 	"golang.org/x/net/websocket"
 	"superstellar/backend/events"
 	"sync/atomic"
+	"superstellar/backend/monitor"
 )
 
 // Server struct holds server variables.
 type Server struct {
 	pattern          string
-	space            *state.Space
 	clients          map[uint32]*Client
-	monitor          *Monitor
+	monitor          *monitor.Monitor
 	delCh            chan *Client
 	doneCh           chan bool
 	errCh            chan error
@@ -30,12 +27,11 @@ type Server struct {
 
 // NewServer initializes a new server.
 // TODO remove space
-func NewServer(pattern string, eventDispatcher *events.EventDispatcher, space *state.Space) *Server {
+func NewServer(pattern string, monitor *monitor.Monitor, eventDispatcher *events.EventDispatcher) *Server {
 	return &Server{
 		pattern:      pattern,
-		space:        space,
 		clients:      make(map[uint32]*Client),
-		monitor:      newMonitor(),
+		monitor:      monitor,
 		delCh:        make(chan *Client),
 		doneCh:       make(chan bool),
 		errCh:        make(chan error),
@@ -59,7 +55,6 @@ func (s *Server) Listen() {
 	log.Println("Listening server...")
 
 	s.addNewClientHandler()
-	s.monitor.run()
 	s.eventsDispatcher.RegisterTimeTickListener(s)
 }
 
@@ -190,14 +185,4 @@ func (s *Server) sendHelloMessage(client *Client) {
 	}
 
 	s.SendToClient(client.id, message)
-}
-
-
-func (s *Server) handlePhysicsUpdate() {
-	before := time.Now()
-
-	simulation.UpdatePhysics(s.space, s.eventsDispatcher)
-
-	elapsed := time.Since(before)
-	s.monitor.addPhysicsTime(elapsed)
 }

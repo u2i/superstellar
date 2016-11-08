@@ -16,6 +16,7 @@ import (
 	"superstellar/backend/game"
 	"superstellar/backend/simulation"
 	"superstellar/backend/state"
+	"superstellar/backend/monitor"
 )
 
 func main() {
@@ -26,23 +27,25 @@ func main() {
 	eventDispatcher := events.NewEventDispatcher()
 	physicsTicker := game.NewPhysicsTicker(eventDispatcher)
 
+	monitor := monitor.NewMonitor()
+
 	space := state.NewSpace()
-	updater := simulation.NewUpdater(space, eventDispatcher)
+	updater := simulation.NewUpdater(space, monitor, eventDispatcher)
 	eventDispatcher.RegisterUserInputListener(updater)
 	eventDispatcher.RegisterTimeTickListener(updater)
 	eventDispatcher.RegisterUserJoinedListener(updater)
 	eventDispatcher.RegisterUserLeftListener(updater)
 
-	srv := server.NewServer("/superstellar", eventDispatcher, space)
-	go srv.Listen()
+	srv := server.NewServer("/superstellar", monitor, eventDispatcher)
 
 	sender := server.NewSender(srv, space)
 	eventDispatcher.RegisterTimeTickListener(sender)
 	eventDispatcher.RegisterProjectileFiredListener(sender)
 	eventDispatcher.RegisterUserLeftListener(sender)
 
+	monitor.Run()
+	go srv.Listen()
 	go eventDispatcher.RunEventLoop()
-
 	go physicsTicker.Run()
 
 	log.Fatal(http.ListenAndServe(":8080", nil))

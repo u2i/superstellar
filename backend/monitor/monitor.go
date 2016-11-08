@@ -1,4 +1,4 @@
-package server
+package monitor
 
 import (
 	"log"
@@ -20,7 +20,7 @@ type Monitor struct {
 	droppedMessages uint64
 }
 
-func newMonitor() *Monitor {
+func NewMonitor() *Monitor {
 	return &Monitor{
 		printCh:         make(chan bool),
 		sendTimeCh:      make(chan time.Duration, channelBufferSize),
@@ -31,24 +31,24 @@ func newMonitor() *Monitor {
 	}
 }
 
-func (m *Monitor) run() {
+func (m *Monitor) Run() {
 	m.runPrintTicker()
 	go m.loop()
 }
 
-func (m *Monitor) addSendTime(duration time.Duration) {
+func (m *Monitor) AddSendTime(duration time.Duration) {
 	select {
 	case m.sendTimeCh <- duration:
 	}
 }
 
-func (m *Monitor) addPhysicsTime(duration time.Duration) {
+func (m *Monitor) AddPhysicsTime(duration time.Duration) {
 	select {
 	case m.physicsTimeCh <- duration:
 	}
 }
 
-func (m *Monitor) addDroppedMessage() {
+func (m *Monitor) AddDroppedMessage() {
 	atomic.AddUint64(&m.droppedMessages, 1)
 }
 
