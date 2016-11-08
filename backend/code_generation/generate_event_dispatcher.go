@@ -143,6 +143,7 @@ func main() {
 			{"ProjectileFired"},
 			{"UserInput"},
 			{"UserJoined"},
+			{"UserLeft"},
 		},
 	})
 	checkError(err)

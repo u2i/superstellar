@@ -2,7 +2,6 @@ package server
 
 import (
 	"errors"
-	"io"
 	"log"
 	"superstellar/backend/pb"
 	"superstellar/backend/events"
@@ -89,7 +88,6 @@ func (c *Client) listenWrite() {
 			}
 
 		case <-c.doneCh:
-			c.server.Del(c)
 			c.doneCh <- true
 			return
 		}
@@ -102,7 +100,6 @@ func (c *Client) listenRead() {
 		select {
 
 		case <-c.doneCh:
-			c.server.Del(c)
 			c.doneCh <- true
 			return
 
@@ -115,10 +112,12 @@ func (c *Client) listenRead() {
 func (c *Client) readFromWebSocket() {
 	var data []byte
 	err := websocket.Message.Receive(c.ws, &data)
-	if err == io.EOF {
+	if err != nil {
+		log.Println(err)
+
 		c.doneCh <- true
-	} else if err != nil {
-		c.server.Err(err)
+		c.server.deleteClient(c)
+		c.eventDispatcher.FireUserLeft(&events.UserLeft{ClientID: c.id})
 	} else {
 		c.unmarshalUserInput(data)
 	}

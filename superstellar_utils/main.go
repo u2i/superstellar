@@ -10,8 +10,8 @@ import (
 
 	"github.com/golang/protobuf/proto"
 
-	"golang.org/x/net/websocket"
 	"fmt"
+	"golang.org/x/net/websocket"
 )
 
 const botEmoji = '🤖'

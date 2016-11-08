@@ -45,11 +45,6 @@ func NewServer(pattern string, eventDispatcher *events.EventDispatcher, space *s
 	}
 }
 
-// Del sends client delete command to the server.
-func (s *Server) Del(c *Client) {
-	s.delCh <- c
-}
-
 // Done sends done command to the server.
 func (s *Server) Done() {
 	s.doneCh <- true
@@ -76,7 +71,7 @@ func (s *Server) Listen() {
 	s.eventsDispatcher.RegisterTimeTickListener(s)
 }
 
-func (s *Server) SendToAll(message proto.Message) {
+func (s *Server) SendToAllClients(message proto.Message) {
 	bytes, err := proto.Marshal(message)
 	if err != nil {
 		log.Println(err)
@@ -88,7 +83,21 @@ func (s *Server) SendToAll(message proto.Message) {
 	}
 }
 
+func (s *Server) SendToClient(clientID uint32, message proto.Message) {
+	bytes, err := proto.Marshal(message)
+	if err != nil {
+		log.Println(err)
+		return
+	}
 
+	client, ok := s.clients[clientID]
+	if ok {
+		client.SendMessage(&bytes)
+	} else {
+		log.Println("Client %i not found", clientID)
+		return
+	}
+}
 
 func (s *Server) addNewClientHandler() {
 	onConnected := func(ws *websocket.Conn) {
@@ -107,11 +116,32 @@ func (s *Server) addNewClientHandler() {
 	http.Handle(s.pattern, websocket.Handler(onConnected))
 }
 
+func (s *Server) handleAddNewClient(client *Client) {
+	log.Println("Added new client")
+
+	s.clients[client.id] = client
+	s.sendHelloMessage(client)
+
+	log.Println("Now", len(s.clients), "clients connected.")
+}
+
+func (s *Server) deleteClient(c *Client) {
+	log.Println("Delete client")
+
+	delete(s.clients, c.id)
+}
+
+
+
+
+
+
+
+
+
+
 func (s *Server) readChannels() {
 	select {
-
-	case c := <-s.delCh:
-		s.handleDelClient(c)
 
 	case ch := <-s.generateIDCh:
 		s.handleGenerateIDCh(ch)
@@ -130,16 +160,6 @@ func (s *Server) HandleTimeTick(e *events.TimeTick) {
 }
 
 
-
-func (s *Server) handleAddNewClient(client *Client) {
-	log.Println("Added new client")
-
-	s.clients[client.id] = client
-	s.sendHelloMessage(client)
-
-	log.Println("Now", len(s.clients), "clients connected.")
-}
-
 func (s *Server) SendJoinGameAckMessage(client *Client, joinGameAck *pb.JoinGameAck) {
 	message := &pb.Message{
 		Content: &pb.Message_JoinGameAck{
@@ -147,14 +167,7 @@ func (s *Server) SendJoinGameAckMessage(client *Client, joinGameAck *pb.JoinGame
 		},
 	}
 
-	bytes, err := proto.Marshal(message)
-
-	if err != nil {
-		log.Println(err)
-		return
-	}
-
-	client.SendMessage(&bytes)
+	s.SendToClient(client.id, message)
 }
 
 func (s *Server) SendPlayerJoinedMessage(client *Client) {
@@ -167,15 +180,7 @@ func (s *Server) SendPlayerJoinedMessage(client *Client) {
 		},
 	}
 
-	bytes, err := proto.Marshal(message)
-	if err != nil {
-		log.Println(err)
-		return
-	}
-
-	for _, c := range s.clients {
-		c.SendMessage(&bytes)
-	}
+	s.SendToAllClients(message)
 }
 
 func (s *Server) sendHelloMessage(client *Client) {
@@ -194,42 +199,9 @@ func (s *Server) sendHelloMessage(client *Client) {
 		},
 	}
 
-	bytes, err := proto.Marshal(message)
-	if err != nil {
-		log.Println(err)
-		return
-	}
-
-	client.SendMessage(&bytes)
+	s.SendToClient(client.id, message)
 }
 
-func (s *Server) handleDelClient(c *Client) {
-	log.Println("Delete client")
-
-	s.space.RemoveSpaceship(c.id)
-
-	delete(s.clients, c.id)
-
-	s.sendUserLeftMessage(c.id)
-}
-
-func (s *Server) sendUserLeftMessage(userID uint32) {
-	message := &pb.Message{
-		Content: &pb.Message_PlayerLeft{
-			PlayerLeft: &pb.PlayerLeft{Id: userID},
-		},
-	}
-
-	bytes, err := proto.Marshal(message)
-	if err != nil {
-		log.Println(err)
-		return
-	}
-
-	for _, c := range s.clients {
-		c.SendMessage(&bytes)
-	}
-}
 
 func (s *Server) handlePhysicsUpdate() {
 	before := time.Now()

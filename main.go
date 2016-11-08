@@ -14,8 +14,8 @@ import (
 	_ "net/http/pprof"
 	"superstellar/backend/events"
 	"superstellar/backend/game"
-	"superstellar/backend/state"
 	"superstellar/backend/simulation"
+	"superstellar/backend/state"
 )
 
 func main() {
@@ -31,6 +31,7 @@ func main() {
 	eventDispatcher.RegisterUserInputListener(updater)
 	eventDispatcher.RegisterTimeTickListener(updater)
 	eventDispatcher.RegisterUserJoinedListener(updater)
+	eventDispatcher.RegisterUserLeftListener(updater)
 
 	srv := server.NewServer("/superstellar", eventDispatcher, space)
 	go srv.Listen()
@@ -38,6 +39,7 @@ func main() {
 	sender := server.NewSender(srv, space)
 	eventDispatcher.RegisterTimeTickListener(sender)
 	eventDispatcher.RegisterProjectileFiredListener(sender)
+	eventDispatcher.RegisterUserLeftListener(sender)
 
 	go eventDispatcher.RunEventLoop()
 

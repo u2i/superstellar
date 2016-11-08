@@ -29,3 +29,7 @@ func (updater *Updater) HandleTimeTick(*events.TimeTick) {
 func (updater *Updater) HandleUserJoined(userJoinedEvent *events.UserJoined) {
 	updater.space.NewSpaceship(userJoinedEvent.ClientID)
 }
+
+func (updater *Updater) HandleUserLeft(userLeftEvent *events.UserLeft) {
+	updater.space.RemoveSpaceship(userLeftEvent.ClientID)
+}

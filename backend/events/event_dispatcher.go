@@ -28,6 +28,10 @@ type UserJoinedListener interface {
 	HandleUserJoined(*UserJoined)
 }
 
+type UserLeftListener interface {
+	HandleUserLeft(*UserLeft)
+}
+
 type EventDispatcher struct {
 
 	// TimeTick
@@ -45,6 +49,10 @@ type EventDispatcher struct {
 	// UserJoined
 	userJoinedQueue     chan *UserJoined
 	userJoinedListeners []UserJoinedListener
+
+	// UserLeft
+	userLeftQueue     chan *UserLeft
+	userLeftListeners []UserLeftListener
 }
 
 func NewEventDispatcher() *EventDispatcher {
@@ -65,6 +73,10 @@ func NewEventDispatcher() *EventDispatcher {
 		// UserJoined
 		userJoinedQueue:     make(chan *UserJoined, buffersLength),
 		userJoinedListeners: []UserJoinedListener{},
+
+		// UserLeft
+		userLeftQueue:     make(chan *UserLeft, buffersLength),
+		userLeftListeners: []UserLeftListener{},
 	}
 }
 
@@ -94,6 +106,12 @@ func (d *EventDispatcher) RunEventLoop() {
 		case event := <-d.userJoinedQueue:
 			for _, listener := range d.userJoinedListeners {
 				listener.HandleUserJoined(event)
+			}
+
+		// UserLeft
+		case event := <-d.userLeftQueue:
+			for _, listener := range d.userLeftListeners {
+				listener.HandleUserLeft(event)
 			}
 
 		default:
@@ -142,4 +160,14 @@ func (d *EventDispatcher) RegisterUserJoinedListener(listener UserJoinedListener
 
 func (d *EventDispatcher) FireUserJoined(e *UserJoined) {
 	d.userJoinedQueue <- e
+}
+
+// UserLeft
+
+func (d *EventDispatcher) RegisterUserLeftListener(listener UserLeftListener) {
+	d.userLeftListeners = append(d.userLeftListeners, listener)
+}
+
+func (d *EventDispatcher) FireUserLeft(e *UserLeft) {
+	d.userLeftQueue <- e
 }

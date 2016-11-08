@@ -4,7 +4,8 @@ import (
 	"superstellar/backend/state"
 	"superstellar/backend/events"
 	"superstellar/backend/leaderboard"
-)
+	"superstellar/backend/pb"
+	)
 
 type Sender struct {
 	server 	*Server
@@ -26,15 +27,26 @@ func (sender *Sender) HandleTimeTick(timeTickEvent *events.TimeTick) {
 }
 
 func (sender *Sender) HandleProjectileFired(projectileFiredEvent *events.ProjectileFired) {
-	sender.server.SendToAll(projectileFiredEvent.Projectile.ToMessage())
+	sender.server.SendToAllClients(projectileFiredEvent.Projectile.ToMessage())
+}
+
+
+func (sender *Sender) HandleUserLeft(userLeftEvent *events.UserLeft) {
+	message := &pb.Message{
+		Content: &pb.Message_PlayerLeft{
+			PlayerLeft: &pb.PlayerLeft{Id: userLeftEvent.ClientID},
+		},
+	}
+
+	sender.server.SendToAllClients(message)
 }
 
 
 func (sender *Sender) sendSpace() {
-	sender.server.SendToAll(sender.space.ToMessage())
+	sender.server.SendToAllClients(sender.space.ToMessage())
 }
 
 func (sender *Sender) sendLeaderboard() {
 	leaderboard := leaderboard.LeaderboardFromSpace(sender.space)
-	sender.server.SendToAll(leaderboard.ToMessage())
+	sender.server.SendToAllClients(leaderboard.ToMessage())
 }
