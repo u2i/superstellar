@@ -27,7 +27,7 @@ type Client struct {
 }
 
 // NewClient initializes a new Client struct with given websocket and Server.
-func NewClient(ws *websocket.Conn, server *Server) *Client {
+func NewClient(ws *websocket.Conn, server *Server, clientID uint32) *Client {
 	if ws == nil {
 		panic("ws cannot be nil")
 	}
@@ -38,10 +38,9 @@ func NewClient(ws *websocket.Conn, server *Server) *Client {
 
 	ch := make(chan *[]byte, channelBufSize)
 	doneCh := make(chan bool)
-	id := server.GenerateID()
 	monitor := server.monitor
 
-	return &Client{id, "", ws, server, ch, doneCh, monitor, server.eventsDispatcher}
+	return &Client{clientID, "", ws, server, ch, doneCh, monitor, server.eventsDispatcher}
 }
 
 // Conn returns client's websocket.Conn struct.

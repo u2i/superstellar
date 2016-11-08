@@ -12,6 +12,7 @@ import (
 
 	"golang.org/x/net/websocket"
 	"superstellar/backend/events"
+	"sync/atomic"
 )
 
 // Server struct holds server variables.
@@ -23,7 +24,6 @@ type Server struct {
 	delCh            chan *Client
 	doneCh           chan bool
 	errCh            chan error
-	generateIDCh     chan chan uint32
 	clientID         uint32
 	eventsDispatcher *events.EventDispatcher
 }
@@ -39,7 +39,6 @@ func NewServer(pattern string, eventDispatcher *events.EventDispatcher, space *s
 		delCh:        make(chan *Client),
 		doneCh:       make(chan bool),
 		errCh:        make(chan error),
-		generateIDCh: make(chan chan uint32),
 		clientID:     0,
 		eventsDispatcher: eventDispatcher,
 	}
@@ -53,13 +52,6 @@ func (s *Server) Done() {
 // Err sends error to the server.
 func (s *Server) Err(err error) {
 	s.errCh <- err
-}
-
-// GenerateID generates new unique ID for a client
-func (s *Server) GenerateID() uint32 {
-	ch := make(chan uint32)
-	s.generateIDCh <- ch
-	return <-ch
 }
 
 // Listen runs puts server into listening mode.
@@ -108,7 +100,7 @@ func (s *Server) addNewClientHandler() {
 			}
 		}()
 
-		client := NewClient(ws, s)
+		client := NewClient(ws, s, s.nextClientID())
 		s.handleAddNewClient(client)
 		client.Listen()
 	}
@@ -131,8 +123,9 @@ func (s *Server) deleteClient(c *Client) {
 	delete(s.clients, c.id)
 }
 
-
-
+func (s *Server) nextClientID() uint32 {
+	return atomic.AddUint32(&s.clientID, 1)
+}
 
 
 
@@ -142,9 +135,6 @@ func (s *Server) deleteClient(c *Client) {
 
 func (s *Server) readChannels() {
 	select {
-
-	case ch := <-s.generateIDCh:
-		s.handleGenerateIDCh(ch)
 
 	case err := <-s.errCh:
 		log.Println("Error:", err.Error())
@@ -210,11 +200,4 @@ func (s *Server) handlePhysicsUpdate() {
 
 	elapsed := time.Since(before)
 	s.monitor.addPhysicsTime(elapsed)
-}
-
-
-
-func (s *Server) handleGenerateIDCh(ch chan uint32) {
-	s.clientID++
-	ch <- s.clientID
 }
