@@ -22,7 +22,7 @@ export default class Spaceship {
       fontFamily: 'Roboto',
       fontSize: '12px',
       fill: '#FFFFFF',
-      align: 'center'
+      align: 'center',
     };
 
     this.hpTextStyle = {
@@ -82,6 +82,11 @@ export default class Spaceship {
 
     if (globalState.clientId !== this.id) {
       this.label.text = globalState.clientIdToName.get(this.id);
+
+      if(this.id === globalState.killedBy) {
+        this.label.style.fill = '#FF0000'
+      }
+
       this.label.position.set(x - (this.label.text.length * 6) / 2, y - this.sprite.height);
     }
 

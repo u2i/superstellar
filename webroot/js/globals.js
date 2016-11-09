@@ -15,7 +15,8 @@ export const globalState = {
   spaceshipMap: new Map(),
   physicsFrameID: 0,
   projectiles: [],
-  dialog: null
+  dialog: null,
+  killedBy: null
 };
 
 export const leaderboardDialog = new LeaderboardDialog();

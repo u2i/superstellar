@@ -8,6 +8,10 @@ const playerLeftHandler = (message) => {
     spaceship.remove();
     globalState.spaceshipMap.delete(playerId);
   }
+
+  if (globalState.killedBy === playerId) {
+    globalState.killedBy = null
+  }
 };
 
 export default playerLeftHandler;
