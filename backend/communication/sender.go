@@ -46,6 +46,10 @@ func (sender *Sender) HandleUserLeft(userLeftEvent *events.UserLeft) {
 	sender.server.SendToAllClients(message)
 }
 
+func (sender *Sender) HandleUserDied(userDiedEvent *events.UserDied) {
+	sender.sendUserDiedMessage(userDiedEvent.ClientID, userDiedEvent.KilledBy)
+}
+
 
 func (sender *Sender) sendSpace() {
 	sender.server.SendToAllClients(sender.space.ToMessage())
@@ -86,4 +90,17 @@ func (sender *Sender) sendHelloMessage(clientID uint32) {
 	}
 
 	sender.server.SendToClient(clientID, message)
+}
+
+func (sender *Sender) sendUserDiedMessage(clientID uint32, killedBy uint32) {
+	message := &pb.Message{
+		Content: &pb.Message_PlayerDied{
+			PlayerDied: &pb.PlayerDied{
+				Id:       clientID,
+				KilledBy: clientID,
+			},
+		},
+	}
+
+	sender.server.SendToAllClients(message)
 }

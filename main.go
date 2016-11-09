@@ -11,12 +11,12 @@ import (
 
 import (
 	_ "net/http/pprof"
+	"superstellar/backend/communication"
 	"superstellar/backend/events"
 	"superstellar/backend/game"
+	"superstellar/backend/monitor"
 	"superstellar/backend/simulation"
 	"superstellar/backend/state"
-	"superstellar/backend/monitor"
-	"superstellar/backend/communication"
 )
 
 func main() {
@@ -44,7 +44,7 @@ func main() {
 	eventDispatcher.RegisterProjectileFiredListener(sender)
 	eventDispatcher.RegisterUserLeftListener(sender)
 	eventDispatcher.RegisterUserJoinedListener(sender)
-
+	eventDispatcher.RegisterUserDiedListener(sender)
 
 	monitor.Run()
 	go srv.Listen()

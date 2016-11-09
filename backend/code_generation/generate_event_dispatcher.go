@@ -144,6 +144,7 @@ func main() {
 			{"UserInput"},
 			{"UserJoined"},
 			{"UserLeft"},
+			{"UserDied"},
 		},
 	})
 	checkError(err)

@@ -32,6 +32,10 @@ type UserLeftListener interface {
 	HandleUserLeft(*UserLeft)
 }
 
+type UserDiedListener interface {
+	HandleUserDied(*UserDied)
+}
+
 type EventDispatcher struct {
 
 	// TimeTick
@@ -53,6 +57,10 @@ type EventDispatcher struct {
 	// UserLeft
 	userLeftQueue     chan *UserLeft
 	userLeftListeners []UserLeftListener
+
+	// UserDied
+	userDiedQueue     chan *UserDied
+	userDiedListeners []UserDiedListener
 }
 
 func NewEventDispatcher() *EventDispatcher {
@@ -77,6 +85,10 @@ func NewEventDispatcher() *EventDispatcher {
 		// UserLeft
 		userLeftQueue:     make(chan *UserLeft, buffersLength),
 		userLeftListeners: []UserLeftListener{},
+
+		// UserDied
+		userDiedQueue:     make(chan *UserDied, buffersLength),
+		userDiedListeners: []UserDiedListener{},
 	}
 }
 
@@ -112,6 +124,12 @@ func (d *EventDispatcher) RunEventLoop() {
 		case event := <-d.userLeftQueue:
 			for _, listener := range d.userLeftListeners {
 				listener.HandleUserLeft(event)
+			}
+
+		// UserDied
+		case event := <-d.userDiedQueue:
+			for _, listener := range d.userDiedListeners {
+				listener.HandleUserDied(event)
 			}
 
 		default:
@@ -170,4 +188,14 @@ func (d *EventDispatcher) RegisterUserLeftListener(listener UserLeftListener) {
 
 func (d *EventDispatcher) FireUserLeft(e *UserLeft) {
 	d.userLeftQueue <- e
+}
+
+// UserDied
+
+func (d *EventDispatcher) RegisterUserDiedListener(listener UserDiedListener) {
+	d.userDiedListeners = append(d.userDiedListeners, listener)
+}
+
+func (d *EventDispatcher) FireUserDied(e *UserDied) {
+	d.userDiedQueue <- e
 }

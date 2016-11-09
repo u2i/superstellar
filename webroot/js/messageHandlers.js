@@ -8,6 +8,8 @@ import spaceHandler from './messageHandlers/spaceHandler';
 import projectileFiredHandler from './messageHandlers/projectileFiredHandler';
 import playerJoinedHandler from './messageHandlers/playerJoinedHandler';
 import leaderboardHandler from './messageHandlers/leaderboardHandler';
+import playerDiedHandler from './messageHandlers/playerDiedHandler';
+
 
 export const initializeHandlers = () => {
   registerMessageHandler(Constants.HELLO_MESSAGE,            helloHandler);
@@ -17,5 +19,6 @@ export const initializeHandlers = () => {
   registerMessageHandler(Constants.PROJECTILE_FIRED_MESSAGE, projectileFiredHandler);
   registerMessageHandler(Constants.SPACE_MESSAGE,            spaceHandler);
   registerMessageHandler(Constants.LEADERBOARD_MESSAGE,      leaderboardHandler);
+  registerMessageHandler(Constants.PLAYER_DIED_MESSAGE,      playerDiedHandler);
 };
 

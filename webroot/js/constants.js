@@ -26,3 +26,5 @@ export const LEADERBOARD_MESSAGE       = "leaderboard";
 export const PLAYER_LEFT_MESSAGE       = "playerLeft";
 export const PLAYER_JOINED_MESSAGE     = "playerJoined";
 export const PROJECTILE_FIRED_MESSAGE  = "projectileFired";
+export const PLAYER_DIED_MESSAGE       = "playerDied";
+

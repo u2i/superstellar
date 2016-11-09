@@ -11,6 +11,7 @@ message Message {
     PlayerJoined    playerJoined      = 5;
     JoinGameAck     joinGameAck       = 6;
     Leaderboard     leaderboard       = 7;
+    PlayerDied      playerDied        = 8;
   }
 }
 
@@ -52,6 +53,11 @@ message PlayerJoined {
   string username = 2;
 };
 
+message PlayerDied {
+  uint32 id = 1;
+  uint32 killedBy = 2;
+}
+
 message Space {
   uint32 physicsFrameID = 1;
   repeated Spaceship spaceships = 2;
@@ -70,6 +76,7 @@ message JoinGameAck {
   bool   success = 1;
   string error   = 2;
 }
+
 
 enum UserInput {
   CENTER = 0;

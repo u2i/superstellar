@@ -14,17 +14,24 @@ import (
 
 // UpdatePhysics updates world physics for the next simulation step
 func UpdatePhysics(space *state.Space, eventDispatcher *events.EventDispatcher) {
-	detectProjectileCollisions(space)
+	detectProjectileCollisions(space, eventDispatcher)
 	updateSpaceships(space, eventDispatcher)
 	updateProjectiles(space)
 }
 
-func detectProjectileCollisions(space *state.Space) {
+func detectProjectileCollisions(space *state.Space, eventDispatcher *events.EventDispatcher) {
 	for projectile := range space.Projectiles {
 		for clientID, spaceship := range space.Spaceships {
 			if projectile.ClientID != clientID && projectile.DetectCollision(spaceship) {
 				spaceship.CollideWithProjectile(projectile)
 				space.RemoveProjectile(projectile)
+
+				if (spaceship.HP <= 0) {
+					space.RemoveSpaceship(clientID)
+
+					userDiedMessage := &events.UserDied{ClientID: clientID, KilledBy: projectile.ClientID}
+					eventDispatcher.FireUserDied(userDiedMessage)
+				}
 			}
 		}
 	}
