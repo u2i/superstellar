@@ -2,21 +2,22 @@ import GameOverDialog from '../dialogs/gameOverDialog';
 import { globalState } from '../globals';
 
 const playerDiedHandler = (message) => {
-  const playerId = message.id;
-  const killedBy = message.killedBy
-  const killedByName = globalState.clientIdToName.get(killedBy)
+  const killedPlayer = message.id;
+  const killedBy = message.killedBy;
+  const myId = globalState.clientId;
 
-  let spaceship = globalState.spaceshipMap.get(playerId);
+  let spaceship = globalState.spaceshipMap.get(killedPlayer);
   spaceship.remove();
-  globalState.spaceshipMap.delete(playerId);
+  globalState.spaceshipMap.delete(killedPlayer);
 
-  if (globalState.killedBy === killedBy) {
-    globalState.killedBy = null
+  if (killedPlayer === globalState.killedBy) {
+    globalState.killedBy = null;
   }
 
-  if (playerId === globalState.clientId) {
-    globalState.killedBy = killedBy
+  if (killedPlayer === myId) {
+    globalState.killedBy = killedBy;
 
+    const killedByName = globalState.clientIdToName.get(killedBy);
     const gameOverDialog = new GameOverDialog(killedByName);
     gameOverDialog.show();
   }
