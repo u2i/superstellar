@@ -97,7 +97,7 @@ func (sender *Sender) sendUserDiedMessage(clientID uint32, killedBy uint32) {
 		Content: &pb.Message_PlayerDied{
 			PlayerDied: &pb.PlayerDied{
 				Id:       clientID,
-				KilledBy: clientID,
+				KilledBy: killedBy,
 			},
 		},
 	}
