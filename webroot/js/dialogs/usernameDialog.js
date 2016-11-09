@@ -1,6 +1,7 @@
-import { sendMessage, JoinGame } from './communicationLayer';
+import { sendMessage, JoinGame } from '../communicationLayer';
+import { globalState } from '../globals';
 import Cookie from 'js-cookie';
-import * as Utils from "./utils";
+import * as Utils from "../utils";
 
 const WIDTH = 300;
 const HEIGHT = 150;
@@ -26,6 +27,8 @@ export default class UsernameDialog {
   }
 
   show () {
+    globalState.dialog = this
+
     document.body.appendChild(this.domNode);
     this.resizeListenerID = window.addEventListener("resize", () => { this._updatePosition() });
     this.submitListenerID  = document.
@@ -47,6 +50,8 @@ export default class UsernameDialog {
     window.removeEventListener("resize", this.resizeListenerID);
     window.removeEventListener("submit", this.submitListenerID);
     document.body.removeChild(this.domNode);
+
+    globalState.dialog = null
   }
 
   _updatePosition () {
@@ -64,6 +69,7 @@ export default class UsernameDialog {
   _sendJoinGame () {
     const nickname = document.getElementById("insert-name-input").value;
     Cookie.set('nickname', nickname, {expires: 7});
+    globalState.nickname = nickname
     sendMessage(new JoinGame(nickname));
   }
 }

@@ -1,14 +1,14 @@
 import { initializeControls } from '../controls';
-import { usernameDialog } from '../globals';
+import { globalState } from '../globals';
 
 const joinGameAckHandler = (message) => {
   const { success, error } = message;
 
   if (success) {
-    usernameDialog.hide();
+    globalState.dialog.hide();
     initializeControls();
   } else {
-    usernameDialog.showError(error);
+    globalState.dialog.showError(error);
   }
 };
 

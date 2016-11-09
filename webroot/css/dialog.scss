@@ -17,6 +17,11 @@
   text-align: center;
 }
 
+.dialog-message {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
 .game-dialog.error {
   .underline-input {
     border-bottom: solid 2px #b93535;

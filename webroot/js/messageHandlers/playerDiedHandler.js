@@ -1,4 +1,4 @@
-import GameOverDialog from '../gameOverDialog';
+import GameOverDialog from '../dialogs/gameOverDialog';
 import { globalState } from '../globals';
 
 const playerDiedHandler = (message) => {

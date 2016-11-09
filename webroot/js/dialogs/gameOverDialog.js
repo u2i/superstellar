@@ -1,7 +1,9 @@
-import * as Utils from "./utils";
+import { sendMessage, JoinGame } from '../communicationLayer';
+import { globalState } from '../globals';
+import * as Utils from "../utils";
 
 const WIDTH = 300;
-const HEIGHT = 150;
+const HEIGHT = 130;
 
 export default class GameOverDialog {
   constructor (killedBy) {
@@ -13,19 +15,39 @@ export default class GameOverDialog {
     this.domNode.innerHTML = `
     <div class="dialog-content">
       <p class="dialog-message">You died, captain!</p>
-      <p>You were killed by: ` + killedBy + `</p>
+      <p class="dialog-message">You were killed by: ` + killedBy + `</p>
+      <p class="action-button" id="submit">Take revenge!<p/>
     </div>
     `;
   }
 
   show () {
+    globalState.dialog = this
+
     document.body.appendChild(this.domNode);
     this.resizeListenerID = window.addEventListener("resize", () => { this._updatePosition() });
+    this.submitListenerID  = document.
+          getElementById("submit").
+          addEventListener("click", (ev) => {
+            ev.preventDefault();
+            this._sendJoinGame();
+          });
+  }
+
+  showError (errorMsg) {
+    const dialog = document.getElementsByClassName("dialog-message")[0];
+    dialog.innerText = errorMsg;
+    this.domNode.classList.add("error");
+    globalState.dialog = null
+
   }
 
   hide () {
     window.removeEventListener("resize", this.resizeListenerID);
+    window.removeEventListener("submit", this.submitListenerID);
     document.body.removeChild(this.domNode);
+
+    globalState.dialog = null
   }
 
   _updatePosition () {
@@ -38,5 +60,9 @@ export default class GameOverDialog {
     this.domNode.style.left = `${x}px`;
     this.domNode.style.width = `${WIDTH}px`;
     this.domNode.style.height = `${HEIGHT}px`;
+  }
+
+  _sendJoinGame () {
+    sendMessage(new JoinGame(globalState.nickname));
   }
 }

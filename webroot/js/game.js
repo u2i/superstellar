@@ -4,11 +4,12 @@ import * as PIXI from "pixi.js";
 import Assets from './assets';
 import * as Constants from './constants';
 import * as Utils from './utils';
-import { renderer, stage, globalState, usernameDialog, leaderboardDialog } from './globals';
+import { renderer, stage, globalState, leaderboardDialog } from './globals';
 import { initializeConnection } from './communicationLayer';
 import { initializeHandlers } from './messageHandlers';
 import Hud from './hud';
 import AnnulusFilter from './annulusFilter';
+import UsernameDialog from "./dialogs/usernameDialog";
 
 const HOST = window.location.hostname;
 const PORT = BACKEND_PORT;
@@ -50,7 +51,9 @@ function setup() {
   hud = new Hud();
   hud.show();
 
-  usernameDialog.show();
+  var dialog = new UsernameDialog();
+  dialog.show()
+
   leaderboardDialog.show();
 
   main();
