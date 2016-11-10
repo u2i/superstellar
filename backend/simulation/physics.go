@@ -6,10 +6,10 @@ import (
 	"math"
 	"math/rand"
 	"superstellar/backend/constants"
+	"superstellar/backend/events"
+	"superstellar/backend/state"
 	"superstellar/backend/types"
 	"time"
-	"superstellar/backend/state"
-	"superstellar/backend/events"
 )
 
 // UpdatePhysics updates world physics for the next simulation step
@@ -26,7 +26,7 @@ func detectProjectileCollisions(space *state.Space, eventDispatcher *events.Even
 				spaceship.CollideWithProjectile(projectile)
 				space.RemoveProjectile(projectile)
 
-				if (spaceship.HP <= 0) {
+				if spaceship.HP <= 0 {
 					space.RemoveSpaceship(clientID)
 
 					userDiedMessage := &events.UserDied{ClientID: clientID, KilledBy: projectile.ClientID}
@@ -59,6 +59,8 @@ func updateSpaceships(s *state.Space, eventDispatcher *events.EventDispatcher) {
 		if spaceship.InputThrust {
 			deltaVelocity := spaceship.NormalizedFacing().Multiply(constants.SpaceshipAcceleration)
 			spaceship.Velocity = spaceship.Velocity.Add(deltaVelocity)
+		} else {
+			spaceship.Velocity = spaceship.Velocity.Multiply(1 - constants.FrictionCoefficient)
 		}
 
 		if spaceship.Position.Add(spaceship.Velocity).Length() > constants.WorldRadius {
