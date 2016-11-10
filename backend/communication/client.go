@@ -3,26 +3,28 @@ package communication
 import (
 	"errors"
 	"log"
-	"superstellar/backend/pb"
+	"strings"
 	"superstellar/backend/events"
+	"superstellar/backend/pb"
 	"time"
 
 	"github.com/golang/protobuf/proto"
 
-	"golang.org/x/net/websocket"
 	"superstellar/backend/monitor"
+
+	"golang.org/x/net/websocket"
 )
 
 const channelBufSize = 100
 
 // Client struct holds client-specific variables.
 type Client struct {
-	id       uint32
-	username string
-	ws       *websocket.Conn
-	ch       chan *[]byte
-	doneCh   chan bool
-	monitor  *monitor.Monitor
+	id              uint32
+	username        string
+	ws              *websocket.Conn
+	ch              chan *[]byte
+	doneCh          chan bool
+	monitor         *monitor.Monitor
 	eventDispatcher *events.EventDispatcher
 }
 
@@ -135,7 +137,7 @@ func (c *Client) unmarshalUserInput(data []byte) {
 }
 
 func (c *Client) tryToJoinGame(joinGameMsg *pb.JoinGame) {
-	username := joinGameMsg.Username
+	username := strings.TrimSpace(joinGameMsg.Username)
 	ok, err := validateUsername(username)
 
 	if ok {

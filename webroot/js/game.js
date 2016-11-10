@@ -51,7 +51,7 @@ function setup() {
   hud = new Hud();
   hud.show();
 
-  var dialog = new UsernameDialog();
+  const dialog = new UsernameDialog();
   dialog.show()
 
   leaderboardDialog.show();
