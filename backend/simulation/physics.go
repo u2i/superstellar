@@ -60,7 +60,13 @@ func updateSpaceships(s *state.Space, eventDispatcher *events.EventDispatcher) {
 			deltaVelocity := spaceship.NormalizedFacing().Multiply(constants.SpaceshipAcceleration)
 			spaceship.Velocity = spaceship.Velocity.Add(deltaVelocity)
 		} else {
-			spaceship.Velocity = spaceship.Velocity.Multiply(1 - constants.FrictionCoefficient)
+			if spaceship.Velocity.Length() != 0 {
+				spaceship.Velocity = spaceship.Velocity.Multiply(1 - constants.FrictionCoefficient)
+
+				if spaceship.Velocity.Length() < 1 {
+					spaceship.Velocity = types.ZeroVector()
+				}
+			}
 		}
 
 		if spaceship.Position.Add(spaceship.Velocity).Length() > constants.WorldRadius {
