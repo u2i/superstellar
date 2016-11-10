@@ -19,13 +19,13 @@ const (
 	RandomPositionEmptyRadius = 5000.0
 
 	// Acceleration is spaceship's linear acceleration on thruster.
-	SpaceshipAcceleration = 20.0
+	SpaceshipAcceleration = 30.0
 
 	// AngularVelocity is an angular velocity added on user input.
-	SpaceshipAngularVelocity = 0.1
+	SpaceshipAngularVelocity = 0.11
 
 	// MaxSpeed maximum speed of the spacecraft
-	SpaceshipMaxSpeed = 1999
+	SpaceshipMaxSpeed = 1500
 
 	// SpaceshipSize is spaceship's radius
 	SpaceshipSize = 2000
