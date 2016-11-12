@@ -8,7 +8,7 @@ export default class AnnulusFilter extends PIXI.Filter {
     this._setWindowSize();
 
     this.uniforms.worldCoordinates = new Float32Array([0.0, 0.0]);
-    this.uniforms.interpolationStep = new Float32Array([1000.0, 1400.0]);
+    this.uniforms.worldBoundarySize = new Float32Array([1000.0, 1400.0]);
     this.uniforms.magicMatrix = new PIXI.Matrix;
 
     window.addEventListener("resize", () => {
@@ -29,12 +29,12 @@ export default class AnnulusFilter extends PIXI.Filter {
     this.uniforms.worldCoordinates = value;
   }
 
-  get interpolationStep () {
-    return this.uniforms.interpolationStep;
+  get worldBoundarySize () {
+    return this.uniforms.worldBoundarySize;
   }
 
-  set interpolationStep (value) {
-    this.uniforms.interpolationStep = value;
+  set worldBoundarySize (value) {
+    this.uniforms.worldBoundarySize = value;
   }
 
   get windowSize () {
