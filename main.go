@@ -35,6 +35,7 @@ func main() {
 	eventDispatcher.RegisterTimeTickListener(updater)
 	eventDispatcher.RegisterUserJoinedListener(updater)
 	eventDispatcher.RegisterUserLeftListener(updater)
+	eventDispatcher.RegisterUserDiedListener(updater)
 
 	srv := communication.NewServer("/superstellar", monitor, eventDispatcher)
 	eventDispatcher.RegisterUserLeftListener(srv)

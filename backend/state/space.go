@@ -73,6 +73,10 @@ func (space *Space) NextProjectileID() uint32 {
 	return ID
 }
 
+func (space *Space) AddRewardToClient(clientId uint32, reward uint32) {
+	space.Spaceships[clientId].AddReward(reward)
+}
+
 // ToProto returns protobuf representation
 func (space *Space) ToProto() *pb.Space {
 	protoSpaceships := make([]*pb.Spaceship, 0, len(space.Spaceships))

@@ -108,3 +108,8 @@ func (s *Spaceship) CollideWithProjectile(projectile *Projectile) {
 		s.HP -= 100
 	}
 }
+
+func (s *Spaceship) AddReward(reward uint32) {
+	s.HP += reward
+	s.MaxHP += reward
+}

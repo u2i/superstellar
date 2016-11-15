@@ -33,6 +33,9 @@ const (
 	// SpaceshipInitialHP spaceship HP
 	SpaceshipInitialHP = 500
 
+	// Part of killed player's Max HP that killing player receives
+	KillRewardRatio = 0.1
+
 	// WorldRadius is the radius of playable world (in .01 units)
 	WorldRadius = 100000
 )

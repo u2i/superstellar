@@ -29,7 +29,11 @@ func detectProjectileCollisions(space *state.Space, eventDispatcher *events.Even
 				if spaceship.HP <= 0 {
 					space.RemoveSpaceship(clientID)
 
-					userDiedMessage := &events.UserDied{ClientID: clientID, KilledBy: projectile.ClientID}
+					userDiedMessage := &events.UserDied{
+						ClientID: clientID,
+						KilledBy: projectile.ClientID,
+						ShotSpaceship: spaceship,
+					}
 					eventDispatcher.FireUserDied(userDiedMessage)
 				}
 			}
