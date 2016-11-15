@@ -5,6 +5,7 @@ import (
 	"superstellar/backend/events"
 	"superstellar/backend/leaderboard"
 	"superstellar/backend/pb"
+	"superstellar/backend/constants"
 	)
 
 type Sender struct {
@@ -85,6 +86,7 @@ func (sender *Sender) sendHelloMessage(clientID uint32) {
 			Hello: &pb.Hello{
 				MyId:         clientID,
 				IdToUsername: idToUsername,
+				WorldRadius:  constants.WorldRadius,
 			},
 		},
 	}

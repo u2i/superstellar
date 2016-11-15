@@ -66,6 +66,7 @@ message Space {
 message Hello {
   uint32 myId = 1;
   map<uint32, string> idToUsername = 2;
+  uint32 worldRadius = 3;
 }
 
 message JoinGame {

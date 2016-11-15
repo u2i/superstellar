@@ -276,6 +276,12 @@
                     "keytype": "uint32",
                     "name": "idToUsername",
                     "id": 2
+                },
+                {
+                    "rule": "optional",
+                    "type": "uint32",
+                    "name": "worldRadius",
+                    "id": 3
                 }
             ]
         },
