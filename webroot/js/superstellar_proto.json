@@ -279,9 +279,15 @@
                 },
                 {
                     "rule": "optional",
-                    "type": "uint32",
+                    "type": "float",
                     "name": "worldRadius",
                     "id": 3
+                },
+                {
+                    "rule": "optional",
+                    "type": "float",
+                    "name": "boundaryAnnulusWidth",
+                    "id": 4
                 }
             ]
         },

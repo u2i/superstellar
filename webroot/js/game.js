@@ -8,14 +8,13 @@ import { renderer, stage, globalState, leaderboardDialog } from './globals';
 import { initializeConnection } from './communicationLayer';
 import { initializeHandlers } from './messageHandlers';
 import Hud from './hud';
-import AnnulusFilter from './annulusFilter';
 import UsernameDialog from "./dialogs/usernameDialog";
 
 const HOST = window.location.hostname;
 const PORT = BACKEND_PORT;
 const PATH = '/superstellar';
 
-const fogShader = new AnnulusFilter();
+const fogShader = globalState.worldSizeFilter;
 
 document.getElementById('game').appendChild(renderer.view);
 

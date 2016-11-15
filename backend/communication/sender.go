@@ -86,7 +86,8 @@ func (sender *Sender) sendHelloMessage(clientID uint32) {
 			Hello: &pb.Hello{
 				MyId:         clientID,
 				IdToUsername: idToUsername,
-				WorldRadius:  constants.WorldRadius,
+				WorldRadius:  constants.WorldRadius / 100,
+				BoundaryAnnulusWidth: constants.BoundaryAnnulusWidth / 100,
 			},
 		},
 	}

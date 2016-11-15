@@ -1,5 +1,6 @@
 import { getCurrentWindowSize } from './utils';
 import LeaderboardDialog from "./leaderboardDialog";
+import AnnulusFilter from './annulusFilter';
 
 const windowSize = getCurrentWindowSize();
 
@@ -16,7 +17,8 @@ export const globalState = {
   physicsFrameID: 0,
   projectiles: [],
   dialog: null,
-  killedBy: null
+  killedBy: null,
+  worldSizeFilter: new AnnulusFilter()
 };
 
 export const leaderboardDialog = new LeaderboardDialog();
