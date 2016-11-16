@@ -38,4 +38,13 @@ const (
 
 	// WorldRadius is the radius of playable world (in .01 units)
 	WorldRadius = 100000
+
+	// AutoRepairDelay is time after which spaceship will repair itself
+	AutoRepairDelay = 120
+
+	// AutoRepairInterval is the time between repairs
+	AutoRepairInterval = 30
+
+	// AutoRepair is the amount of HP player will receive after AutoRepairDelay
+	AutoRepairAmount = 25
 )

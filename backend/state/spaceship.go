@@ -21,16 +21,17 @@ const (
 
 // Spaceship struct describes a spaceship.
 type Spaceship struct {
-	ID             uint32
-	Position       *types.Point
-	Velocity       *types.Vector
-	Facing         *types.Vector
-	InputThrust    bool
-	InputDirection Direction
-	Fire           bool
-	LastShotTime   time.Time
-	HP             uint32
-	MaxHP          uint32
+	ID              uint32
+	Position        *types.Point
+	Velocity        *types.Vector
+	Facing          *types.Vector
+	InputThrust     bool
+	InputDirection  Direction
+	Fire            bool
+	LastShotTime    time.Time
+	HP              uint32
+	MaxHP           uint32
+	AutoRepairDelay uint32
 }
 
 // String function returns string representation.
@@ -107,9 +108,19 @@ func (s *Spaceship) CollideWithProjectile(projectile *Projectile) {
 	} else {
 		s.HP -= 100
 	}
+	s.AutoRepairDelay = constants.AutoRepairDelay
 }
 
 func (s *Spaceship) AddReward(reward uint32) {
 	s.HP += reward
 	s.MaxHP += reward
+}
+
+func (s *Spaceship) AutoRepair() {
+	s.HP += constants.AutoRepairAmount
+
+	if(s.HP > s.MaxHP) {
+		s.HP = s.MaxHP
+	}
+	s.AutoRepairDelay = constants.AutoRepairInterval
 }

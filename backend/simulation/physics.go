@@ -95,6 +95,8 @@ func updateSpaceships(s *state.Space, eventDispatcher *events.EventDispatcher) {
 		}
 
 		spaceship.Facing = types.NewVector(math.Cos(angle), math.Sin(angle))
+
+		handleAutoRepair(spaceship)
 	}
 
 	collided := make(map[*state.Spaceship]bool)
@@ -175,6 +177,16 @@ func updateSpaceships(s *state.Space, eventDispatcher *events.EventDispatcher) {
 	// koniec kodu przeciwzakrzepowego
 
 	s.PhysicsFrameID++
+}
+
+func handleAutoRepair(spaceship *state.Spaceship) {
+	if(spaceship.AutoRepairDelay == 0) {
+		if(spaceship.HP < spaceship.MaxHP) {
+			spaceship.AutoRepair()
+		}
+	} else {
+		spaceship.AutoRepairDelay--
+	}
 }
 
 func updateProjectiles(space *state.Space) {
