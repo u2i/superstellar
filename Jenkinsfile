@@ -20,7 +20,7 @@ stage('Checkout') {
             stash 'source'
         }
     }
-}   
+}
 
 stage('Build & Test') {
     parallel(
@@ -34,7 +34,7 @@ stage('Build & Test') {
                         sh """
                             go get superstellar github.com/onsi/ginkgo github.com/onsi/gomega
                             go build superstellar
-                            go test superstellar
+                            go test superstellar/...
                         """
                         sh 'cp /go/bin/superstellar .'
                     }
