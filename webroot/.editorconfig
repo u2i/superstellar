@@ -1,0 +1,15 @@
+[*]
+insert_final_newline = true
+charset = utf-8
+trim_trailing_whitespace = true
+end_of_line = lf
+indent_style = space
+
+[*.{js,json}]
+indent_size = 2
+
+[*.html]
+indent_size = 4
+
+[*.frag]
+indent_size = 4
