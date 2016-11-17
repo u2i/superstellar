@@ -16,8 +16,7 @@ func LeaderboardFromSpace(space *state.Space) *Leaderboard{
 	size := len(space.Spaceships)
 	ranks := make([]Rank, 0, size)
 	for _, stateship := range space.Spaceships {
-		// TODO: change to MaxHP?
-		ranks = append(ranks, Rank{stateship.ID, stateship.HP})
+		ranks = append(ranks, Rank{stateship.ID, stateship.MaxHP})
 	}
 	sort.Stable(sort.Reverse(SortableByScore(ranks)))
 	return &Leaderboard{ranks: ranks}
