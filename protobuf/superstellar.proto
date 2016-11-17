@@ -108,4 +108,7 @@ message Rank {
 
 message Leaderboard {
   repeated Rank ranks = 1;
+  uint32 clientId = 2;
+  uint32 userScore = 3;
+  uint32 userPosition = 4;
 }

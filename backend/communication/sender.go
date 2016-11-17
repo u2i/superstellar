@@ -6,11 +6,11 @@ import (
 	"superstellar/backend/leaderboard"
 	"superstellar/backend/pb"
 	"superstellar/backend/constants"
-	)
+)
 
 type Sender struct {
-	server 	*Server
-	space 	*state.Space
+	server *Server
+	space  *state.Space
 }
 
 func NewSender(server *Server, space *state.Space) *Sender {
@@ -31,7 +31,6 @@ func (sender *Sender) HandleProjectileFired(projectileFiredEvent *events.Project
 	sender.server.SendToAllClients(projectileFiredEvent.Projectile.ToMessage())
 }
 
-
 func (sender *Sender) HandleUserJoined(userJoinedEvent *events.UserJoined) {
 	sender.sendHelloMessage(userJoinedEvent.ClientID)
 	sender.sendUserJoinedMessage(userJoinedEvent.ClientID, userJoinedEvent.UserName)
@@ -51,14 +50,17 @@ func (sender *Sender) HandleUserDied(userDiedEvent *events.UserDied) {
 	sender.sendUserDiedMessage(userDiedEvent.ClientID, userDiedEvent.KilledBy)
 }
 
-
 func (sender *Sender) sendSpace() {
 	sender.server.SendToAllClients(sender.space.ToMessage())
 }
 
 func (sender *Sender) sendLeaderboard() {
-	leaderboard := leaderboard.LeaderboardFromSpace(sender.space)
-	sender.server.SendToAllClients(leaderboard.ToMessage())
+	fullLeaderboard := leaderboard.FullLeaderboardFromSpace(sender.space)
+	leaderboards := fullLeaderboard.BuildLeaderboards()
+
+	for _, l := range leaderboards {
+		sender.server.SendToClient(l.ClientId, l.ToMessage())
+	}
 }
 
 func (sender *Sender) sendUserJoinedMessage(clientID uint32, userName string) {

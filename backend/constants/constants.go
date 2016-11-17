@@ -1,6 +1,8 @@
 package constants
 
-import "time"
+import (
+	"time"
+)
 
 const (
 	PhysicsFrameDuration = 20 * time.Millisecond
@@ -12,7 +14,7 @@ const (
 	FrictionCoefficient = 0.02
 
 	// MinFireInterval is a minimum time between firing.
-	MinFireInterval = 500 * time.Millisecond
+	MinFireInterval = 100 * time.Millisecond
 
 	// RandomPositionEmptyRadius describes the minimum radius around randomized
 	// initial position that needs to be free of any objects.
@@ -47,4 +49,7 @@ const (
 
 	// AutoRepair is the amount of HP player will receive after AutoRepairDelay
 	AutoRepairAmount = 1
+
+	// Number of best players in Leaderboard
+	LeaderboardLength = 2
 )

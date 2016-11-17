@@ -1,8 +1,10 @@
-package types
+package types_test
 
 import (
 	"math"
-
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
+	. "superstellar/backend/types"
 )
 
 var _ = Describe("Vector", func() {

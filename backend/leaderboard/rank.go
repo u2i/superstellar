@@ -1,6 +1,8 @@
 package leaderboard
 
-import "superstellar/backend/pb"
+import (
+	"superstellar/backend/pb"
+)
 
 type Rank struct {
 	clientId uint32

@@ -1,4 +1,4 @@
-package main_test
+package types_test
 
 import (
 	. "github.com/onsi/ginkgo"
@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func TestSuperstellar(t *testing.T) {
+func TestTypesTest(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Superstellar Suite")
+	RunSpecs(t, "TypesTest Suite")
 }

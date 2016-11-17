@@ -380,6 +380,24 @@
                     "type": "Rank",
                     "name": "ranks",
                     "id": 1
+                },
+                {
+                    "rule": "optional",
+                    "type": "uint32",
+                    "name": "clientId",
+                    "id": 2
+                },
+                {
+                    "rule": "optional",
+                    "type": "uint32",
+                    "name": "userScore",
+                    "id": 3
+                },
+                {
+                    "rule": "optional",
+                    "type": "uint32",
+                    "name": "userPosition",
+                    "id": 4
                 }
             ]
         }

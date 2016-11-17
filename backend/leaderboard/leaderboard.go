@@ -2,24 +2,13 @@ package leaderboard
 
 import (
 	"superstellar/backend/pb"
-	"superstellar/backend/state"
-	"sort"
 )
 
-const LeaderboardLength = 10
-
 type Leaderboard struct {
-	ranks []Rank
-}
-
-func LeaderboardFromSpace(space *state.Space) *Leaderboard{
-	size := len(space.Spaceships)
-	ranks := make([]Rank, 0, size)
-	for _, stateship := range space.Spaceships {
-		ranks = append(ranks, Rank{stateship.ID, stateship.MaxHP})
-	}
-	sort.Stable(sort.Reverse(SortableByScore(ranks)))
-	return &Leaderboard{ranks: ranks}
+	ClientId     uint32
+	userScore    uint32
+	userPosition uint16
+	ranks        []Rank
 }
 
 // ToProto returns protobuf representation
@@ -29,7 +18,12 @@ func (leaderboard *Leaderboard) ToProto() *pb.Leaderboard {
 		ranks = append(ranks, rank.ToProto())
 	}
 
-	return &pb.Leaderboard{Ranks: ranks}
+	return &pb.Leaderboard{
+		Ranks: ranks,
+		ClientId: leaderboard.ClientId,
+		UserScore: leaderboard.userScore,
+		UserPosition: uint32(leaderboard.userPosition),
+	}
 }
 
 // ToMessage returns protobuffer Message object with Leaderboard containing ordered Ranks.
