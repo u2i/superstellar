@@ -30,9 +30,9 @@ export default class LeaderboardDialog {
     return tr;
   }
 
-  buildCell(html, className) {
+  buildCell(text, className) {
     let td = document.createElement("td");
-    td.innerText = html;
+    td.innerText = text;
     td.className = className;
     return td;
   }

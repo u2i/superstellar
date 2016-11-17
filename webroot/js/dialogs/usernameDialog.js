@@ -41,7 +41,7 @@ export default class UsernameDialog {
 
   showError (errorMsg) {
     const dialog = document.getElementsByClassName("dialog-message")[0];
-    dialog.innerText = errorMsg;
+    dialog.textContent = errorMsg;
 
     this.domNode.classList.add("error");
   }
