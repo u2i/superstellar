@@ -40,7 +40,7 @@ export default class GameOverDialog {
 
   showError (errorMsg) {
     const dialog = document.getElementsByClassName("dialog-message")[0];
-    dialog.innerText = errorMsg;
+    dialog.textContent = errorMsg;
     this.domNode.classList.add("error");
     globalState.dialog = null
 
