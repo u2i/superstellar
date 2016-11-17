@@ -1,11 +1,8 @@
+@import "hud";
+
 div.hud-leaderboard {
-  padding: 3px;
-  margin: 10px;
+  @extend .hud;
   display: none;
-  background: transparentize($color-background, 0.9);
-  color: $color-primary;
-  position: absolute;
-  z-index: 4000;
   width: 300px;
 }
 
@@ -13,7 +10,6 @@ table.leaderboard {
   table-layout: fixed;
   width: 100%;
   font-size: 8pt;
-  color: transparentize($color-primary, 0.2);
 
   tbody tr.current {
     font-weight: bolder; // Why u no work?

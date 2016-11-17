@@ -1,0 +1,10 @@
+@import "base";
+
+.hud {
+  padding: 3px;
+  margin: 10px;
+  background: transparentize($color-background, $hud-transparency);
+  color: transparentize($color-primary, 0.2);
+  position: absolute;
+  z-index: 4000;
+}

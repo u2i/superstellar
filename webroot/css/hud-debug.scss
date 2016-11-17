@@ -1,18 +1,15 @@
+@import "base";
+@import "hud";
+
 .hud-debug {
-  right: 0px;
-  padding: 3px;
-  margin: 10px;
+  @extend .hud;
+  right: 0;
   display: none;
-  background: transparentize($color-background, 0.9);
-  color: $color-primary;
-  position: absolute;
-  z-index: 4000;
 }
 
 dl.dl-horizontal {
   font-size: 12pt;
   font-family: $font-secondary;
-  color: $color-primary;
 
   dt {
     float: left;
