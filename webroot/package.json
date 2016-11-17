@@ -1,7 +1,7 @@
 {
   "name": "superstellar-frontend",
   "version": "0.0.1",
-  "description": "",
+  "description": "Super frontend to super game superstellar",
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -9,7 +9,8 @@
     "build": "webpack -p --config ./webpack.production.config.js"
   },
   "author": "u2i",
-  "license": "ISC",
+  "private": true,
+  "repository": "https://github.com/u2i/superstellar",
   "devDependencies": {
     "babel-core": "^6.14.0",
     "babel-loader": "^6.2.5",
