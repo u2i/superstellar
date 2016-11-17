@@ -43,8 +43,8 @@ const (
 	AutoRepairDelay = 120
 
 	// AutoRepairInterval is the time between repairs
-	AutoRepairInterval = 30
+	AutoRepairInterval = 6
 
 	// AutoRepair is the amount of HP player will receive after AutoRepairDelay
-	AutoRepairAmount = 25
+	AutoRepairAmount = 1
 )
