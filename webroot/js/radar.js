@@ -60,7 +60,6 @@ export default class Radar {
   otherShips(myShip, viewport) {
     let result = [];
     for(let ship of globalState.spaceshipMap.values()) {
-      console.log(ship);
       if(ship.id !== myShip.id) {
         let viewportRespectCoords = Utils.translateToViewport(ship.position.x / 100, ship.position.y / 100, viewport);
         viewportRespectCoords.x -= viewport.width / 2;

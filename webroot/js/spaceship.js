@@ -1,8 +1,12 @@
 import * as Utils from './utils.js';
-import { globalState, renderer, stage } from './globals.js';
+import HealthBarFilter from './healthBarFilter';
+import {globalState, renderer, stage} from './globals.js';
+
+const healthBarRadius = 40;
 
 export default class Spaceship {
-  constructor (shipTexture, thrustAnimationFrames, data) {
+  constructor(shipTexture, thrustAnimationFrames, data) {
+    this.createHealthBarFilter();
     this.updateData(data);
     this.container = new PIXI.Container();
     this.sprite = new PIXI.Sprite(shipTexture);
@@ -25,32 +29,23 @@ export default class Spaceship {
       align: 'center',
     };
 
-    this.hpTextStyle = {
-      fontFamily: 'Roboto Mono',
-      fontSize: '10px',
-      fill: '#FFFFFF',
-      align: 'center'
-    };
-
     this.label = new PIXI.Text('', this.labelTextStyle);
-
-    this.healthBar = new PIXI.Text('', this.hpTextStyle);
 
     stage.addChild(this.container);
     this.container.addChild(this.sprite);
     this.container.addChild(this.thrustAnimation);
+    this.addHealthBar();
 
     if (__DEBUG__) {
       this.container.addChild(this.collisionSphere);
     }
 
     stage.addChild(this.label);
-    stage.addChild(this.healthBar);
 
     this.container.pivot.set(this.sprite.width / 2, this.sprite.height / 2);
   }
 
-  updateData ({ id, position, velocity, facing, inputThrust, hp, maxHp }) {
+  updateData({id, position, velocity, facing, inputThrust, hp, maxHp}) {
     this.id = id;
     this.position = position;
     this.velocity = velocity;
@@ -58,9 +53,10 @@ export default class Spaceship {
     this.inputThrust = inputThrust;
     this.hp = hp;
     this.maxHp = maxHp;
+    this.updateHealthBar();
   }
 
-  update (viewport) {
+  update(viewport) {
     if (this.inputThrust) {
       this.thrustAnimation.visible = true;
       this.thrustAnimation.play();
@@ -69,37 +65,69 @@ export default class Spaceship {
       this.thrustAnimation.stop();
     }
 
-    const { x, y } = Utils.translateToViewport(
+    const {x, y} = Utils.translateToViewport(
       this.position.x / 100,
       this.position.y / 100,
       viewport
     );
 
     this.container.position.set(x, y);
-    this.healthBar.position.set(x - (this.healthBar.text.length * 8) / 2, y + this.sprite.height * 2 / 3);
+
+    if (this.isOutOfView(x, y, viewport)) {
+      this.disableHealthBarFilter();
+    } else {
+      this.enableHealthBarFilter(x, y);
+    }
 
     this.container.rotation = this.facing;
 
     if (globalState.clientId !== this.id) {
       this.label.text = globalState.clientIdToName.get(this.id);
 
-      if(this.id === globalState.killedBy) {
+      if (this.id === globalState.killedBy) {
         this.label.style.fill = '#FF0000'
       }
 
       this.label.position.set(x - (this.label.text.length * 6) / 2, y - this.sprite.height);
     }
-
-    this.healthBar.text = this.hp;
   }
 
-  remove () {
+  isOutOfView(x, y, viewport) {
+    return x - healthBarRadius < 0
+      || y - healthBarRadius < 0
+      || x + healthBarRadius > viewport.width
+      || y + healthBarRadius > viewport.height;
+  }
+
+  addHealthBar() {
+    this.healthBar = new PIXI.Graphics();
+    this.healthBar.filterArea = new PIXI.Rectangle(100, 100, 200, 200);
+    this.container.addChild(this.healthBar);
+  }
+
+  enableHealthBarFilter(x, y) {
+    this.healthBar.filterArea = new PIXI.Rectangle(x - healthBarRadius, y - healthBarRadius, healthBarRadius * 2, healthBarRadius * 2);
+    this.healthBar.filters = [this.healthBarFilter];
+  }
+
+  disableHealthBarFilter() {
+    this.healthBar.filters = [];
+  }
+
+  createHealthBarFilter() {
+    this.healthBarFilter = new HealthBarFilter();
+  }
+
+  updateHealthBar() {
+    this.healthBarFilter.hps = [this.hp, this.maxHp];
+  }
+
+  remove() {
     stage.removeChild(this.container);
-    stage.removeChild(this.healthBar);
     stage.removeChild(this.label);
   }
 
-  viewport () {
+  viewport() {
     return {
       vx: this.position.x / 100,
       vy: this.position.y / 100,
