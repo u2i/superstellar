@@ -14,7 +14,7 @@ const (
 	FrictionCoefficient = 0.02
 
 	// MinFireInterval is a minimum time between firing.
-	MinFireInterval = 100 * time.Millisecond
+	MinFireInterval = 250 * time.Millisecond
 
 	// RandomPositionEmptyRadius describes the minimum radius around randomized
 	// initial position that needs to be free of any objects.
