@@ -7,16 +7,21 @@ div.hud-leaderboard {
 }
 
 table.leaderboard {
+  &.tail {
+    color: transparentize($color-primary, ($hud-transparency * 3))
+  }
+
   table-layout: fixed;
   width: 100%;
   font-size: 8pt;
 
   tbody tr.current {
-    font-weight: bolder; // Why u no work?
+    color: $color-primary;
+    font-weight: 900;
   }
 
   tbody tr td {
-    &.rank {
+    &.rank-position {
       text-align: right;
       width: 10%;
       font-family: $font-mono;
