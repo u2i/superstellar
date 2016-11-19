@@ -7,7 +7,6 @@ import (
 	"superstellar/backend/constants"
 	"superstellar/backend/pb"
 	"superstellar/backend/types"
-	"time"
 )
 
 // Space struct holds entire game state.
@@ -30,20 +29,7 @@ func NewSpace() *Space {
 
 // NewSpaceship creates a new spaceship and adds it to the space.
 func (space *Space) NewSpaceship(clientID uint32) {
-	spaceship := &Spaceship{
-		ID:              clientID,
-		Position:        space.randomEmptyPosition(),
-		Velocity:        types.ZeroVector(),
-		Facing:          types.NewVector(0.0, 1.0),
-		InputThrust:     false,
-		InputDirection:  NONE,
-		Fire:            false,
-		LastShotTime:    time.Now(),
-		HP:              constants.SpaceshipInitialHP,
-		MaxHP:           constants.SpaceshipInitialHP,
-		AutoRepairDelay: constants.AutoRepairDelay,
-	}
-
+	spaceship := NewSpaceship(clientID, space.randomEmptyPosition())
 	space.AddSpaceship(clientID, spaceship)
 }
 
