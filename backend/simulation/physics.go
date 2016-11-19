@@ -89,10 +89,13 @@ func updateSpaceships(s *state.Space, eventDispatcher *events.EventDispatcher) {
 		angle := math.Atan2(spaceship.Facing.Y, spaceship.Facing.X)
 		switch spaceship.InputDirection {
 		case state.LEFT:
-			angle += constants.SpaceshipAngularVelocity
+			spaceship.LeftTurn()
 		case state.RIGHT:
-			angle -= constants.SpaceshipAngularVelocity
+			spaceship.RightTurn()
+		default:
+			spaceship.ApplyAngularFriction()
 		}
+		angle += spaceship.AngularSpeed
 
 		spaceship.Facing = types.NewVector(math.Cos(angle), math.Sin(angle))
 

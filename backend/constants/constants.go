@@ -23,8 +23,14 @@ const (
 	// Acceleration is spaceship's linear acceleration on thruster.
 	SpaceshipAcceleration = 30.0
 
-	// AngularVelocity is an angular velocity added on user input.
-	SpaceshipAngularVelocity = 0.11
+	// Maximum angular velocity added on user input.
+	SpaceshipMaxAngularSpeed = 0.1
+
+	SpaceshipLinearAngularAcceleration = 0.0001
+
+	SpaceshipNonlinearAngularAcceleration = 2
+
+	SpaceshipAngularFriction = 0.2
 
 	// MaxSpeed maximum speed of the spacecraft
 	SpaceshipMaxSpeed = 1500
