@@ -1,6 +1,7 @@
 // ********** TEXTURES **********
 export const BACKGROUND_TEXTURE = "images/background1.png";
 export const SHIP_TEXTURE = "images/ship.png";
+export const RADER_REFRESH_TEXTURE = "images/radar_refresh.png"
 
 // ********** SPRITESHEETS **********
 export const FLAME_SPRITESHEET = "spritesheets/flame_yellow.json";

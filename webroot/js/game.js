@@ -9,6 +9,7 @@ import { initializeConnection } from './communicationLayer';
 import { initializeHandlers } from './messageHandlers';
 import Hud from './hud';
 import UsernameDialog from "./dialogs/usernameDialog";
+import Radar from './radar';
 
 const HOST = window.location.hostname;
 const PORT = BACKEND_PORT;
@@ -30,6 +31,7 @@ PIXI.loader.
 let tilingSprite;
 let overlay;
 let hud;
+let radar;
 
 function setup() {
   initializeHandlers();
@@ -46,6 +48,9 @@ function setup() {
   overlay.filterArea = new PIXI.Rectangle(0, 0, renderer.width, renderer.height);
   overlay.filters = [fogShader];
   stage.addChild(overlay);
+
+  radar = new Radar();
+  radar.show();
 
   hud = new Hud();
   hud.show();
@@ -84,6 +89,10 @@ const render = function () {
 
   globalState.spaceshipMap.forEach((spaceship) => spaceship.update(viewport));
   globalState.projectiles.forEach((projectile) => projectile.update(viewport));
+
+  if(myShip) {
+    radar.update(myShip, viewport);
+  }
 
   hud.update();
 
