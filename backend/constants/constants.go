@@ -57,5 +57,5 @@ const (
 	AutoRepairAmount = 1
 
 	// Number of best players in Leaderboard
-	LeaderboardLength = 3
+	LeaderboardLength = 10
 )
