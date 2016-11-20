@@ -15,7 +15,7 @@ export const globalState = {
   nickname: null,
   spaceshipMap: new Map(),
   physicsFrameID: 0,
-  projectiles: [],
+  projectilesMap: new Map(),
   dialog: null,
   killedBy: null,
   worldSizeFilter: new AnnulusFilter(),

@@ -141,6 +141,7 @@ func main() {
 		EventTypes: []EventType{
 			{"TimeTick"},
 			{"ProjectileFired"},
+			{"ProjectileHit"},
 			{"UserInput"},
 			{"UserJoined"},
 			{"UserLeft"},

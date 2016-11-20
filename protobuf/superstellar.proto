@@ -8,11 +8,12 @@ message Message {
     Hello           hello             = 2;
     PlayerLeft      playerLeft        = 3;
     ProjectileFired projectileFired   = 4;
-    PlayerJoined    playerJoined      = 5;
-    JoinGameAck     joinGameAck       = 6;
-    Leaderboard     leaderboard       = 7;
-    PlayerDied      playerDied        = 8;
-    Pong            pong              = 9;
+    ProjectileHit   projectileHit     = 5;
+    PlayerJoined    playerJoined      = 6;
+    JoinGameAck     joinGameAck       = 7;
+    Leaderboard     leaderboard       = 8;
+    PlayerDied      playerDied        = 9;
+    Pong            pong              = 10;
   }
 }
 
@@ -43,6 +44,10 @@ message ProjectileFired {
   Vector    velocity = 4;
   float     facing = 5;
   uint32    ttl = 6;
+}
+
+message ProjectileHit {
+  uint32    id = 1;
 }
 
 message PlayerLeft {

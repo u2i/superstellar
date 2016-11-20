@@ -92,7 +92,7 @@ const render = function () {
   tilingSprite.tilePosition.set(backgroundPos.x, backgroundPos.y);
 
   globalState.spaceshipMap.forEach((spaceship) => spaceship.update(viewport));
-  globalState.projectiles.forEach((projectile) => projectile.update(viewport));
+  globalState.projectilesMap.forEach((projectile) => projectile.update(viewport));
 
   if(myShip) {
     radar.update(myShip, viewport);

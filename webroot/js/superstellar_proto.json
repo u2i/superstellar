@@ -37,37 +37,44 @@
                 },
                 {
                     "rule": "optional",
+                    "type": "ProjectileHit",
+                    "name": "projectileHit",
+                    "id": 5,
+                    "oneof": "content"
+                },
+                {
+                    "rule": "optional",
                     "type": "PlayerJoined",
                     "name": "playerJoined",
-                    "id": 5,
+                    "id": 6,
                     "oneof": "content"
                 },
                 {
                     "rule": "optional",
                     "type": "JoinGameAck",
                     "name": "joinGameAck",
-                    "id": 6,
+                    "id": 7,
                     "oneof": "content"
                 },
                 {
                     "rule": "optional",
                     "type": "Leaderboard",
                     "name": "leaderboard",
-                    "id": 7,
+                    "id": 8,
                     "oneof": "content"
                 },
                 {
                     "rule": "optional",
                     "type": "PlayerDied",
                     "name": "playerDied",
-                    "id": 8,
+                    "id": 9,
                     "oneof": "content"
                 },
                 {
                     "rule": "optional",
                     "type": "Pong",
                     "name": "pong",
-                    "id": 9,
+                    "id": 10,
                     "oneof": "content"
                 }
             ],
@@ -81,7 +88,8 @@
                     6,
                     7,
                     8,
-                    9
+                    9,
+                    10
                 ]
             }
         },
@@ -204,6 +212,17 @@
                     "type": "uint32",
                     "name": "ttl",
                     "id": 6
+                }
+            ]
+        },
+        {
+            "name": "ProjectileHit",
+            "fields": [
+                {
+                    "rule": "optional",
+                    "type": "uint32",
+                    "name": "id",
+                    "id": 1
                 }
             ]
         },

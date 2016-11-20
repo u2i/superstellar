@@ -43,6 +43,7 @@ func main() {
 	sender := communication.NewSender(srv, space)
 	eventDispatcher.RegisterTimeTickListener(sender)
 	eventDispatcher.RegisterProjectileFiredListener(sender)
+	eventDispatcher.RegisterProjectileHitListener(sender)
 	eventDispatcher.RegisterUserLeftListener(sender)
 	eventDispatcher.RegisterUserJoinedListener(sender)
 	eventDispatcher.RegisterUserDiedListener(sender)

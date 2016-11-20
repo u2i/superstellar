@@ -31,6 +31,10 @@ func (sender *Sender) HandleProjectileFired(projectileFiredEvent *events.Project
 	sender.server.SendToAllClients(projectileFiredEvent.Projectile.ToMessage())
 }
 
+func (sender *Sender) HandleProjectileHit(projectileHitEvent *events.ProjectileHit) {
+	sender.server.SendToAllClients(projectileHitEvent.Projectile.ToHitMessage())
+}
+
 func (sender *Sender) HandleUserJoined(userJoinedEvent *events.UserJoined) {
 	sender.sendHelloMessage(userJoinedEvent.ClientID)
 	sender.sendUserJoinedMessage(userJoinedEvent.ClientID, userJoinedEvent.UserName)

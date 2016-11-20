@@ -2,7 +2,8 @@ import { stage, globalState } from './globals';
 import * as Utils from './utils.js';
 
 export default class Projectile {
-  constructor (animationFrames, frameId, origin, ttl, velocity, facing) {
+  constructor (id, animationFrames, frameId, origin, ttl, velocity, facing) {
+    this.id = id;
     this.frameId  = frameId;
     this.origin   = origin;
     this.ttl      = ttl;
@@ -27,7 +28,7 @@ export default class Projectile {
   update (viewport) {
     if(globalState.physicsFrameID > this.frameId + this.ttl) {
       this.remove();
-      globalState.projectiles.splice(globalState.projectiles.indexOf(this), 1);
+      globalState.projectilesMap.delete(this.id);
     }
 
     this._updatePosition();
@@ -35,7 +36,7 @@ export default class Projectile {
 
     const translatedPosition = Utils.translateToViewport(
       this.position.x / 100,
-      this.position.y / 100, 
+      this.position.y / 100,
       viewport
     )
 

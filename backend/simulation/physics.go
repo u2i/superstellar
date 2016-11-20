@@ -25,6 +25,8 @@ func detectProjectileCollisions(space *state.Space, eventDispatcher *events.Even
 			if projectile.ClientID != clientID && projectile.DetectCollision(spaceship) {
 				spaceship.CollideWithProjectile(projectile)
 				space.RemoveProjectile(projectile)
+				projectileHitMessage := &events.ProjectileHit{Projectile: projectile}
+				eventDispatcher.FireProjectileHit(projectileHitMessage)
 
 				if spaceship.HP <= 0 {
 					space.RemoveSpaceship(clientID)

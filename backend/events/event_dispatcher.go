@@ -20,6 +20,10 @@ type ProjectileFiredListener interface {
 	HandleProjectileFired(*ProjectileFired)
 }
 
+type ProjectileHitListener interface {
+	HandleProjectileHit(*ProjectileHit)
+}
+
 type UserInputListener interface {
 	HandleUserInput(*UserInput)
 }
@@ -45,6 +49,10 @@ type EventDispatcher struct {
 	// ProjectileFired
 	projectileFiredQueue     chan *ProjectileFired
 	projectileFiredListeners []ProjectileFiredListener
+
+	// ProjectileHit
+	projectileHitQueue     chan *ProjectileHit
+	projectileHitListeners []ProjectileHitListener
 
 	// UserInput
 	userInputQueue     chan *UserInput
@@ -73,6 +81,10 @@ func NewEventDispatcher() *EventDispatcher {
 		// ProjectileFired
 		projectileFiredQueue:     make(chan *ProjectileFired, buffersLength),
 		projectileFiredListeners: []ProjectileFiredListener{},
+
+		// ProjectileHit
+		projectileHitQueue:     make(chan *ProjectileHit, buffersLength),
+		projectileHitListeners: []ProjectileHitListener{},
 
 		// UserInput
 		userInputQueue:     make(chan *UserInput, buffersLength),
@@ -106,6 +118,12 @@ func (d *EventDispatcher) RunEventLoop() {
 		case event := <-d.projectileFiredQueue:
 			for _, listener := range d.projectileFiredListeners {
 				listener.HandleProjectileFired(event)
+			}
+
+		// ProjectileHit
+		case event := <-d.projectileHitQueue:
+			for _, listener := range d.projectileHitListeners {
+				listener.HandleProjectileHit(event)
 			}
 
 		// UserInput
@@ -158,6 +176,16 @@ func (d *EventDispatcher) RegisterProjectileFiredListener(listener ProjectileFir
 
 func (d *EventDispatcher) FireProjectileFired(e *ProjectileFired) {
 	d.projectileFiredQueue <- e
+}
+
+// ProjectileHit
+
+func (d *EventDispatcher) RegisterProjectileHitListener(listener ProjectileHitListener) {
+	d.projectileHitListeners = append(d.projectileHitListeners, listener)
+}
+
+func (d *EventDispatcher) FireProjectileHit(e *ProjectileHit) {
+	d.projectileHitQueue <- e
 }
 
 // UserInput
