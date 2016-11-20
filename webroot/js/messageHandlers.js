@@ -9,7 +9,7 @@ import projectileFiredHandler from './messageHandlers/projectileFiredHandler';
 import playerJoinedHandler from './messageHandlers/playerJoinedHandler';
 import leaderboardHandler from './messageHandlers/leaderboardHandler';
 import playerDiedHandler from './messageHandlers/playerDiedHandler';
-
+import pongHandler from './messageHandlers/pongHandler';
 
 export const initializeHandlers = () => {
   registerMessageHandler(Constants.HELLO_MESSAGE,            helloHandler);
@@ -20,5 +20,5 @@ export const initializeHandlers = () => {
   registerMessageHandler(Constants.SPACE_MESSAGE,            spaceHandler);
   registerMessageHandler(Constants.LEADERBOARD_MESSAGE,      leaderboardHandler);
   registerMessageHandler(Constants.PLAYER_DIED_MESSAGE,      playerDiedHandler);
+  registerMessageHandler(Constants.PONG_MESSAGE,             pongHandler);
 };
-

@@ -19,6 +19,8 @@ export const USER_MESSAGE_DEFINITION  = "superstellar.UserMessage";
 export const PLAYER_LEFT_DEFINITION   = "superstellar.PlayerLeft";
 export const SHOT_DEFINITION          = "superstellar.Shot";
 export const MESSAGE_DEFINITION       = "superstellar.Message";
+export const PING_DEFINITION          = "superstellar.Ping";
+export const PONG_DEFINITION          = "superstellar.Pong";
 
 export const HELLO_MESSAGE             = "hello";
 export const JOIN_GAME_ACK_MESSAGE     = "joinGameAck";
@@ -28,4 +30,8 @@ export const PLAYER_LEFT_MESSAGE       = "playerLeft";
 export const PLAYER_JOINED_MESSAGE     = "playerJoined";
 export const PROJECTILE_FIRED_MESSAGE  = "projectileFired";
 export const PLAYER_DIED_MESSAGE       = "playerDied";
+export const PING_MESSAGE              = "ping";
+export const PONG_MESSAGE              = "pong";
+
+
 

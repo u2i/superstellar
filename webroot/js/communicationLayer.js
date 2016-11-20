@@ -54,6 +54,17 @@ const getMessageName = (protobufMsg) => {
   return messageType.charAt(0).toLowerCase() + messageType.slice(1);
 };
 
+export const sendPing = () => {
+  var pingId = nextPingId++;
+
+  pingDates.set(pingId, new Date());
+
+  const ping = new Ping();
+  ping.set('Id', pingId)
+
+  sendMessage(ping);
+}
+
 const builder = ProtoBuf.loadJsonFile(Constants.PROTOBUF_DEFINITION);
 
 export const JoinGame    = builder.build(Constants.JOIN_GAME_DEFINITION);
@@ -63,8 +74,13 @@ export const UserMessage = builder.build(Constants.USER_MESSAGE_DEFINITION);
 export const PlayerLeft  = builder.build(Constants.PLAYER_LEFT_DEFINITION);
 export const UserEvent   = builder.build(Constants.USER_EVENT_DEFINITION);
 export const UserAction  = builder.build(Constants.USER_ACTION_DEFINITION);
+export const Ping        = builder.build(Constants.PING_DEFINITION);
+export const Pong        = builder.build(Constants.PONG_DEFINITION);
+
 
 const messageHandlers = new Map();
+var nextPingId = 0;
+export const pingDates = new Map();
 
 export const registerMessageHandler = (messageType, handler) => {
   let currentHandlers = messageHandlers.get(messageType) || [];

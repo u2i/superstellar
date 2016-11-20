@@ -62,6 +62,13 @@
                     "name": "playerDied",
                     "id": 8,
                     "oneof": "content"
+                },
+                {
+                    "rule": "optional",
+                    "type": "Pong",
+                    "name": "pong",
+                    "id": 9,
+                    "oneof": "content"
                 }
             ],
             "oneofs": {
@@ -73,7 +80,8 @@
                     5,
                     6,
                     7,
-                    8
+                    8,
+                    9
                 ]
             }
         },
@@ -245,6 +253,28 @@
             ]
         },
         {
+            "name": "Ping",
+            "fields": [
+                {
+                    "rule": "optional",
+                    "type": "uint32",
+                    "name": "Id",
+                    "id": 1
+                }
+            ]
+        },
+        {
+            "name": "Pong",
+            "fields": [
+                {
+                    "rule": "optional",
+                    "type": "uint32",
+                    "name": "Id",
+                    "id": 1
+                }
+            ]
+        },
+        {
             "name": "Space",
             "fields": [
                 {
@@ -346,12 +376,20 @@
                     "name": "joinGame",
                     "id": 2,
                     "oneof": "content"
+                },
+                {
+                    "rule": "optional",
+                    "type": "Ping",
+                    "name": "ping",
+                    "id": 3,
+                    "oneof": "content"
                 }
             ],
             "oneofs": {
                 "content": [
                     1,
-                    2
+                    2,
+                    3
                 ]
             }
         },

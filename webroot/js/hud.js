@@ -6,6 +6,7 @@ export default class Hud {
 
     this.frameCounter = 0;
     this.fps = 0;
+    this.ping = 0;
     this.lastTime = Date.now();
   }
 
@@ -41,6 +42,7 @@ export default class Hud {
 
     this.getFpsNode().textContent = this.fps;
     this.getShipsNode().textContent = globalState.spaceshipMap.size;
+    this.getPingNode().textContent = globalState.ping;
 
     if (__DEBUG__) {
       this.getSpeedNode().textContent = this.getSpeed();
@@ -72,6 +74,10 @@ export default class Hud {
 
   getSpeedNode() {
     return this.domNode.querySelector('[data-type="speed"]');
+  }
+
+  getPingNode() {
+    return this.domNode.querySelector('[data-type="ping"]');
   }
 
   getPosition(playerShip) {

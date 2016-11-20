@@ -18,7 +18,8 @@ export const globalState = {
   projectiles: [],
   dialog: null,
   killedBy: null,
-  worldSizeFilter: new AnnulusFilter()
+  worldSizeFilter: new AnnulusFilter(),
+  ping: null
 };
 
 export const leaderboardDialog = new LeaderboardDialog();

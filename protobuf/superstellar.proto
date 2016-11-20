@@ -12,6 +12,7 @@ message Message {
     JoinGameAck     joinGameAck       = 6;
     Leaderboard     leaderboard       = 7;
     PlayerDied      playerDied        = 8;
+    Pong            pong              = 9;
   }
 }
 
@@ -58,6 +59,14 @@ message PlayerDied {
   uint32 killedBy = 2;
 }
 
+message Ping {
+  uint32 Id = 1;
+}
+
+message Pong {
+  uint32 Id = 1;
+}
+
 message Space {
   uint32 physicsFrameID = 1;
   repeated Spaceship spaceships = 2;
@@ -98,6 +107,7 @@ message UserMessage {
   oneof content {
     UserAction userAction = 1;
     JoinGame   joinGame   = 2;
+    Ping       ping       = 3;
   }
 }
 

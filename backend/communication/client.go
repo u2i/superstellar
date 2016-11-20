@@ -131,6 +131,8 @@ func (c *Client) unmarshalUserInput(data []byte) {
 		c.eventDispatcher.FireUserInput(userInputEvent)
 	case *pb.UserMessage_JoinGame:
 		c.tryToJoinGame(protoUserMessage.GetJoinGame())
+	case *pb.UserMessage_Ping:
+		c.sendPong(protoUserMessage.GetPing().Id)
 	default:
 		log.Fatalln("Unknown message type %T", x)
 	}
@@ -175,3 +177,12 @@ func (c *Client) sendJoinGameAckMessage(joinGameAck *pb.JoinGameAck) {
 	c.SendMessage(marshalMessage(message))
 }
 
+func (c *Client) sendPong(id uint32) {
+	message := &pb.Message{
+		Content: &pb.Message_Pong{
+			Pong: &pb.Pong{Id: id},
+		},
+	}
+
+	c.SendMessage(marshalMessage(message))
+}
