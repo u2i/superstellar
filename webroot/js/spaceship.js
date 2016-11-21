@@ -101,12 +101,14 @@ export default class Spaceship {
 
   addHealthBar() {
     this.healthBar = new PIXI.Graphics();
-    this.healthBar.filterArea = new PIXI.Rectangle(100, 100, 200, 200);
+    this.healthBarRectangle = new PIXI.Rectangle(100, 100, healthBarRadius * 2, healthBarRadius * 2);
+    this.healthBar.filterArea = this.healthBarRectangle;
     this.container.addChild(this.healthBar);
   }
 
   enableHealthBarFilter(x, y) {
-    this.healthBar.filterArea = new PIXI.Rectangle(x - healthBarRadius, y - healthBarRadius, healthBarRadius * 2, healthBarRadius * 2);
+    this.healthBarRectangle.x = x - healthBarRadius;
+    this.healthBarRectangle.y = y - healthBarRadius;
     this.healthBar.filters = [this.healthBarFilter];
   }
 
