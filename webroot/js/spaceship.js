@@ -88,7 +88,7 @@ export default class Spaceship {
         this.label.style.fill = '#FF0000'
       }
 
-      this.label.position.set(x - (this.label.text.length * 6) / 2, y - this.sprite.height);
+      this.label.position.set(x - (this.label.text.length * 6) / 2, y + this.sprite.height);
     }
   }
 
