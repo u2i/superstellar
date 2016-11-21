@@ -14,7 +14,7 @@ const float lostHealthAlpha = 0.1;
 // circle constants
 const vec2 center = vec2(0.5, 0.5);
 const float radius = 0.45;
-const float epsilon = 0.030;
+const float epsilon = 0.035;
 const float angleFraction = PI;
 // hp bar consts
 const float hpPerBucket = 100.0; // because of circle mirroring each bucket shows half of that value
@@ -28,7 +28,7 @@ void main() {
     float separatorWidth = 0.08 * bucketWidth;
     float separatorHalfWidth = separatorWidth / 2.0;
     float bucketInteriorWidth = bucketWidth - separatorWidth;
-    float health = hp / maxHp;
+    float health = hp / (bucketsNo * hpPerBucket);
 
     vec3 mapCoord = vec3(vTextureCoord, 1.0) * magicMatrix;
     vec2 u = mapCoord.xy;
@@ -45,14 +45,10 @@ void main() {
     float x = angleFilled;
     float bucketsBehind = floor((x + separatorHalfWidth) / bucketWidth);
     float logicalX = ((x - separatorHalfWidth) - (bucketsBehind * separatorWidth)) / (bucketsNo * bucketInteriorWidth);
-    float logicalXHealth = logicalX * (bucketsNo * hpPerBucket / maxHp);
-    float hpBarFunction = step(logicalXHealth, health);
-    float alphaFunction = step(separatorHalfWidth, abs((bucketsBehind * bucketWidth) - x));
+    float hpBarFunction = step(logicalX, health);
+    float alphaFunction = step(separatorHalfWidth, abs((bucketsBehind * bucketWidth) - x)) * step(logicalX, maxHp/(bucketsNo * hpPerBucket));
+    float lostHealthOverlay = alphaFunction * 0.2;
 
-    float lostHealthOverlay = alphaFunction * lostHealthAlpha;
-
-    float alpha = circleFilter * healthAlpha * hpBarFunction * alphaFunction;
-    vec3 color = (circleFilter * alpha + circleFilter * lostHealthOverlay) * healthColor;
-
-    gl_FragColor = vec4(color, alpha);
+    float colorFunction = hpBarFunction * alphaFunction + lostHealthOverlay;
+    gl_FragColor = vec4(circleFilter * healthColor * colorFunction, circleFilter * hpBarFunction * alphaFunction);
 }
