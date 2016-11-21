@@ -1,5 +1,5 @@
-#define PI 3.1415926535897932384626433832795
 precision mediump float;
+#define PI 3.1415926535897932384626433832795
 
 varying vec2 vTextureCoord;
 
@@ -7,9 +7,9 @@ uniform vec2 hps;
 uniform mat3 magicMatrix;
 
 // colors
-const vec3 healthColor = vec3(0.5, 1.0, 0.5);
+const vec3 healthColor = vec3(0.6, 1.0, 0.6);
 const float healthAlpha = 0.4;
-const float lostHealthAlpha = 0.1;
+const float lostHealthAlpha = 0.2;
 
 // circle constants
 const vec2 center = vec2(0.5, 0.5);
@@ -46,8 +46,8 @@ void main() {
     float bucketsBehind = floor((x + separatorHalfWidth) / bucketWidth);
     float logicalX = ((x - separatorHalfWidth) - (bucketsBehind * separatorWidth)) / (bucketsNo * bucketInteriorWidth);
     float hpBarFunction = step(logicalX, health);
-    float alphaFunction = step(separatorHalfWidth, abs((bucketsBehind * bucketWidth) - x)) * step(logicalX, maxHp/(bucketsNo * hpPerBucket));
-    float lostHealthOverlay = alphaFunction * 0.2;
+    float alphaFunction = healthAlpha * step(separatorHalfWidth, abs((bucketsBehind * bucketWidth) - x)) * step(logicalX, maxHp/(bucketsNo * hpPerBucket));
+    float lostHealthOverlay = alphaFunction * lostHealthAlpha;
 
     float colorFunction = hpBarFunction * alphaFunction + lostHealthOverlay;
     gl_FragColor = vec4(circleFilter * healthColor * colorFunction, circleFilter * hpBarFunction * alphaFunction);
