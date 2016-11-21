@@ -51,5 +51,5 @@ func (updater *Updater) HandleUserDied(event *events.UserDied) {
 	shotSpaceshipMaxHP := event.ShotSpaceship.MaxHP
 	reward := uint32(float32(shotSpaceshipMaxHP) * constants.KillRewardRatio)
 
-	updater.space.AddRewardToClient(event.KilledBy, reward)
+	event.Shooter.AddReward(reward)
 }

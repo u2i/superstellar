@@ -1,7 +1,6 @@
 package state
 
 import (
-	"log"
 	"math"
 	"math/rand"
 	"superstellar/backend/constants"
@@ -60,10 +59,6 @@ func (space *Space) NextProjectileID() uint32 {
 	return ID
 }
 
-func (space *Space) AddRewardToClient(clientId uint32, reward uint32) {
-	space.Spaceships[clientId].AddReward(reward)
-}
-
 // ToProto returns protobuf representation
 func (space *Space) ToProto() *pb.Space {
 	protoSpaceships := make([]*pb.Spaceship, 0, len(space.Spaceships))
@@ -116,12 +111,10 @@ func (space *Space) allObjectsPositions() []*types.Point {
 	var positions []*types.Point
 
 	for _, spaceship := range space.Spaceships {
-		log.Printf("%d %d", spaceship.Position.X, spaceship.Position.Y)
 		positions = append(positions, spaceship.Position)
 	}
 
 	for projectile := range space.Projectiles {
-		log.Printf("%d %d", projectile.Position.X, projectile.Position.Y)
 		positions = append(positions, projectile.Position)
 	}
 

@@ -33,6 +33,7 @@ func detectProjectileCollisions(space *state.Space, eventDispatcher *events.Even
 
 					userDiedMessage := &events.UserDied{
 						ClientID: clientID,
+						Shooter: projectile.Spaceship,
 						KilledBy: projectile.ClientID,
 						ShotSpaceship: spaceship,
 					}

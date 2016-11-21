@@ -17,14 +17,15 @@ const (
 
 // Projectile struct holds players' shots data.
 type Projectile struct {
-	ID       uint32
-	ClientID uint32
-	FrameID  uint32
-	Facing   float32
-	Origin   *types.Point
-	Velocity *types.Vector
-	Position *types.Point
-	TTL      uint32
+	ID        uint32
+	ClientID  uint32
+	Spaceship *Spaceship
+	FrameID   uint32
+	Facing    float32
+	Origin    *types.Point
+	Velocity  *types.Vector
+	Position  *types.Point
+	TTL       uint32
 }
 
 // NewProjectile returns new instance of Projectile
@@ -32,14 +33,15 @@ func NewProjectile(ID, frameID uint32, spaceship *Spaceship) *Projectile {
 	facing := float32(math.Atan2(-spaceship.Facing.Y, spaceship.Facing.X))
 
 	return &Projectile{
-		ID:       ID,
-		ClientID: spaceship.ID,
-		FrameID:  frameID,
-		Origin:   spaceship.Position,
-		Position: spaceship.Position,
-		Facing:   facing,
-		Velocity: spaceship.Facing.Multiply(ProjectileSpeed).Add(spaceship.Velocity),
-		TTL:      DefaultTTL,
+		ID:        ID,
+		ClientID:  spaceship.ID,
+		Spaceship: spaceship,
+		FrameID:   frameID,
+		Origin:    spaceship.Position,
+		Position:  spaceship.Position,
+		Facing:    facing,
+		Velocity:  spaceship.Facing.Multiply(ProjectileSpeed).Add(spaceship.Velocity),
+		TTL:       DefaultTTL,
 	}
 }
 
