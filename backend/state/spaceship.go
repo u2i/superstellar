@@ -28,6 +28,7 @@ type Spaceship struct {
 	AngularSpeed    float64
 	InputThrust     bool
 	InputDirection  Direction
+	TargetAngle		*float64
 	Fire            bool
 	LastShotTime    time.Time
 	HP              uint32
@@ -66,10 +67,13 @@ func (s *Spaceship) UpdateUserInput(userInput pb.UserInput) {
 	switch userInput {
 	case pb.UserInput_CENTER:
 		s.InputDirection = NONE
+		s.TargetAngle = nil
 	case pb.UserInput_LEFT:
 		s.InputDirection = LEFT
+		s.TargetAngle = nil
 	case pb.UserInput_RIGHT:
 		s.InputDirection = RIGHT
+		s.TargetAngle = nil
 	case pb.UserInput_THRUST_ON:
 		s.InputThrust = true
 	case pb.UserInput_THRUST_OFF:
@@ -79,6 +83,11 @@ func (s *Spaceship) UpdateUserInput(userInput pb.UserInput) {
 	case pb.UserInput_FIRE_STOP:
 		s.Fire = false
 	}
+}
+
+func (s *Spaceship) UpdateTargetAngle(angle float64) {
+	s.TargetAngle = &angle
+	s.InputDirection = NONE
 }
 
 // ToProto returns protobuf representation
@@ -150,6 +159,19 @@ func (s *Spaceship) LeftTurn() {
 
 func (s *Spaceship) RightTurn() {
 	s.AngularSpeed -= s.angularSpeedDelta()
+	s.LimitAngularSpeed()
+}
+
+func (s *Spaceship) TurnToTarget() {
+	targetAngle := *s.TargetAngle
+	offset := targetAngle - s.Facing.Radians()
+
+	if math.Abs(offset) > math.Pi {
+		offset -= math.Copysign(2 * math.Pi, offset)
+	}
+
+	s.AngularSpeed = -offset * constants.SpaceshipTurnToAngleP
+
 	s.LimitAngularSpeed()
 }
 

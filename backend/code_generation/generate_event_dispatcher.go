@@ -146,6 +146,7 @@ func main() {
 			{"UserJoined"},
 			{"UserLeft"},
 			{"UserDied"},
+			{"TargetAngle"},
 		},
 	})
 	checkError(err)

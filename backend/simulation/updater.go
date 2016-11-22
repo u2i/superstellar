@@ -30,6 +30,14 @@ func (updater *Updater) HandleUserInput(userInputEvent *events.UserInput) {
 	}
 }
 
+func (updater *Updater) HandleTargetAngle(targetAngleEvent *events.TargetAngle) {
+	spaceship, found := updater.space.Spaceships[targetAngleEvent.ClientID]
+
+	if found {
+		spaceship.UpdateTargetAngle(targetAngleEvent.Angle)
+	}
+}
+
 func (updater *Updater) HandleTimeTick(*events.TimeTick) {
 	before := time.Now()
 

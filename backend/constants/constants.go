@@ -32,6 +32,9 @@ const (
 
 	SpaceshipAngularFriction = 0.2
 
+	// SpaceshipTurnToAngleP is TurnToTarget propotional gain.
+	SpaceshipTurnToAngleP = 0.9
+
 	// MaxSpeed maximum speed of the spacecraft
 	SpaceshipMaxSpeed = 1500
 

@@ -1,9 +1,16 @@
-import { sendMessage, UserAction } from './communicationLayer';
+import { sendMessage, UserAction, TargetAngle } from './communicationLayer';
+import { renderer } from './globals';
+
+var mouseDown = false;
+var lastTargetAngle = null;
 
 const KEY_SPACE = 32;
 const KEY_UP    = 38;
 const KEY_LEFT  = 37;
 const KEY_RIGHT = 39;
+const KEY_W     = 87;
+const KEY_A     = 65;
+const KEY_D     = 68;
 
 const keysDown = new Map();
 
@@ -11,6 +18,9 @@ keysDown.set(KEY_SPACE, false);
 keysDown.set(KEY_UP,    false);
 keysDown.set(KEY_LEFT,  false);
 keysDown.set(KEY_RIGHT, false);
+keysDown.set(KEY_W, false);
+keysDown.set(KEY_A, false);
+keysDown.set(KEY_D, false);
 
 const updateKeysState = (keyCode, isPressed) => {
   const lastState = keysDown.get(keyCode);
@@ -24,17 +34,27 @@ const updateKeysState = (keyCode, isPressed) => {
   }
 }
 
+const updateMouseState = (isDown) => {
+  if (mouseDown != isDown) {
+    mouseDown = isDown;
+    sendInput(KEY_SPACE, isDown);
+  }
+}
+
 const sendInput = (keyCode, isPressed) => {
   let userInput = "CENTER"
 
   switch(keyCode) {
   case KEY_UP:
+  case KEY_W:
     userInput = isPressed ? "THRUST_ON" : "THRUST_OFF";
     break;
   case KEY_LEFT:
+  case KEY_A:
     userInput = isPressed ? "LEFT" : "CENTER"
     break;
   case KEY_RIGHT:
+  case KEY_D:
     userInput = isPressed ? "RIGHT" : "CENTER"
     break;
   case KEY_SPACE:
@@ -55,4 +75,27 @@ export const initializeControls = () => {
   addEventListener("keyup", function (e) {
     updateKeysState(e.keyCode, false);
   }, false);
+
+  addEventListener("mousedown", function() {
+    updateMouseState(true);
+  }, false);
+
+  addEventListener("mouseup", function() {
+    updateMouseState(false);
+  }, false);
 };
+
+window.setInterval(function() {
+  var mousePosition = renderer.plugins.interaction.mouse.global;
+
+  let x = mousePosition.x - renderer.width / 2;
+  let y = mousePosition.y - renderer.height / 2;
+  let targetAngle = Math.atan2(y, x);
+
+  if (lastTargetAngle != targetAngle) {
+    lastTargetAngle = targetAngle;
+
+    let targetAngleMsg = new TargetAngle(targetAngle);
+    sendMessage(targetAngleMsg);
+  }
+}, 100)

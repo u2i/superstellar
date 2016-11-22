@@ -17,9 +17,9 @@ func NewUserInput(clientID uint32) *UserInput {
 }
 
 // UserInputFromProto returns new instance of UserInput basing on proto object.
-func UserInputFromProto(userInput pb.UserInput, clientID uint32) *UserInput {
+func UserInputFromProto(userAction *pb.UserAction, clientID uint32) *UserInput {
 	return &UserInput{
 		ClientID:  clientID,
-		UserInput: userInput,
+		UserInput: userAction.UserInput,
 	}
 }

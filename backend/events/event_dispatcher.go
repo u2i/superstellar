@@ -40,6 +40,10 @@ type UserDiedListener interface {
 	HandleUserDied(*UserDied)
 }
 
+type TargetAngleListener interface {
+	HandleTargetAngle(*TargetAngle)
+}
+
 type EventDispatcher struct {
 
 	// TimeTick
@@ -69,6 +73,10 @@ type EventDispatcher struct {
 	// UserDied
 	userDiedQueue     chan *UserDied
 	userDiedListeners []UserDiedListener
+
+	// TargetAngle
+	targetAngleQueue     chan *TargetAngle
+	targetAngleListeners []TargetAngleListener
 }
 
 func NewEventDispatcher() *EventDispatcher {
@@ -101,6 +109,10 @@ func NewEventDispatcher() *EventDispatcher {
 		// UserDied
 		userDiedQueue:     make(chan *UserDied, buffersLength),
 		userDiedListeners: []UserDiedListener{},
+
+		// TargetAngle
+		targetAngleQueue:     make(chan *TargetAngle, buffersLength),
+		targetAngleListeners: []TargetAngleListener{},
 	}
 }
 
@@ -148,6 +160,12 @@ func (d *EventDispatcher) RunEventLoop() {
 		case event := <-d.userDiedQueue:
 			for _, listener := range d.userDiedListeners {
 				listener.HandleUserDied(event)
+			}
+
+		// TargetAngle
+		case event := <-d.targetAngleQueue:
+			for _, listener := range d.targetAngleListeners {
+				listener.HandleTargetAngle(event)
 			}
 
 		default:
@@ -226,4 +244,14 @@ func (d *EventDispatcher) RegisterUserDiedListener(listener UserDiedListener) {
 
 func (d *EventDispatcher) FireUserDied(e *UserDied) {
 	d.userDiedQueue <- e
+}
+
+// TargetAngle
+
+func (d *EventDispatcher) RegisterTargetAngleListener(listener TargetAngleListener) {
+	d.targetAngleListeners = append(d.targetAngleListeners, listener)
+}
+
+func (d *EventDispatcher) FireTargetAngle(e *TargetAngle) {
+	d.targetAngleQueue <- e
 }

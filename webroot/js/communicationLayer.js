@@ -74,6 +74,7 @@ export const UserMessage = builder.build(Constants.USER_MESSAGE_DEFINITION);
 export const PlayerLeft  = builder.build(Constants.PLAYER_LEFT_DEFINITION);
 export const UserEvent   = builder.build(Constants.USER_EVENT_DEFINITION);
 export const UserAction  = builder.build(Constants.USER_ACTION_DEFINITION);
+export const TargetAngle = builder.build(Constants.TARGET_ANGLE_DEFINITION);
 export const Ping        = builder.build(Constants.PING_DEFINITION);
 export const Pong        = builder.build(Constants.PONG_DEFINITION);
 
@@ -89,3 +90,7 @@ export const registerMessageHandler = (messageType, handler) => {
 
   messageHandlers.set(messageType, currentHandlers);
 };
+
+window.setInterval(function() {
+  sendPing();
+}, 1000)

@@ -108,11 +108,16 @@ message UserAction {
   UserInput userInput = 1;
 }
 
+message TargetAngle {
+  float angle = 1;
+}
+
 message UserMessage {
   oneof content {
-    UserAction userAction = 1;
-    JoinGame   joinGame   = 2;
-    Ping       ping       = 3;
+    UserAction  userAction  = 1;
+    JoinGame    joinGame    = 2;
+    Ping        ping        = 3;
+    TargetAngle  targetAngle = 4;
   }
 }
 

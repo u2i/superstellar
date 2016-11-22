@@ -127,8 +127,11 @@ func (c *Client) unmarshalUserInput(data []byte) {
 
 	switch x := protoUserMessage.Content.(type) {
 	case *pb.UserMessage_UserAction:
-		userInputEvent := events.UserInputFromProto(protoUserMessage.GetUserAction().UserInput, c.id)
+		userInputEvent := events.UserInputFromProto(protoUserMessage.GetUserAction(), c.id)
 		c.eventDispatcher.FireUserInput(userInputEvent)
+	case *pb.UserMessage_TargetAngle:
+		targetAngleEvent := events.TargetAngleFromProto(protoUserMessage.GetTargetAngle(), c.id)
+		c.eventDispatcher.FireTargetAngle(targetAngleEvent)
 	case *pb.UserMessage_JoinGame:
 		c.tryToJoinGame(protoUserMessage.GetJoinGame())
 	case *pb.UserMessage_Ping:

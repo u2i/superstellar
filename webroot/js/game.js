@@ -5,7 +5,7 @@ import Assets from './assets';
 import * as Constants from './constants';
 import * as Utils from './utils';
 import { renderer, stage, globalState, leaderboardDialog } from './globals';
-import { initializeConnection, sendPing } from './communicationLayer';
+import { initializeConnection } from './communicationLayer';
 import { initializeHandlers } from './messageHandlers';
 import Hud from './hud';
 import UsernameDialog from "./dialogs/usernameDialog";
@@ -71,10 +71,6 @@ window.addEventListener("resize", () => {
   overlay.filterArea.width = windowSize.width;
   overlay.filterArea.height = windowSize.height;
 });
-
-window.setInterval(function() {
-  sendPing();
-}, 1000)
 
 const defaultViewport = { vx: 0, vy: 0, width: renderer.width, height: renderer.height };
 

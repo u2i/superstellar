@@ -90,13 +90,18 @@ func updateSpaceships(s *state.Space, eventDispatcher *events.EventDispatcher) {
 		spaceship.Position = spaceship.Position.Add(spaceship.Velocity)
 
 		angle := math.Atan2(spaceship.Facing.Y, spaceship.Facing.X)
-		switch spaceship.InputDirection {
-		case state.LEFT:
-			spaceship.LeftTurn()
-		case state.RIGHT:
-			spaceship.RightTurn()
-		default:
-			spaceship.ApplyAngularFriction()
+
+		if (spaceship.TargetAngle != nil) {
+			spaceship.TurnToTarget()
+		} else {
+			switch spaceship.InputDirection {
+			case state.LEFT:
+				spaceship.LeftTurn()
+			case state.RIGHT:
+				spaceship.RightTurn()
+			default:
+				spaceship.ApplyAngularFriction()
+			}
 		}
 		angle += spaceship.AngularSpeed
 
@@ -186,8 +191,8 @@ func updateSpaceships(s *state.Space, eventDispatcher *events.EventDispatcher) {
 }
 
 func handleAutoRepair(spaceship *state.Spaceship) {
-	if(spaceship.AutoRepairDelay == 0) {
-		if(spaceship.HP < spaceship.MaxHP) {
+	if (spaceship.AutoRepairDelay == 0) {
+		if (spaceship.HP < spaceship.MaxHP) {
 			spaceship.AutoRepair()
 		}
 	} else {

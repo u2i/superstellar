@@ -380,6 +380,17 @@
             ]
         },
         {
+            "name": "TargetAngle",
+            "fields": [
+                {
+                    "rule": "optional",
+                    "type": "float",
+                    "name": "angle",
+                    "id": 1
+                }
+            ]
+        },
+        {
             "name": "UserMessage",
             "fields": [
                 {
@@ -402,13 +413,21 @@
                     "name": "ping",
                     "id": 3,
                     "oneof": "content"
+                },
+                {
+                    "rule": "optional",
+                    "type": "TargetAngle",
+                    "name": "targetAngle",
+                    "id": 4,
+                    "oneof": "content"
                 }
             ],
             "oneofs": {
                 "content": [
                     1,
                     2,
-                    3
+                    3,
+                    4
                 ]
             }
         },
