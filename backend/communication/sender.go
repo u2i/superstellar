@@ -6,23 +6,29 @@ import (
 	"superstellar/backend/leaderboard"
 	"superstellar/backend/pb"
 	"superstellar/backend/constants"
+	"time"
 )
 
 type Sender struct {
 	server *Server
 	space  *state.Space
+	leaderboardCounter int32
 }
 
 func NewSender(server *Server, space *state.Space) *Sender {
 	return &Sender{
 		server: server,
 		space: space,
+		leaderboardCounter: 0,
 	}
 }
 
-func (sender *Sender) HandleTimeTick(timeTickEvent *events.TimeTick) {
+func (sender *Sender) HandleCommunicationTimeTick(timeTickEvent *events.CommunicationTimeTick) {
 	sender.sendSpace()
-	if (timeTickEvent.FrameId % 50 == 0) {
+	sender.leaderboardCounter++
+
+	if (sender.leaderboardCounter % 10 == 0) {
+		sender.leaderboardCounter = 0
 		sender.sendLeaderboard()
 	}
 }
