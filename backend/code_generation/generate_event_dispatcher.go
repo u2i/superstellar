@@ -140,6 +140,7 @@ func main() {
 		// TODO: load this list automatically
 		EventTypes: []EventType{
 			{"TimeTick"},
+			{"CommunicationTimeTick"},
 			{"ProjectileFired"},
 			{"ProjectileHit"},
 			{"UserInput"},

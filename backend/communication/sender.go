@@ -1,28 +1,33 @@
 package communication
 
 import (
-	"superstellar/backend/state"
+	"superstellar/backend/constants"
 	"superstellar/backend/events"
 	"superstellar/backend/leaderboard"
 	"superstellar/backend/pb"
-	"superstellar/backend/constants"
+	"superstellar/backend/state"
 )
 
 type Sender struct {
-	server *Server
-	space  *state.Space
+	server             *Server
+	space              *state.Space
+	leaderboardCounter int32
 }
 
 func NewSender(server *Server, space *state.Space) *Sender {
 	return &Sender{
-		server: server,
-		space: space,
+		server:             server,
+		space:              space,
+		leaderboardCounter: 0,
 	}
 }
 
-func (sender *Sender) HandleTimeTick(timeTickEvent *events.TimeTick) {
+func (sender *Sender) HandleCommunicationTimeTick(timeTickEvent *events.CommunicationTimeTick) {
 	sender.sendSpace()
-	if (timeTickEvent.FrameId % 50 == 0) {
+	sender.leaderboardCounter++
+
+	if sender.leaderboardCounter%10 == 0 {
+		sender.leaderboardCounter = 0
 		sender.sendLeaderboard()
 	}
 }
@@ -90,9 +95,9 @@ func (sender *Sender) sendHelloMessage(clientID uint32) {
 	message := &pb.Message{
 		Content: &pb.Message_Hello{
 			Hello: &pb.Hello{
-				MyId:         clientID,
-				IdToUsername: idToUsername,
-				WorldRadius:  constants.WorldRadius / 100,
+				MyId:                 clientID,
+				IdToUsername:         idToUsername,
+				WorldRadius:          constants.WorldRadius / 100,
 				BoundaryAnnulusWidth: constants.BoundaryAnnulusWidth / 100,
 			},
 		},

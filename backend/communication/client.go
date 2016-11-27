@@ -2,13 +2,13 @@ package communication
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"strings"
+	"superstellar/backend/constants"
 	"superstellar/backend/events"
 	"superstellar/backend/pb"
-	"superstellar/backend/constants"
 	"time"
-	"fmt"
 
 	"github.com/golang/protobuf/proto"
 

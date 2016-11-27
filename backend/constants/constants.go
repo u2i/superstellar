@@ -7,6 +7,8 @@ import (
 const (
 	PhysicsFrameDuration = 20 * time.Millisecond
 
+	UpdateSendInterval = 200 * time.Millisecond
+
 	// BoundaryAnnulusWidth is the width of boundary region (in .01 units), i.e. from WorldRadius till when no more movement is possible
 	BoundaryAnnulusWidth = 20000
 
@@ -72,7 +74,7 @@ const (
 	AutoEnergyRechargeInterval = 1
 
 	// EnergyRecharge is the amount of Energy player will receive after AutoRepairDelay
-	AutoEnergyRechargeAmount = 3;
+	AutoEnergyRechargeAmount = 3
 
 	// Number of best players in Leaderboard
 	LeaderboardLength = 10
