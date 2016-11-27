@@ -290,6 +290,12 @@
                     "type": "uint32",
                     "name": "Id",
                     "id": 1
+                },
+                {
+                    "rule": "optional",
+                    "type": "uint64",
+                    "name": "Timestamp",
+                    "id": 2
                 }
             ]
         },
@@ -337,6 +343,18 @@
                     "type": "float",
                     "name": "boundaryAnnulusWidth",
                     "id": 4
+                },
+                {
+                    "rule": "optional",
+                    "type": "uint64",
+                    "name": "firstPhysicsFrameTimestamp",
+                    "id": 5
+                },
+                {
+                    "rule": "optional",
+                    "type": "uint32",
+                    "name": "physicsFrameRate",
+                    "id": 6
                 }
             ]
         },

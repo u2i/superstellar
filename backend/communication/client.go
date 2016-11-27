@@ -5,6 +5,7 @@ import (
 	"log"
 	"strings"
 	"superstellar/backend/events"
+	"superstellar/backend/util"
 	"superstellar/backend/pb"
 	"time"
 
@@ -181,9 +182,12 @@ func (c *Client) sendJoinGameAckMessage(joinGameAck *pb.JoinGameAck) {
 }
 
 func (c *Client) sendPong(id uint32) {
+	timestampMs := uint64(util.UnixMillis())
+
 	message := &pb.Message{
 		Content: &pb.Message_Pong{
-			Pong: &pb.Pong{Id: id},
+			Pong: &pb.Pong{Id: id, Timestamp: timestampMs},
+
 		},
 	}
 

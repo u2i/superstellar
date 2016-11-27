@@ -10,10 +10,11 @@ import (
 
 // Space struct holds entire game state.
 type Space struct {
-	Spaceships            map[uint32]*Spaceship
-	Projectiles           map[*Projectile]bool
-	PhysicsFrameID        uint32
-	NextProjectileIDValue uint32
+	Spaceships                 map[uint32]*Spaceship
+	Projectiles                map[*Projectile]bool
+	PhysicsFrameID             uint32
+	NextProjectileIDValue 	   uint32
+	FirstPhysicsFrameTimestamp int64
 }
 
 // NewSpace initializes new Space.
@@ -23,6 +24,7 @@ func NewSpace() *Space {
 		Projectiles:           make(map[*Projectile]bool),
 		PhysicsFrameID:        0,
 		NextProjectileIDValue: 0,
+		FirstPhysicsFrameTimestamp: 0,
 	}
 }
 

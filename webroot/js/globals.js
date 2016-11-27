@@ -19,7 +19,9 @@ export const globalState = {
   dialog: null,
   killedBy: null,
   worldSizeFilter: new AnnulusFilter(),
-  ping: null
+  ping: null,
+  firstPhysicsFrameTimestamp: null,
+  physicsFrameRate: null,
 };
 
 export const leaderboardDialog = new LeaderboardDialog();

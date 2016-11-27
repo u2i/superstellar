@@ -9,6 +9,7 @@ import (
 	"superstellar/backend/events"
 	"superstellar/backend/state"
 	"superstellar/backend/types"
+	"superstellar/backend/util"
 	"time"
 )
 
@@ -186,6 +187,10 @@ func updateSpaceships(s *state.Space, eventDispatcher *events.EventDispatcher) {
 		}
 	}
 	// koniec kodu przeciwzakrzepowego
+
+	if (s.PhysicsFrameID == 0) {
+		s.FirstPhysicsFrameTimestamp = util.UnixMillis()
+	}
 
 	s.PhysicsFrameID++
 }

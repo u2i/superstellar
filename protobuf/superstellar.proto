@@ -70,6 +70,7 @@ message Ping {
 
 message Pong {
   uint32 Id = 1;
+  uint64 Timestamp = 2;
 }
 
 message Space {
@@ -81,7 +82,9 @@ message Hello {
   uint32 myId = 1;
   map<uint32, string> idToUsername = 2;
   float worldRadius = 3;
-  float boundaryAnnulusWidth  = 4;
+  float boundaryAnnulusWidth = 4;
+  uint64 firstPhysicsFrameTimestamp = 5;
+  uint32 physicsFrameRate = 6;
 }
 
 message JoinGame {

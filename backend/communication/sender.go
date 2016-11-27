@@ -6,6 +6,7 @@ import (
 	"superstellar/backend/leaderboard"
 	"superstellar/backend/pb"
 	"superstellar/backend/constants"
+		"time"
 )
 
 type Sender struct {
@@ -94,6 +95,8 @@ func (sender *Sender) sendHelloMessage(clientID uint32) {
 				IdToUsername: idToUsername,
 				WorldRadius:  constants.WorldRadius / 100,
 				BoundaryAnnulusWidth: constants.BoundaryAnnulusWidth / 100,
+				FirstPhysicsFrameTimestamp: uint64(sender.space.FirstPhysicsFrameTimestamp),
+				PhysicsFrameRate: uint32(time.Second.Nanoseconds() / constants.PhysicsFrameDuration.Nanoseconds()),
 			},
 		},
 	}
