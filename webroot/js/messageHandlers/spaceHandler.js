@@ -4,6 +4,7 @@ import Assets from '../assets';
 import * as Constants from '../constants';
 
 const spaceHandler = (space) => {
+  console.log(space.physicsFrameID - globalState.physicsFrameID)
   globalState.physicsFrameID = space.physicsFrameID;
   const ships = space.spaceships;
   const shipTexture = Assets.getTexture(Constants.SHIP_TEXTURE);
@@ -16,14 +17,14 @@ const spaceHandler = (space) => {
 
   for (let i in ships) {
     let shipId = ships[i].id;
+    let timestamp = new Date();
 
     if (!globalState.spaceshipMap.has(shipId)) {
-      const newSpaceship = new Spaceship(shipTexture, shipThrustFrames, ships[i]);
-
+      const newSpaceship = new Spaceship(shipTexture, shipThrustFrames);
       globalState.spaceshipMap.set(shipId, newSpaceship);
-    } else {
-      globalState.spaceshipMap.get(shipId).updateData(ships[i]);
     }
+
+    globalState.spaceshipMap.get(shipId).updateData(timestamp, ships[i]);
   }
 };
 

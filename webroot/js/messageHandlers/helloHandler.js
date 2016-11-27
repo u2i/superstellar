@@ -8,8 +8,8 @@ const helloHandler = (message) => {
   });
   const anulusBorder = worldRadius + 2*boundaryAnnulusWidth;
   globalState.worldSizeFilter.worldBoundarySize = new Float32Array([worldRadius, anulusBorder]);
-  global.firstPhysicsFrameTimestamp = firstPhysicsFrameTimestamp;
-  global.physicsFrameRate = physicsFrameRate;
+  globalState.firstPhysicsFrameTimestamp = firstPhysicsFrameTimestamp;
+  globalState.physicsFrameRate = physicsFrameRate;
 };
 
 export default helloHandler;

@@ -5,9 +5,8 @@ import {globalState, renderer, stage} from './globals.js';
 const healthBarRadius = 40;
 
 export default class Spaceship {
-  constructor(shipTexture, thrustAnimationFrames, data) {
+  constructor(shipTexture, thrustAnimationFrames) {
     this.createHealthBarFilter();
-    this.updateData(data);
     this.container = new PIXI.Container();
     this.sprite = new PIXI.Sprite(shipTexture);
     this.thrustAnimation = new PIXI.extras.MovieClip(thrustAnimationFrames);
@@ -45,7 +44,8 @@ export default class Spaceship {
     this.container.pivot.set(this.sprite.width / 2, this.sprite.height / 2);
   }
 
-  updateData({id, position, velocity, facing, inputThrust, hp, maxHp}) {
+  updateData(timestamp, {id, position, velocity, facing, inputThrust, hp, maxHp}) {
+    this.timestamp = timestamp;
     this.id = id;
     this.position = position;
     this.velocity = velocity;
@@ -54,6 +54,24 @@ export default class Spaceship {
     this.hp = hp;
     this.maxHp = maxHp;
     this.updateHealthBar();
+  }
+
+  interpolateData() {
+    let now = new Date();
+    let delta = now - this.timestamp;
+
+    let interpolatedPositionX = this.position.x + this.velocity.x * delta / globalState.physicsFrameRate;
+    let interpolatedPositionY = this.position.y + this.velocity.y * delta / globalState.physicsFrameRate;
+
+    //console.log(now);
+    //console.log(interpolatedPositionX);
+    //console.log(this.velocity.x);
+    //console.log(this.position.x);
+    //console.log(this.velocity.x * delta / globalState.physicsFrameRate);
+    //console.log(globalState.physicsFrameID);
+    console.log('--------------')
+
+    this.interpolatedPosition = {x: Math.round(interpolatedPositionX), y: Math.round(interpolatedPositionY)};
   }
 
   update(viewport) {
@@ -66,8 +84,8 @@ export default class Spaceship {
     }
 
     const {x, y} = Utils.translateToViewport(
-      this.position.x / 100,
-      this.position.y / 100,
+      this.interpolatedPosition.x / 100,
+      this.interpolatedPosition.y / 100,
       viewport
     );
 
@@ -131,8 +149,8 @@ export default class Spaceship {
 
   viewport() {
     return {
-      vx: this.position.x / 100,
-      vy: this.position.y / 100,
+      vx: this.interpolatedPosition.x / 100,
+      vy: this.interpolatedPosition.y / 100,
       width: renderer.width,
       height: renderer.height
     };

@@ -31,7 +31,7 @@ export default class Radar {
   }
 
   update(myShip, viewport) {
-    let radarPos = Utils.translateToViewport(myShip.position.x/100, myShip.position.y/100, viewport);
+    let radarPos = Utils.translateToViewport(myShip.interpolatedPosition.x/100, myShip.interpolatedPosition.y/100, viewport);
     this.container.x = radarPos.x + (viewport.width / 2 - (2*this.radius)) - this.borderOffset;
     this.container.y = radarPos.y + (viewport.height / 2 - (2*this.radius)) - this.borderOffset;
 

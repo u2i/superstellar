@@ -78,6 +78,10 @@ const defaultViewport = { vx: 0, vy: 0, width: renderer.width, height: renderer.
 const render = function () {
   let myShip;
 
+  for (var spaceship of globalState.spaceshipMap.values()) {
+    spaceship.interpolateData();
+  }
+
   if (globalState.spaceshipMap.size > 0) {
     myShip = globalState.spaceshipMap.get(globalState.clientId);
   }
@@ -96,8 +100,8 @@ const render = function () {
 
   hud.update();
 
-  let x = myShip ? Math.floor(myShip.position.x / 100) : '?';
-  let y = myShip ? Math.floor(myShip.position.y / 100) : '?';
+  let x = myShip ? Math.floor(myShip.interpolatedPosition.x / 100) : '?';
+  let y = myShip ? Math.floor(myShip.interpolatedPosition.y / 100) : '?';
 
   fogShader.worldCoordinates[0] = x;
   fogShader.worldCoordinates[1] = y;
