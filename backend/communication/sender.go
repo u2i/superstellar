@@ -12,18 +12,23 @@ import (
 type Sender struct {
 	server *Server
 	space  *state.Space
+	leaderboardCounter int32
 }
 
 func NewSender(server *Server, space *state.Space) *Sender {
 	return &Sender{
 		server: server,
 		space: space,
+		leaderboardCounter: 0,
 	}
 }
 
-func (sender *Sender) HandleTimeTick(timeTickEvent *events.TimeTick) {
+func (sender *Sender) HandleCommunicationTimeTick(timeTickEvent *events.CommunicationTimeTick) {
 	sender.sendSpace()
-	if (timeTickEvent.FrameId % 50 == 0) {
+	sender.leaderboardCounter++
+
+	if (sender.leaderboardCounter % 10 == 0) {
+		sender.leaderboardCounter = 0
 		sender.sendLeaderboard()
 	}
 }
@@ -96,7 +101,7 @@ func (sender *Sender) sendHelloMessage(clientID uint32) {
 				WorldRadius:  constants.WorldRadius / 100,
 				BoundaryAnnulusWidth: constants.BoundaryAnnulusWidth / 100,
 				FirstPhysicsFrameTimestamp: uint64(sender.space.FirstPhysicsFrameTimestamp),
-				PhysicsFrameRate: uint32(time.Second.Nanoseconds() / constants.PhysicsFrameDuration.Nanoseconds()),
+				PhysicsFrameRate: uint32(time.Second.Nanoseconds() / constants.UpdateSendInterval.Nanoseconds()),
 			},
 		},
 	}

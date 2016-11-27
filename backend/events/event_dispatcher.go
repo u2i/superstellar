@@ -16,6 +16,10 @@ type TimeTickListener interface {
 	HandleTimeTick(*TimeTick)
 }
 
+type CommunicationTimeTickListener interface {
+	HandleCommunicationTimeTick(*CommunicationTimeTick)
+}
+
 type ProjectileFiredListener interface {
 	HandleProjectileFired(*ProjectileFired)
 }
@@ -49,6 +53,10 @@ type EventDispatcher struct {
 	// TimeTick
 	timeTickQueue     chan *TimeTick
 	timeTickListeners []TimeTickListener
+
+	// CommunicationTimeTick
+	communicationTimeTickQueue     chan *CommunicationTimeTick
+	communicationTimeTickListeners []CommunicationTimeTickListener
 
 	// ProjectileFired
 	projectileFiredQueue     chan *ProjectileFired
@@ -85,6 +93,10 @@ func NewEventDispatcher() *EventDispatcher {
 		// TimeTick
 		timeTickQueue:     make(chan *TimeTick, buffersLength),
 		timeTickListeners: []TimeTickListener{},
+
+		// CommunicationTimeTick
+		communicationTimeTickQueue:     make(chan *CommunicationTimeTick, buffersLength),
+		communicationTimeTickListeners: []CommunicationTimeTickListener{},
 
 		// ProjectileFired
 		projectileFiredQueue:     make(chan *ProjectileFired, buffersLength),
@@ -124,6 +136,12 @@ func (d *EventDispatcher) RunEventLoop() {
 		case event := <-d.timeTickQueue:
 			for _, listener := range d.timeTickListeners {
 				listener.HandleTimeTick(event)
+			}
+
+		// CommunicationTimeTick
+		case event := <-d.communicationTimeTickQueue:
+			for _, listener := range d.communicationTimeTickListeners {
+				listener.HandleCommunicationTimeTick(event)
 			}
 
 		// ProjectileFired
@@ -184,6 +202,16 @@ func (d *EventDispatcher) RegisterTimeTickListener(listener TimeTickListener) {
 
 func (d *EventDispatcher) FireTimeTick(e *TimeTick) {
 	d.timeTickQueue <- e
+}
+
+// CommunicationTimeTick
+
+func (d *EventDispatcher) RegisterCommunicationTimeTickListener(listener CommunicationTimeTickListener) {
+	d.communicationTimeTickListeners = append(d.communicationTimeTickListeners, listener)
+}
+
+func (d *EventDispatcher) FireCommunicationTimeTick(e *CommunicationTimeTick) {
+	d.communicationTimeTickQueue <- e
 }
 
 // ProjectileFired
