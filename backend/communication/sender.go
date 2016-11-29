@@ -6,7 +6,6 @@ import (
 	"superstellar/backend/leaderboard"
 	"superstellar/backend/pb"
 	"superstellar/backend/constants"
-	"time"
 )
 
 type Sender struct {

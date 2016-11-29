@@ -1,6 +1,7 @@
 import * as Utils from './utils.js';
 import HealthBarFilter from './healthBarFilter';
 import {globalState, renderer, stage} from './globals.js';
+import MoveFilter from './moveFilter.js';
 
 const healthBarRadius = 40;
 
@@ -8,6 +9,7 @@ export default class Spaceship {
   constructor(shipTexture, thrustAnimationFrames, data) {
     this.createHealthBarFilter();
     this.updateData(data);
+    this.moveFilter = new MoveFilter(this.position, this.velocity);
     this.container = new PIXI.Container();
     this.sprite = new PIXI.Sprite(shipTexture);
     this.thrustAnimation = new PIXI.extras.MovieClip(thrustAnimationFrames);
@@ -54,6 +56,11 @@ export default class Spaceship {
     this.hp = hp;
     this.maxHp = maxHp;
     this.updateHealthBar();
+  }
+
+  predict() {
+    this.moveFilter.predict()
+    this.position = this.moveFilter.position()
   }
 
   update(viewport) {

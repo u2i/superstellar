@@ -22,7 +22,7 @@ const spaceHandler = (space) => {
 
       globalState.spaceshipMap.set(shipId, newSpaceship);
     } else {
-      globalState.spaceshipMap.get(shipId).updateData(ships[i]);
+      //globalState.spaceshipMap.get(shipId).updateData(ships[i]);
     }
   }
 };

@@ -78,6 +78,10 @@ const defaultViewport = { vx: 0, vy: 0, width: renderer.width, height: renderer.
 const render = function () {
   let myShip;
 
+  for (let spaceship of globalState.spaceshipMap.values()) {
+    spaceship.predict();
+  }
+
   if (globalState.spaceshipMap.size > 0) {
     myShip = globalState.spaceshipMap.get(globalState.clientId);
   }
