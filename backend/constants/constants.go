@@ -11,7 +11,7 @@ const (
 	BoundaryAnnulusWidth = 20000
 
 	// FrictionCoefficient is the coefficient saying how fast a spaceship will slow down when not using acceleration
-	FrictionCoefficient = 0.02
+	FrictionCoefficient = 0.005
 
 	// MinFireInterval is a minimum time between firing.
 	MinFireInterval = 250 * time.Millisecond
@@ -21,10 +21,10 @@ const (
 	RandomPositionEmptyRadius = 5000.0
 
 	// Acceleration is spaceship's linear acceleration on thruster.
-	SpaceshipAcceleration = 30.0
+	SpaceshipAcceleration = 50.0
 
 	// Maximum angular velocity added on user input.
-	SpaceshipMaxAngularSpeed = 0.1
+	SpaceshipMaxAngularSpeed = 0.12
 
 	SpaceshipLinearAngularAcceleration = 0.0001
 
@@ -36,10 +36,10 @@ const (
 	SpaceshipTurnToAngleP = 0.9
 
 	// MaxSpeed maximum speed of the spacecraft
-	SpaceshipMaxSpeed = 1500
+	SpaceshipMaxSpeed = 600
 
 	// SpaceshipSize is spaceship's radius
-	SpaceshipSize = 2000
+	SpaceshipSize = 2200
 
 	// SpaceshipInitialHP spaceship HP
 	SpaceshipInitialHP = 500
@@ -48,7 +48,7 @@ const (
 	SpaceshipInitialEnergy = 100
 
 	// Part of killed player's Max HP that killing player receives
-	KillRewardRatio = 0.1
+	KillRewardRatio = 0.2
 
 	// Energy reward for each
 	KillEnergyRewardRatio = 0.1
@@ -60,16 +60,16 @@ const (
 	WorldRadius = 100000
 
 	// AutoRepairDelay is time after which spaceship will repair itself
-	AutoRepairDelay = 120
+	AutoRepairDelay = 250
 
 	// AutoRepairInterval is the time between repairs
-	AutoRepairInterval = 6
+	AutoRepairInterval = 1
 
 	// Time between Energy renewal
 	AutoEnergyRepairInterval = 1
 
 	// AutoRepair is the amount of HP player will receive after AutoRepairDelay
-	AutoRepairAmount = 1
+	AutoRepairAmount = 2
 
 	// EnergyRepair is the amount of Energy player will receive after AutoRepairDelay
 	AutoEnergyRepairAmount = 2;

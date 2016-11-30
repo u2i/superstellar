@@ -147,10 +147,10 @@ func (s *Spaceship) ShootIfPossible() (canShoot bool) {
 }
 
 func (s *Spaceship) CollideWithProjectile(projectile *Projectile) {
-	if s.HP < 100 {
+	if s.HP < 50 {
 		s.HP = 0
 	} else {
-		s.HP -= 100
+		s.HP -= 50
 	}
 	s.AutoRepairDelay = constants.AutoRepairDelay
 }

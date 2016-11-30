@@ -9,10 +9,10 @@ import (
 
 const (
 	// DefaultTTL describes the default number of frames the projectile lives.
-	DefaultTTL = 50
+	DefaultTTL = 15
 
 	// ProjectileSpeed describes projectile speed. Captain Obvious.
-	ProjectileSpeed = 2000
+	ProjectileSpeed = 4000
 )
 
 // Projectile struct holds players' shots data.

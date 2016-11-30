@@ -9,7 +9,7 @@ export default class Radar {
     this.borderOffset = 20;
     this.radarColor = 0x00FF00;
     this.enemyColor = 0xFF0000;
-    this.maxRadarRange = 1500;
+    this.maxRadarRange = 3000;
     this.radarScale = this.radius / this.maxRadarRange;
     this.shipsGraphics = new PIXI.Graphics();
     this.refreshSprite = new PIXI.Sprite(this.loadRefreshTexture());
