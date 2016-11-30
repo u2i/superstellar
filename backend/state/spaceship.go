@@ -21,22 +21,22 @@ const (
 
 // Spaceship struct describes a spaceship.
 type Spaceship struct {
-	ID                    uint32
-	Position              *types.Point
-	Velocity              *types.Vector
-	Facing                *types.Vector
-	AngularSpeed          float64
-	InputThrust           bool
-	InputDirection        Direction
-	TargetAngle           *float64
-	Fire                  bool
-	LastShotTime          time.Time
-	HP                    uint32
-	MaxHP                 uint32
-	Energy                uint32
-	MaxEnergy             uint32
-	AutoRepairDelay       uint32
-	AutoEnergyRepairDelay uint32
+	ID                      uint32
+	Position                *types.Point
+	Velocity                *types.Vector
+	Facing                  *types.Vector
+	AngularSpeed            float64
+	InputThrust             bool
+	InputDirection          Direction
+	TargetAngle             *float64
+	Fire                    bool
+	LastShotTime            time.Time
+	HP                      uint32
+	MaxHP                   uint32
+	Energy                  uint32
+	MaxEnergy               uint32
+	AutoRepairDelay         uint32
+	AutoEnergyRechargeDelay uint32
 }
 
 func NewSpaceship(clientId uint32, initialPosition *types.Point) *Spaceship {
@@ -174,13 +174,13 @@ func (s *Spaceship) AutoRepair() {
 	s.AutoRepairDelay = constants.AutoRepairInterval
 }
 
-func (s *Spaceship) AutoEnergyRepair() {
-	s.Energy += constants.AutoEnergyRepairAmount
+func (s *Spaceship) AutoEnergyRecharge() {
+	s.Energy += constants.AutoEnergyRechargeAmount
 
 	if (s.Energy > s.MaxEnergy) {
 		s.Energy = s.MaxEnergy
 	}
-	s.AutoEnergyRepairDelay = constants.AutoEnergyRepairInterval
+	s.AutoEnergyRechargeDelay = constants.AutoEnergyRechargeInterval
 }
 
 func (s *Spaceship) LeftTurn() {

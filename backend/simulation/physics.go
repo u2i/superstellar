@@ -111,7 +111,7 @@ func updateSpaceships(s *state.Space, eventDispatcher *events.EventDispatcher) {
 		spaceship.Facing = types.NewVector(math.Cos(angle), math.Sin(angle))
 
 		handleAutoRepair(spaceship)
-		handleAutoEnergyRepair(spaceship)
+		handleAutoEnergyRecharge(spaceship)
 	}
 
 	collided := make(map[*state.Spaceship]bool)
@@ -204,13 +204,13 @@ func handleAutoRepair(spaceship *state.Spaceship) {
 	}
 }
 
-func handleAutoEnergyRepair(spaceship *state.Spaceship) {
-	if (spaceship.AutoEnergyRepairDelay == 0) {
+func handleAutoEnergyRecharge(spaceship *state.Spaceship) {
+	if (spaceship.AutoEnergyRechargeDelay == 0) {
 		if (spaceship.Energy < spaceship.MaxEnergy) {
-			spaceship.AutoEnergyRepair()
+			spaceship.AutoEnergyRecharge()
 		}
 	} else {
-		spaceship.AutoEnergyRepairDelay--
+		spaceship.AutoEnergyRechargeDelay--
 	}
 
 }
