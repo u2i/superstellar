@@ -58,6 +58,8 @@ func (updater *Updater) HandleUserLeft(userLeftEvent *events.UserLeft) {
 func (updater *Updater) HandleUserDied(event *events.UserDied) {
 	shotSpaceshipMaxHP := event.ShotSpaceship.MaxHP
 	reward := uint32(float32(shotSpaceshipMaxHP) * constants.KillRewardRatio)
+	energyReward := uint32(float32(shotSpaceshipMaxHP) * constants.KillEnergyRewardRatio)
 
 	event.Shooter.AddReward(reward)
+	event.Shooter.AddEnergyReward(energyReward)
 }

@@ -1,10 +1,11 @@
-const shaderContent = require('raw!../shaders/circle_healthbar.frag');
+const shaderContent = require('raw!../shaders/circle_bar.frag');
 
-export default class HealthBarFilter extends PIXI.Filter {
-  constructor() {
+export default class CircleBarFilter extends PIXI.Filter {
+  constructor(basicColor) {
     super(null, shaderContent);
 
     this.uniforms.magicMatrix = new PIXI.Matrix;
+    this.uniforms.basicColor = new Float32Array(basicColor);
   }
 
   apply(filterManager, input, output) {

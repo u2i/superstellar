@@ -51,15 +51,18 @@ func updateSpaceships(s *state.Space, eventDispatcher *events.EventDispatcher) {
 		if spaceship.Fire {
 			timeSinceLastShot := now.Sub(spaceship.LastShotTime)
 			if timeSinceLastShot >= constants.MinFireInterval {
-				projectile := state.NewProjectile(s.NextProjectileID(),
-					s.PhysicsFrameID, spaceship)
-				s.AddProjectile(projectile)
-				spaceship.LastShotTime = now
+				if spaceship.ShootIfPossible() {
+					projectile := state.NewProjectile(s.NextProjectileID(),
+						s.PhysicsFrameID, spaceship)
 
-				shotEvent := &events.ProjectileFired{
-					Projectile: projectile,
+					s.AddProjectile(projectile)
+					spaceship.LastShotTime = now
+
+					shotEvent := &events.ProjectileFired{
+						Projectile: projectile,
+					}
+					eventDispatcher.FireProjectileFired(shotEvent)
 				}
-				eventDispatcher.FireProjectileFired(shotEvent)
 			}
 		}
 
@@ -108,6 +111,7 @@ func updateSpaceships(s *state.Space, eventDispatcher *events.EventDispatcher) {
 		spaceship.Facing = types.NewVector(math.Cos(angle), math.Sin(angle))
 
 		handleAutoRepair(spaceship)
+		handleAutoEnergyRepair(spaceship)
 	}
 
 	collided := make(map[*state.Spaceship]bool)
@@ -198,6 +202,17 @@ func handleAutoRepair(spaceship *state.Spaceship) {
 	} else {
 		spaceship.AutoRepairDelay--
 	}
+}
+
+func handleAutoEnergyRepair(spaceship *state.Spaceship) {
+	if (spaceship.AutoEnergyRepairDelay == 0) {
+		if (spaceship.Energy < spaceship.MaxEnergy) {
+			spaceship.AutoEnergyRepair()
+		}
+	} else {
+		spaceship.AutoEnergyRepairDelay--
+	}
+
 }
 
 func updateProjectiles(space *state.Space) {

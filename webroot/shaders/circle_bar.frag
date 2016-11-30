@@ -5,9 +5,9 @@ varying vec2 vTextureCoord;
 
 uniform vec2 hps;
 uniform mat3 magicMatrix;
+uniform vec3 basicColor;
 
 // colors
-const vec3 healthColor = vec3(0.6, 1.0, 0.6);
 const float healthAlpha = 0.4;
 const float lostHealthAlpha = 0.2;
 
@@ -50,5 +50,5 @@ void main() {
     float lostHealthOverlay = alphaFunction * lostHealthAlpha;
 
     float colorFunction = hpBarFunction * alphaFunction + lostHealthOverlay;
-    gl_FragColor = vec4(circleFilter * healthColor * colorFunction, circleFilter * hpBarFunction * alphaFunction);
+    gl_FragColor = vec4(circleFilter * basicColor * colorFunction, circleFilter * hpBarFunction * alphaFunction);
 }

@@ -171,6 +171,18 @@
                     "type": "uint32",
                     "name": "hp",
                     "id": 7
+                },
+                {
+                    "rule": "optional",
+                    "type": "uint32",
+                    "name": "maxEnergy",
+                    "id": 8
+                },
+                {
+                    "rule": "optional",
+                    "type": "uint32",
+                    "name": "energy",
+                    "id": 9
                 }
             ]
         },

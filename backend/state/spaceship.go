@@ -21,19 +21,22 @@ const (
 
 // Spaceship struct describes a spaceship.
 type Spaceship struct {
-	ID              uint32
-	Position        *types.Point
-	Velocity        *types.Vector
-	Facing          *types.Vector
-	AngularSpeed    float64
-	InputThrust     bool
-	InputDirection  Direction
-	TargetAngle		*float64
-	Fire            bool
-	LastShotTime    time.Time
-	HP              uint32
-	MaxHP           uint32
-	AutoRepairDelay uint32
+	ID                    uint32
+	Position              *types.Point
+	Velocity              *types.Vector
+	Facing                *types.Vector
+	AngularSpeed          float64
+	InputThrust           bool
+	InputDirection        Direction
+	TargetAngle           *float64
+	Fire                  bool
+	LastShotTime          time.Time
+	HP                    uint32
+	MaxHP                 uint32
+	Energy                uint32
+	MaxEnergy             uint32
+	AutoRepairDelay       uint32
+	AutoEnergyRepairDelay uint32
 }
 
 func NewSpaceship(clientId uint32, initialPosition *types.Point) *Spaceship {
@@ -49,6 +52,8 @@ func NewSpaceship(clientId uint32, initialPosition *types.Point) *Spaceship {
 		LastShotTime:    time.Now(),
 		HP:              constants.SpaceshipInitialHP,
 		MaxHP:           constants.SpaceshipInitialHP,
+		Energy:          constants.SpaceshipInitialEnergy,
+		MaxEnergy:       constants.SpaceshipInitialEnergy,
 		AutoRepairDelay: constants.AutoRepairDelay,
 	}
 }
@@ -100,6 +105,8 @@ func (s *Spaceship) ToProto() *pb.Spaceship {
 		InputThrust: s.InputThrust,
 		MaxHp:       s.MaxHP,
 		Hp:          s.HP,
+		MaxEnergy:   s.MaxEnergy,
+		Energy:      s.Energy,
 	}
 }
 
@@ -108,7 +115,7 @@ func (s *Spaceship) DetectCollision(other *Spaceship) bool {
 	v := types.Point{X: s.Position.X - other.Position.X, Y: s.Position.Y - other.Position.Y}
 	dist := v.Length()
 
-	return dist < 2*constants.SpaceshipSize
+	return dist < 2 * constants.SpaceshipSize
 }
 
 // Collide transforms colliding ships' parameters.
@@ -129,6 +136,16 @@ func (s *Spaceship) Collide(other *Spaceship) {
 	other.Velocity = switchedV2.Rotate(-transformAngle)
 }
 
+func (s *Spaceship) ShootIfPossible() (canShoot bool) {
+	if s.Energy >= constants.BasicWeaponEnergyCost {
+		s.Energy -= constants.BasicWeaponEnergyCost;
+		canShoot = true
+	} else {
+		canShoot = false
+	}
+	return canShoot
+}
+
 func (s *Spaceship) CollideWithProjectile(projectile *Projectile) {
 	if s.HP < 100 {
 		s.HP = 0
@@ -143,13 +160,27 @@ func (s *Spaceship) AddReward(reward uint32) {
 	s.MaxHP += reward
 }
 
+func (s *Spaceship) AddEnergyReward(reward uint32) {
+	s.Energy += reward
+	s.MaxEnergy += reward
+}
+
 func (s *Spaceship) AutoRepair() {
 	s.HP += constants.AutoRepairAmount
 
-	if(s.HP > s.MaxHP) {
+	if (s.HP > s.MaxHP) {
 		s.HP = s.MaxHP
 	}
 	s.AutoRepairDelay = constants.AutoRepairInterval
+}
+
+func (s *Spaceship) AutoEnergyRepair() {
+	s.Energy += constants.AutoEnergyRepairAmount
+
+	if (s.Energy > s.MaxEnergy) {
+		s.Energy = s.MaxEnergy
+	}
+	s.AutoEnergyRepairDelay = constants.AutoEnergyRepairInterval
 }
 
 func (s *Spaceship) LeftTurn() {

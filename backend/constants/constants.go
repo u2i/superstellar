@@ -44,8 +44,17 @@ const (
 	// SpaceshipInitialHP spaceship HP
 	SpaceshipInitialHP = 500
 
+	// SpaceshipInitialEnergy spaceship Energy
+	SpaceshipInitialEnergy = 100
+
 	// Part of killed player's Max HP that killing player receives
 	KillRewardRatio = 0.1
+
+	// Energy reward for each
+	KillEnergyRewardRatio = 0.1
+
+	// Energy cost of a single shot
+	BasicWeaponEnergyCost = 33
 
 	// WorldRadius is the radius of playable world (in .01 units)
 	WorldRadius = 100000
@@ -56,8 +65,14 @@ const (
 	// AutoRepairInterval is the time between repairs
 	AutoRepairInterval = 6
 
+	// Time between Energy renewal
+	AutoEnergyRepairInterval = 1
+
 	// AutoRepair is the amount of HP player will receive after AutoRepairDelay
 	AutoRepairAmount = 1
+
+	// EnergyRepair is the amount of Energy player will receive after AutoRepairDelay
+	AutoEnergyRepairAmount = 2;
 
 	// Number of best players in Leaderboard
 	LeaderboardLength = 10

@@ -35,6 +35,8 @@ message Spaceship {
   bool      inputThrust = 5;
   uint32    maxHp = 6;
   uint32    hp = 7;
+  uint32    maxEnergy = 8;
+  uint32    energy = 9;
 }
 
 message ProjectileFired {

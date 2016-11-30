@@ -1,12 +1,14 @@
 import * as Utils from './utils.js';
-import HealthBarFilter from './healthBarFilter';
+import CircleBarFilter from './circleBarFilter';
 import {globalState, renderer, stage} from './globals.js';
 
 const healthBarRadius = 40;
+const energyBarRadius = 50;
 
 export default class Spaceship {
   constructor(shipTexture, thrustAnimationFrames, data) {
     this.createHealthBarFilter();
+    this.createEnergyBarFilter();
     this.updateData(data);
     this.container = new PIXI.Container();
     this.sprite = new PIXI.Sprite(shipTexture);
@@ -35,6 +37,7 @@ export default class Spaceship {
     this.container.addChild(this.sprite);
     this.container.addChild(this.thrustAnimation);
     this.addHealthBar();
+    this.addEnergyBar();
 
     if (__DEBUG__) {
       this.container.addChild(this.collisionSphere);
@@ -45,7 +48,7 @@ export default class Spaceship {
     this.container.pivot.set(this.sprite.width / 2, this.sprite.height / 2);
   }
 
-  updateData({id, position, velocity, facing, inputThrust, hp, maxHp}) {
+  updateData({id, position, velocity, facing, inputThrust, hp, maxHp, energy, maxEnergy}) {
     this.id = id;
     this.position = position;
     this.velocity = velocity;
@@ -53,7 +56,10 @@ export default class Spaceship {
     this.inputThrust = inputThrust;
     this.hp = hp;
     this.maxHp = maxHp;
+    this.energy = energy;
+    this.maxEnergy = maxEnergy;
     this.updateHealthBar();
+    this.updateEnergyBar();
   }
 
   update(viewport) {
@@ -73,10 +79,16 @@ export default class Spaceship {
 
     this.container.position.set(x, y);
 
-    if (this.isOutOfView(x, y, viewport)) {
+    if (this.isOutOfView(x, y, healthBarRadius, viewport)) {
       this.disableHealthBarFilter();
     } else {
       this.enableHealthBarFilter(x, y);
+    }
+
+    if (this.isOutOfView(x, y, energyBarRadius, viewport)) {
+      this.disableEnergyBarFilter();
+    } else {
+      this.enableEnergyBarFilter(x, y);
     }
 
     this.container.rotation = this.facing;
@@ -92,11 +104,11 @@ export default class Spaceship {
     }
   }
 
-  isOutOfView(x, y, viewport) {
-    return x - healthBarRadius < 0
-      || y - healthBarRadius < 0
-      || x + healthBarRadius > viewport.width
-      || y + healthBarRadius > viewport.height;
+  isOutOfView(x, y, barRadius, viewport) {
+    return x - barRadius < 0
+      || y - barRadius < 0
+      || x + barRadius > viewport.width
+      || y + barRadius > viewport.height;
   }
 
   addHealthBar() {
@@ -106,22 +118,47 @@ export default class Spaceship {
     this.container.addChild(this.healthBar);
   }
 
+  addEnergyBar() {
+    this.energyBar = new PIXI.Graphics();
+    this.energyBarRectangle = new PIXI.Rectangle(100, 100, energyBarRadius * 2, energyBarRadius * 2);
+    this.energyBar.filterArea = this.energyBarRectangle;
+    this.container.addChild(this.energyBar);
+  }
+
   enableHealthBarFilter(x, y) {
     this.healthBarRectangle.x = x - healthBarRadius;
     this.healthBarRectangle.y = y - healthBarRadius;
     this.healthBar.filters = [this.healthBarFilter];
   }
 
+  enableEnergyBarFilter(x, y) {
+    this.energyBarRectangle.x = x - energyBarRadius;
+    this.energyBarRectangle.y = y - energyBarRadius;
+    this.energyBar.filters = [this.energyBarFilter];
+  }
+
   disableHealthBarFilter() {
     this.healthBar.filters = [];
   }
 
+  disableEnergyBarFilter() {
+    this.energyBar.filters = [];
+  }
+
   createHealthBarFilter() {
-    this.healthBarFilter = new HealthBarFilter();
+    this.healthBarFilter = new CircleBarFilter([0.6, 1.0, 0.6]);
+  }
+
+  createEnergyBarFilter() {
+    this.energyBarFilter = new CircleBarFilter([0.6, 0.6, 1.0]);
   }
 
   updateHealthBar() {
     this.healthBarFilter.hps = [this.hp, this.maxHp];
+  }
+
+  updateEnergyBar() {
+    this.energyBarFilter.hps = [this.energy, this.maxEnergy]
   }
 
   remove() {
