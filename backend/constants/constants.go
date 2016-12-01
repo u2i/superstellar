@@ -76,4 +76,19 @@ const (
 
 	// Number of best players in Leaderboard
 	LeaderboardLength = 10
+
+	// MinimumUsernameLength is minimal the number of characters in username
+	MinimumUsernameLength = 3
+
+	// MaximumUsernameLength is maximal the number of characters in username
+	MaximumUsernameLength = 25
+
+	// ProjectileSpeed describes projectile speed. Captain Obvious
+	ProjectileSpeed = 4000
+
+	// DefaultTTL describes the default number of frames the projectile lives
+	ProjectileDefaultTTL = 15
+
+	// ProjectileDamage is the damage that is inflicted on a user upon colliding with projectile
+	ProjectileDamage = 50
 )

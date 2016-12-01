@@ -7,14 +7,6 @@ import (
 	"superstellar/backend/types"
 )
 
-const (
-	// DefaultTTL describes the default number of frames the projectile lives.
-	DefaultTTL = 15
-
-	// ProjectileSpeed describes projectile speed. Captain Obvious.
-	ProjectileSpeed = 4000
-)
-
 // Projectile struct holds players' shots data.
 type Projectile struct {
 	ID        uint32
@@ -40,8 +32,8 @@ func NewProjectile(ID, frameID uint32, spaceship *Spaceship) *Projectile {
 		Origin:    spaceship.Position,
 		Position:  spaceship.Position,
 		Facing:    facing,
-		Velocity:  spaceship.Facing.Multiply(ProjectileSpeed).Add(spaceship.Velocity),
-		TTL:       DefaultTTL,
+		Velocity:  spaceship.Facing.Multiply(constants.ProjectileSpeed).Add(spaceship.Velocity),
+		TTL:       constants.ProjectileDefaultTTL,
 	}
 }
 

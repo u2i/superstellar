@@ -6,7 +6,9 @@ import (
 	"strings"
 	"superstellar/backend/events"
 	"superstellar/backend/pb"
+	"superstellar/backend/constants"
 	"time"
+	"fmt"
 
 	"github.com/golang/protobuf/proto"
 
@@ -159,12 +161,12 @@ func (c *Client) tryToJoinGame(joinGameMsg *pb.JoinGame) {
 func validateUsername(username string) (bool, error) {
 	length := len(username)
 
-	if length < 3 {
-		return false, errors.New("I doubt your name is shorter than 3 characters, Captain.")
+	if length < constants.MinimumUsernameLength {
+		return false, errors.New(fmt.Sprintf("I doubt your name is shorter than %d characters, Captain.", constants.MinimumUsernameLength))
 	}
 
-	if length > 25 {
-		return false, errors.New("Space fleet doesn't allow names longer than 25 characters!")
+	if length > constants.MaximumUsernameLength {
+		return false, errors.New(fmt.Sprintf("Space fleet doesn't allow names longer than %d characters!", constants.MaximumUsernameLength))
 	}
 
 	return true, nil
