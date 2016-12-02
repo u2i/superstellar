@@ -11,6 +11,7 @@ import (
 
 import (
 	_ "net/http/pprof"
+	"os"
 	"superstellar/backend/communication"
 	"superstellar/backend/events"
 	"superstellar/backend/game"
@@ -21,6 +22,11 @@ import (
 
 func main() {
 	log.SetFlags(log.Lshortfile)
+
+	debug := false
+	if len(os.Args) == 2 && os.Args[1] == "-d" {
+		debug = true
+	}
 
 	rand.Seed(time.Now().UTC().UnixNano())
 
@@ -49,8 +55,19 @@ func main() {
 	eventDispatcher.RegisterUserJoinedListener(sender)
 	eventDispatcher.RegisterUserDiedListener(sender)
 
+	if debug {
+		fileWriter, err := communication.NewFileWriter(space)
+		if err != nil {
+			panic(err)
+		}
+
+		eventDispatcher.RegisterCommunicationTimeTickListener(fileWriter)
+		go fileWriter.Run()
+	}
+
 	monitor.Run()
 	go srv.Listen()
+
 	go eventDispatcher.RunEventLoop()
 	go physicsTicker.Run()
 
