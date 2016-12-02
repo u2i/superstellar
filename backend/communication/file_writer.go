@@ -66,19 +66,19 @@ func (fileWriter *FileWriter) Run() {
 }
 
 func (fileWriter *FileWriter) writeToFile(space *pb.Space) error {
-	bytes, err := proto.Marshal(space)
+	data, err := proto.Marshal(space)
 	if err != nil {
 		log.Fatal(err)
 		return err
 	}
 
-	msgLen := len(bytes)
+	msgLen := uint32(len(data))
 	if binary.Write(fileWriter.file, binary.LittleEndian, msgLen); err != nil {
 		log.Fatal(err)
 		return err
 	}
 
-	if fileWriter.file.Write(bytes); err != nil {
+	if fileWriter.file.Write(data); err != nil {
 		log.Fatal(err)
 		return err
 	}
