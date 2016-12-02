@@ -8,8 +8,8 @@ const healthBarRadius = 40;
 export default class Spaceship {
   constructor(shipTexture, thrustAnimationFrames, data) {
     this.createHealthBarFilter();
+    this.moveFilter = new MoveFilter(data.position, data.velocity);
     this.updateData(data);
-    this.moveFilter = new MoveFilter(this.position, this.velocity);
     this.container = new PIXI.Container();
     this.sprite = new PIXI.Sprite(shipTexture);
     this.thrustAnimation = new PIXI.extras.MovieClip(thrustAnimationFrames);
@@ -49,8 +49,7 @@ export default class Spaceship {
 
   updateData({id, position, velocity, facing, inputThrust, hp, maxHp}) {
     this.id = id;
-    this.position = position;
-    this.velocity = velocity;
+    this.moveFilter.update(position, velocity);
     this.facing = facing;
     this.inputThrust = inputThrust;
     this.hp = hp;
