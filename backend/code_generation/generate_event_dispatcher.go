@@ -6,7 +6,32 @@ import (
 	"unicode"
 	"bytes"
 	"io/ioutil"
+	"strconv"
+	"sort"
 )
+
+// BEGIN CONFIGURATION
+
+const (
+	targetTypeName = "EventDispatcher"
+	targetFilePath = "backend/events/event_dispatcher.go"
+	eventLoopMethodName = "RunEventLoop"
+	initialPriorityQueueCapacity = 100000
+)
+
+var supportedEvents = []EventType{
+	{"TimeTick", 1},
+	{"CommunicationTimeTick", 1},
+	{"ProjectileFired", 2},
+	{"ProjectileHit", 2},
+	{"UserJoined", 2},
+	{"UserLeft", 2},
+	{"UserDied", 2},
+	{"UserInput", 3},
+	{"TargetAngle", 3},
+}
+
+// END CONFIGURATION
 
 func pascalCaseToCamel(str string) string {
 	out := []rune(str)
@@ -16,6 +41,7 @@ func pascalCaseToCamel(str string) string {
 
 type EventType struct {
 	eventTypeName string
+	priority      uint
 }
 
 func (et *EventType) TypeName() string {
@@ -26,8 +52,16 @@ func (et *EventType) ListenerTypeName() string {
 	return et.eventTypeName + "Listener"
 }
 
+func (et *EventType) HandlerTypeName() string {
+	return pascalCaseToCamel(et.eventTypeName + "Handler")
+}
+
+func EventsQueueName(priority int) string {
+	return "priority" + strconv.Itoa(int(priority)) + "EventsQueue"
+}
+
 func (et *EventType) EventsQueueName() string {
-	return pascalCaseToCamel(et.eventTypeName + "Queue")
+	return EventsQueueName(int(et.priority))
 }
 
 func (et *EventType) ListenerListName() string {
@@ -47,9 +81,34 @@ func (et *EventType) FireMethodName() string {
 }
 
 type Metadata struct {
-	TypeName            string
-	EventLoopMethodName string
-	EventTypes          []EventType
+	TypeName                     string
+	EventLoopMethodName          string
+	InitialPriorityQueueCapacity uint
+	EventHandlerInterfaceName    string
+	EventTypes                   []EventType
+}
+
+func (et Metadata) OrderedPriorityQueueNames() []string {
+	priorities := make(map[uint]bool);
+
+	for _, eventType := range et.EventTypes {
+		priorities[eventType.priority] = true
+	}
+
+	sortedPriorities := make([]int, len(priorities))
+	i := 0
+	for priority := range priorities {
+		sortedPriorities[i] = int(priority)
+		i++
+	}
+	sort.Ints(sortedPriorities)
+
+	sortedQueueNames := make([]string, len(priorities))
+	for i, priority := range sortedPriorities {
+		sortedQueueNames[i] = EventsQueueName(priority)
+	}
+
+	return sortedQueueNames
 }
 
 func checkError(err error) {
@@ -70,43 +129,92 @@ func main() {
 		)
 
 		const (
-			buffersLength = 10000
+			eventQueuesCapacity = {{ .InitialPriorityQueueCapacity }}
 			idleDispatcherSleepTime time.Duration = 5 * time.Millisecond
+			registeringListenerWhileRunningErrorMessage = "Tried to register listener while running event loop. Registering listeners is not thread safe therefore prohibited after starting event loop."
 		)
 
+		// INTERFACE DOCUMENTATION
+
 		{{ range .EventTypes }}
+			// {{ .TypeName }} event
+			// Implement the interface below
 			type {{ .ListenerTypeName }} interface {
 				{{ .ListenerHandleMethodName }}(*{{ .TypeName }})
 			}
+			// and use {{ $.TypeName }}.{{ .RegisterMethodName }}({{ .ListenerTypeName }}) to register listener
+			// use {{ $.TypeName }}.{{ .FireMethodName }}(*{{ .TypeName }}) to trigger event
 		{{ end }}
 
+		// END OF INTERFACE DOCUMENTATION
+
+		// PRIVATE EVENT HANDLERS
+
+		type {{ .EventHandlerInterfaceName }} interface {
+			handle()
+		}
+
+		{{ range .EventTypes }}
+			type {{ .HandlerTypeName }} struct {
+				event *{{ .TypeName }}
+				eventListeners []{{ .ListenerTypeName }}
+			}
+
+			func (h *{{ .HandlerTypeName }}) handle() {
+				for _, listener := range h.eventListeners {
+					listener.{{ .ListenerHandleMethodName }}(h.event)
+				}
+			}
+		{{ end }}
+
+		// EVENT DISPATCHER
+
 		type {{ .TypeName }} struct {
+			running bool
+
+			// EVENT QUEUES
+
+			{{ range .OrderedPriorityQueueNames }}
+				{{ . }} chan {{ $.EventHandlerInterfaceName }}
+			{{ end }}
+
+			// LISTENER LISTS
+
 			{{ range .EventTypes }}
-				// {{ .TypeName }}
-				{{ .EventsQueueName }} chan *{{ .TypeName }}
 				{{ .ListenerListName }} []{{ .ListenerTypeName }}
 			{{ end }}
 		}
 
+		// EVENT DISPATCHER CONSTRUCTOR
+
 		func New{{ .TypeName }}() *{{ .TypeName }} {
 			return &{{ .TypeName }}{
+				running: false,
+
+				// EVENT QUEUES
+
+				{{ range .OrderedPriorityQueueNames }}
+					{{ . }}: make(chan {{ $.EventHandlerInterfaceName }}, eventQueuesCapacity),
+				{{ end }}
+
+				// LISTENER LISTS
+
 				{{ range .EventTypes }}
-					// {{ .TypeName }}
-					{{ .EventsQueueName }}: make(chan *{{ .TypeName }}, buffersLength),
 					{{ .ListenerListName }}: []{{ .ListenerTypeName }}{},
 				{{ end }}
 			}
 		}
 
+		// MAIN EVENT LOOP
+
 		func (d *{{ .TypeName }}) {{ .EventLoopMethodName }}() {
+			d.running = true
+
 			for {
 				select {
-					{{ range .EventTypes }}
-						// {{ .TypeName }}
-						case event := <-d.{{ .EventsQueueName }}:
-							for _, listener := range d.{{ .ListenerListName }} {
-								listener.{{ .ListenerHandleMethodName }}(event)
-							}
+					{{ range .OrderedPriorityQueueNames }}
+						case handler := <-d.{{ . }}:
+							handler.handle()
 					{{ end }}
 				default:
 					time.Sleep(idleDispatcherSleepTime)
@@ -114,17 +222,26 @@ func main() {
 			}
 		}
 
-		// EVENT METHODS
+		// PUBLIC EVENT DISPATCHER METHODS
 
 		{{ range .EventTypes }}
 			// {{ .TypeName }}
 
 			func (d *{{ $.TypeName }}) {{ .RegisterMethodName }}(listener {{ .ListenerTypeName }}) {
+				if(d.running) {
+					panic(registeringListenerWhileRunningErrorMessage)
+				}
+
 				d.{{ .ListenerListName }} = append(d.{{ .ListenerListName }}, listener)
 			}
 
 			func (d *{{ $.TypeName }}) {{ .FireMethodName }}(e *{{ .TypeName }}) {
-				d.{{ .EventsQueueName }} <- e
+				handler := &{{ .HandlerTypeName }}{
+					event: e,
+					eventListeners: d.{{ .ListenerListName }},
+				}
+
+				d.{{ .EventsQueueName }} <- handler
 			}
 		{{ end }}
 	`
@@ -134,26 +251,16 @@ func main() {
 
 	var buffer bytes.Buffer
 	err = tpl.Execute(&buffer, Metadata{
-		TypeName: "EventDispatcher",
-		EventLoopMethodName: "RunEventLoop",
-
-		// TODO: load this list automatically
-		EventTypes: []EventType{
-			{"TimeTick"},
-			{"CommunicationTimeTick"},
-			{"ProjectileFired"},
-			{"ProjectileHit"},
-			{"UserInput"},
-			{"UserJoined"},
-			{"UserLeft"},
-			{"UserDied"},
-			{"TargetAngle"},
-		},
+		TypeName: targetTypeName,
+		EventLoopMethodName: eventLoopMethodName,
+		InitialPriorityQueueCapacity: initialPriorityQueueCapacity,
+		EventHandlerInterfaceName: "eventHandler",
+		EventTypes: supportedEvents,
 	})
 	checkError(err)
 
 	formatted_code, err := format.Source(buffer.Bytes())
 
-	err = ioutil.WriteFile("backend/events/event_dispatcher.go", formatted_code, 0644)
+	err = ioutil.WriteFile(targetFilePath, formatted_code, 0644)
 	checkError(err)
 }

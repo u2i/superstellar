@@ -8,183 +8,287 @@ import (
 )
 
 const (
-	buffersLength                         = 10000
-	idleDispatcherSleepTime time.Duration = 5 * time.Millisecond
+	eventQueuesCapacity                                       = 100000
+	idleDispatcherSleepTime                     time.Duration = 5 * time.Millisecond
+	registeringListenerWhileRunningErrorMessage               = "Tried to register listener while running event loop. Registering listeners is not thread safe therefore prohibited after starting event loop."
 )
 
+// INTERFACE DOCUMENTATION
+
+// TimeTick event
+// Implement the interface below
 type TimeTickListener interface {
 	HandleTimeTick(*TimeTick)
 }
 
+// and use EventDispatcher.RegisterTimeTickListener(TimeTickListener) to register listener
+// use EventDispatcher.FireTimeTick(*TimeTick) to trigger event
+
+// CommunicationTimeTick event
+// Implement the interface below
 type CommunicationTimeTickListener interface {
 	HandleCommunicationTimeTick(*CommunicationTimeTick)
 }
 
+// and use EventDispatcher.RegisterCommunicationTimeTickListener(CommunicationTimeTickListener) to register listener
+// use EventDispatcher.FireCommunicationTimeTick(*CommunicationTimeTick) to trigger event
+
+// ProjectileFired event
+// Implement the interface below
 type ProjectileFiredListener interface {
 	HandleProjectileFired(*ProjectileFired)
 }
 
+// and use EventDispatcher.RegisterProjectileFiredListener(ProjectileFiredListener) to register listener
+// use EventDispatcher.FireProjectileFired(*ProjectileFired) to trigger event
+
+// ProjectileHit event
+// Implement the interface below
 type ProjectileHitListener interface {
 	HandleProjectileHit(*ProjectileHit)
 }
 
-type UserInputListener interface {
-	HandleUserInput(*UserInput)
-}
+// and use EventDispatcher.RegisterProjectileHitListener(ProjectileHitListener) to register listener
+// use EventDispatcher.FireProjectileHit(*ProjectileHit) to trigger event
 
+// UserJoined event
+// Implement the interface below
 type UserJoinedListener interface {
 	HandleUserJoined(*UserJoined)
 }
 
+// and use EventDispatcher.RegisterUserJoinedListener(UserJoinedListener) to register listener
+// use EventDispatcher.FireUserJoined(*UserJoined) to trigger event
+
+// UserLeft event
+// Implement the interface below
 type UserLeftListener interface {
 	HandleUserLeft(*UserLeft)
 }
 
+// and use EventDispatcher.RegisterUserLeftListener(UserLeftListener) to register listener
+// use EventDispatcher.FireUserLeft(*UserLeft) to trigger event
+
+// UserDied event
+// Implement the interface below
 type UserDiedListener interface {
 	HandleUserDied(*UserDied)
 }
 
+// and use EventDispatcher.RegisterUserDiedListener(UserDiedListener) to register listener
+// use EventDispatcher.FireUserDied(*UserDied) to trigger event
+
+// UserInput event
+// Implement the interface below
+type UserInputListener interface {
+	HandleUserInput(*UserInput)
+}
+
+// and use EventDispatcher.RegisterUserInputListener(UserInputListener) to register listener
+// use EventDispatcher.FireUserInput(*UserInput) to trigger event
+
+// TargetAngle event
+// Implement the interface below
 type TargetAngleListener interface {
 	HandleTargetAngle(*TargetAngle)
 }
 
-type EventDispatcher struct {
+// and use EventDispatcher.RegisterTargetAngleListener(TargetAngleListener) to register listener
+// use EventDispatcher.FireTargetAngle(*TargetAngle) to trigger event
 
-	// TimeTick
-	timeTickQueue     chan *TimeTick
+// END OF INTERFACE DOCUMENTATION
+
+// PRIVATE EVENT HANDLERS
+
+type eventHandler interface {
+	handle()
+}
+
+type timeTickHandler struct {
+	event          *TimeTick
+	eventListeners []TimeTickListener
+}
+
+func (h *timeTickHandler) handle() {
+	for _, listener := range h.eventListeners {
+		listener.HandleTimeTick(h.event)
+	}
+}
+
+type communicationTimeTickHandler struct {
+	event          *CommunicationTimeTick
+	eventListeners []CommunicationTimeTickListener
+}
+
+func (h *communicationTimeTickHandler) handle() {
+	for _, listener := range h.eventListeners {
+		listener.HandleCommunicationTimeTick(h.event)
+	}
+}
+
+type projectileFiredHandler struct {
+	event          *ProjectileFired
+	eventListeners []ProjectileFiredListener
+}
+
+func (h *projectileFiredHandler) handle() {
+	for _, listener := range h.eventListeners {
+		listener.HandleProjectileFired(h.event)
+	}
+}
+
+type projectileHitHandler struct {
+	event          *ProjectileHit
+	eventListeners []ProjectileHitListener
+}
+
+func (h *projectileHitHandler) handle() {
+	for _, listener := range h.eventListeners {
+		listener.HandleProjectileHit(h.event)
+	}
+}
+
+type userJoinedHandler struct {
+	event          *UserJoined
+	eventListeners []UserJoinedListener
+}
+
+func (h *userJoinedHandler) handle() {
+	for _, listener := range h.eventListeners {
+		listener.HandleUserJoined(h.event)
+	}
+}
+
+type userLeftHandler struct {
+	event          *UserLeft
+	eventListeners []UserLeftListener
+}
+
+func (h *userLeftHandler) handle() {
+	for _, listener := range h.eventListeners {
+		listener.HandleUserLeft(h.event)
+	}
+}
+
+type userDiedHandler struct {
+	event          *UserDied
+	eventListeners []UserDiedListener
+}
+
+func (h *userDiedHandler) handle() {
+	for _, listener := range h.eventListeners {
+		listener.HandleUserDied(h.event)
+	}
+}
+
+type userInputHandler struct {
+	event          *UserInput
+	eventListeners []UserInputListener
+}
+
+func (h *userInputHandler) handle() {
+	for _, listener := range h.eventListeners {
+		listener.HandleUserInput(h.event)
+	}
+}
+
+type targetAngleHandler struct {
+	event          *TargetAngle
+	eventListeners []TargetAngleListener
+}
+
+func (h *targetAngleHandler) handle() {
+	for _, listener := range h.eventListeners {
+		listener.HandleTargetAngle(h.event)
+	}
+}
+
+// EVENT DISPATCHER
+
+type EventDispatcher struct {
+	running bool
+
+	// EVENT QUEUES
+
+	priority1EventsQueue chan eventHandler
+
+	priority2EventsQueue chan eventHandler
+
+	priority3EventsQueue chan eventHandler
+
+	// LISTENER LISTS
+
 	timeTickListeners []TimeTickListener
 
-	// CommunicationTimeTick
-	communicationTimeTickQueue     chan *CommunicationTimeTick
 	communicationTimeTickListeners []CommunicationTimeTickListener
 
-	// ProjectileFired
-	projectileFiredQueue     chan *ProjectileFired
 	projectileFiredListeners []ProjectileFiredListener
 
-	// ProjectileHit
-	projectileHitQueue     chan *ProjectileHit
 	projectileHitListeners []ProjectileHitListener
 
-	// UserInput
-	userInputQueue     chan *UserInput
-	userInputListeners []UserInputListener
-
-	// UserJoined
-	userJoinedQueue     chan *UserJoined
 	userJoinedListeners []UserJoinedListener
 
-	// UserLeft
-	userLeftQueue     chan *UserLeft
 	userLeftListeners []UserLeftListener
 
-	// UserDied
-	userDiedQueue     chan *UserDied
 	userDiedListeners []UserDiedListener
 
-	// TargetAngle
-	targetAngleQueue     chan *TargetAngle
+	userInputListeners []UserInputListener
+
 	targetAngleListeners []TargetAngleListener
 }
 
+// EVENT DISPATCHER CONSTRUCTOR
+
 func NewEventDispatcher() *EventDispatcher {
 	return &EventDispatcher{
+		running: false,
 
-		// TimeTick
-		timeTickQueue:     make(chan *TimeTick, buffersLength),
+		// EVENT QUEUES
+
+		priority1EventsQueue: make(chan eventHandler, eventQueuesCapacity),
+
+		priority2EventsQueue: make(chan eventHandler, eventQueuesCapacity),
+
+		priority3EventsQueue: make(chan eventHandler, eventQueuesCapacity),
+
+		// LISTENER LISTS
+
 		timeTickListeners: []TimeTickListener{},
 
-		// CommunicationTimeTick
-		communicationTimeTickQueue:     make(chan *CommunicationTimeTick, buffersLength),
 		communicationTimeTickListeners: []CommunicationTimeTickListener{},
 
-		// ProjectileFired
-		projectileFiredQueue:     make(chan *ProjectileFired, buffersLength),
 		projectileFiredListeners: []ProjectileFiredListener{},
 
-		// ProjectileHit
-		projectileHitQueue:     make(chan *ProjectileHit, buffersLength),
 		projectileHitListeners: []ProjectileHitListener{},
 
-		// UserInput
-		userInputQueue:     make(chan *UserInput, buffersLength),
-		userInputListeners: []UserInputListener{},
-
-		// UserJoined
-		userJoinedQueue:     make(chan *UserJoined, buffersLength),
 		userJoinedListeners: []UserJoinedListener{},
 
-		// UserLeft
-		userLeftQueue:     make(chan *UserLeft, buffersLength),
 		userLeftListeners: []UserLeftListener{},
 
-		// UserDied
-		userDiedQueue:     make(chan *UserDied, buffersLength),
 		userDiedListeners: []UserDiedListener{},
 
-		// TargetAngle
-		targetAngleQueue:     make(chan *TargetAngle, buffersLength),
+		userInputListeners: []UserInputListener{},
+
 		targetAngleListeners: []TargetAngleListener{},
 	}
 }
 
+// MAIN EVENT LOOP
+
 func (d *EventDispatcher) RunEventLoop() {
+	d.running = true
+
 	for {
 		select {
 
-		// TimeTick
-		case event := <-d.timeTickQueue:
-			for _, listener := range d.timeTickListeners {
-				listener.HandleTimeTick(event)
-			}
+		case handler := <-d.priority1EventsQueue:
+			handler.handle()
 
-		// CommunicationTimeTick
-		case event := <-d.communicationTimeTickQueue:
-			for _, listener := range d.communicationTimeTickListeners {
-				listener.HandleCommunicationTimeTick(event)
-			}
+		case handler := <-d.priority2EventsQueue:
+			handler.handle()
 
-		// ProjectileFired
-		case event := <-d.projectileFiredQueue:
-			for _, listener := range d.projectileFiredListeners {
-				listener.HandleProjectileFired(event)
-			}
-
-		// ProjectileHit
-		case event := <-d.projectileHitQueue:
-			for _, listener := range d.projectileHitListeners {
-				listener.HandleProjectileHit(event)
-			}
-
-		// UserInput
-		case event := <-d.userInputQueue:
-			for _, listener := range d.userInputListeners {
-				listener.HandleUserInput(event)
-			}
-
-		// UserJoined
-		case event := <-d.userJoinedQueue:
-			for _, listener := range d.userJoinedListeners {
-				listener.HandleUserJoined(event)
-			}
-
-		// UserLeft
-		case event := <-d.userLeftQueue:
-			for _, listener := range d.userLeftListeners {
-				listener.HandleUserLeft(event)
-			}
-
-		// UserDied
-		case event := <-d.userDiedQueue:
-			for _, listener := range d.userDiedListeners {
-				listener.HandleUserDied(event)
-			}
-
-		// TargetAngle
-		case event := <-d.targetAngleQueue:
-			for _, listener := range d.targetAngleListeners {
-				listener.HandleTargetAngle(event)
-			}
+		case handler := <-d.priority3EventsQueue:
+			handler.handle()
 
 		default:
 			time.Sleep(idleDispatcherSleepTime)
@@ -192,94 +296,175 @@ func (d *EventDispatcher) RunEventLoop() {
 	}
 }
 
-// EVENT METHODS
+// PUBLIC EVENT DISPATCHER METHODS
 
 // TimeTick
 
 func (d *EventDispatcher) RegisterTimeTickListener(listener TimeTickListener) {
+	if d.running {
+		panic(registeringListenerWhileRunningErrorMessage)
+	}
+
 	d.timeTickListeners = append(d.timeTickListeners, listener)
 }
 
 func (d *EventDispatcher) FireTimeTick(e *TimeTick) {
-	d.timeTickQueue <- e
+	handler := &timeTickHandler{
+		event:          e,
+		eventListeners: d.timeTickListeners,
+	}
+
+	d.priority1EventsQueue <- handler
 }
 
 // CommunicationTimeTick
 
 func (d *EventDispatcher) RegisterCommunicationTimeTickListener(listener CommunicationTimeTickListener) {
+	if d.running {
+		panic(registeringListenerWhileRunningErrorMessage)
+	}
+
 	d.communicationTimeTickListeners = append(d.communicationTimeTickListeners, listener)
 }
 
 func (d *EventDispatcher) FireCommunicationTimeTick(e *CommunicationTimeTick) {
-	d.communicationTimeTickQueue <- e
+	handler := &communicationTimeTickHandler{
+		event:          e,
+		eventListeners: d.communicationTimeTickListeners,
+	}
+
+	d.priority1EventsQueue <- handler
 }
 
 // ProjectileFired
 
 func (d *EventDispatcher) RegisterProjectileFiredListener(listener ProjectileFiredListener) {
+	if d.running {
+		panic(registeringListenerWhileRunningErrorMessage)
+	}
+
 	d.projectileFiredListeners = append(d.projectileFiredListeners, listener)
 }
 
 func (d *EventDispatcher) FireProjectileFired(e *ProjectileFired) {
-	d.projectileFiredQueue <- e
+	handler := &projectileFiredHandler{
+		event:          e,
+		eventListeners: d.projectileFiredListeners,
+	}
+
+	d.priority2EventsQueue <- handler
 }
 
 // ProjectileHit
 
 func (d *EventDispatcher) RegisterProjectileHitListener(listener ProjectileHitListener) {
+	if d.running {
+		panic(registeringListenerWhileRunningErrorMessage)
+	}
+
 	d.projectileHitListeners = append(d.projectileHitListeners, listener)
 }
 
 func (d *EventDispatcher) FireProjectileHit(e *ProjectileHit) {
-	d.projectileHitQueue <- e
-}
+	handler := &projectileHitHandler{
+		event:          e,
+		eventListeners: d.projectileHitListeners,
+	}
 
-// UserInput
-
-func (d *EventDispatcher) RegisterUserInputListener(listener UserInputListener) {
-	d.userInputListeners = append(d.userInputListeners, listener)
-}
-
-func (d *EventDispatcher) FireUserInput(e *UserInput) {
-	d.userInputQueue <- e
+	d.priority2EventsQueue <- handler
 }
 
 // UserJoined
 
 func (d *EventDispatcher) RegisterUserJoinedListener(listener UserJoinedListener) {
+	if d.running {
+		panic(registeringListenerWhileRunningErrorMessage)
+	}
+
 	d.userJoinedListeners = append(d.userJoinedListeners, listener)
 }
 
 func (d *EventDispatcher) FireUserJoined(e *UserJoined) {
-	d.userJoinedQueue <- e
+	handler := &userJoinedHandler{
+		event:          e,
+		eventListeners: d.userJoinedListeners,
+	}
+
+	d.priority2EventsQueue <- handler
 }
 
 // UserLeft
 
 func (d *EventDispatcher) RegisterUserLeftListener(listener UserLeftListener) {
+	if d.running {
+		panic(registeringListenerWhileRunningErrorMessage)
+	}
+
 	d.userLeftListeners = append(d.userLeftListeners, listener)
 }
 
 func (d *EventDispatcher) FireUserLeft(e *UserLeft) {
-	d.userLeftQueue <- e
+	handler := &userLeftHandler{
+		event:          e,
+		eventListeners: d.userLeftListeners,
+	}
+
+	d.priority2EventsQueue <- handler
 }
 
 // UserDied
 
 func (d *EventDispatcher) RegisterUserDiedListener(listener UserDiedListener) {
+	if d.running {
+		panic(registeringListenerWhileRunningErrorMessage)
+	}
+
 	d.userDiedListeners = append(d.userDiedListeners, listener)
 }
 
 func (d *EventDispatcher) FireUserDied(e *UserDied) {
-	d.userDiedQueue <- e
+	handler := &userDiedHandler{
+		event:          e,
+		eventListeners: d.userDiedListeners,
+	}
+
+	d.priority2EventsQueue <- handler
+}
+
+// UserInput
+
+func (d *EventDispatcher) RegisterUserInputListener(listener UserInputListener) {
+	if d.running {
+		panic(registeringListenerWhileRunningErrorMessage)
+	}
+
+	d.userInputListeners = append(d.userInputListeners, listener)
+}
+
+func (d *EventDispatcher) FireUserInput(e *UserInput) {
+	handler := &userInputHandler{
+		event:          e,
+		eventListeners: d.userInputListeners,
+	}
+
+	d.priority3EventsQueue <- handler
 }
 
 // TargetAngle
 
 func (d *EventDispatcher) RegisterTargetAngleListener(listener TargetAngleListener) {
+	if d.running {
+		panic(registeringListenerWhileRunningErrorMessage)
+	}
+
 	d.targetAngleListeners = append(d.targetAngleListeners, listener)
 }
 
 func (d *EventDispatcher) FireTargetAngle(e *TargetAngle) {
-	d.targetAngleQueue <- e
+	handler := &targetAngleHandler{
+		event:          e,
+		eventListeners: d.targetAngleListeners,
+	}
+
+	d.priority3EventsQueue <- handler
 }
