@@ -20,15 +20,15 @@ const (
 )
 
 var supportedEvents = []EventType{
-	{"TimeTick", 1},
-	{"CommunicationTimeTick", 1},
-	{"ProjectileFired", 2},
-	{"ProjectileHit", 2},
-	{"UserJoined", 2},
-	{"UserLeft", 2},
-	{"UserDied", 2},
-	{"UserInput", 3},
-	{"TargetAngle", 3},
+	{eventTypeName: "TimeTick", priority: 1},
+	{eventTypeName: "CommunicationTimeTick", priority: 1},
+	{eventTypeName: "ProjectileFired", priority: 2},
+	{eventTypeName: "ProjectileHit", priority: 2},
+	{eventTypeName: "UserJoined", priority: 2},
+	{eventTypeName: "UserLeft", priority: 2},
+	{eventTypeName: "UserDied", priority: 2},
+	{eventTypeName: "UserInput", priority: 3},
+	{eventTypeName: "TargetAngle", priority: 3},
 }
 
 // END CONFIGURATION
