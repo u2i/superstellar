@@ -5,22 +5,27 @@ import (
 	"math"
 	"sync/atomic"
 	"time"
+	"superstellar/backend/events"
+	"bytes"
+	"strconv"
 )
 
 const channelBufferSize = 100
 
 // Monitor struct holds collection of monitored variables
 type Monitor struct {
-	printCh chan bool
+	printCh         chan bool
 
 	sendTimeCh      chan time.Duration
 	sendTimes       []time.Duration
 	physicsTimeCh   chan time.Duration
 	physicsTimes    []time.Duration
 	droppedMessages uint64
+
+	eventDispatcher *events.EventDispatcher
 }
 
-func NewMonitor() *Monitor {
+func NewMonitor(eventDispatcher *events.EventDispatcher) *Monitor {
 	return &Monitor{
 		printCh:         make(chan bool),
 		sendTimeCh:      make(chan time.Duration, channelBufferSize),
@@ -28,6 +33,7 @@ func NewMonitor() *Monitor {
 		physicsTimeCh:   make(chan time.Duration, channelBufferSize),
 		physicsTimes:    newDurationSlice(),
 		droppedMessages: 0,
+		eventDispatcher: eventDispatcher,
 	}
 }
 
@@ -76,8 +82,27 @@ func (m *Monitor) print() {
 	droppedMessages := atomic.SwapUint64(&m.droppedMessages, 0)
 	log.Printf("dropped messages: %d", droppedMessages)
 
+	m.printEventQueuesFilling()
+
 	m.sendTimes = newDurationSlice()
 	m.physicsTimes = newDurationSlice()
+}
+
+func (m *Monitor) printEventQueuesFilling() {
+	fillings := m.eventDispatcher.QueuesFilling()
+	var buffer bytes.Buffer
+
+	for priority, filling := range fillings {
+		buffer.WriteString("Priority ")
+		buffer.WriteString(strconv.Itoa(priority))
+		buffer.WriteString(" queue: ")
+		buffer.WriteString(strconv.Itoa(filling.CurrentLength))
+		buffer.WriteString("/")
+		buffer.WriteString(strconv.Itoa(filling.Capacity))
+		buffer.WriteString("\t")
+	}
+
+	log.Println(buffer.String())
 }
 
 func (m *Monitor) printStats(durations []time.Duration, name string) {
@@ -95,7 +120,7 @@ func (m *Monitor) printStats(durations []time.Duration, name string) {
 }
 
 func minMaxAvg(durations []time.Duration) (time.Duration, time.Duration,
-	time.Duration) {
+time.Duration) {
 	var max, sum time.Duration
 	min := durations[0]
 

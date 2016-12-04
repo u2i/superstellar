@@ -34,7 +34,7 @@ func main() {
 	physicsTicker := game.NewPhysicsTicker(eventDispatcher)
 	communicationTicker := communication.NewTicker(eventDispatcher)
 
-	monitor := monitor.NewMonitor()
+	monitor := monitor.NewMonitor(eventDispatcher)
 
 	space := state.NewSpace()
 	updater := simulation.NewUpdater(space, monitor, eventDispatcher)
