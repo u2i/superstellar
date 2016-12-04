@@ -1,6 +1,7 @@
 import * as Utils from './utils.js';
 import CircleBarFilter from './circleBarFilter';
 import {globalState, renderer, stage} from './globals.js';
+import SimulationFrame from './simulationFrame.js';
 
 const healthBarRadius = 40;
 const energyBarRadius = 50;
@@ -9,6 +10,9 @@ export default class Spaceship {
   constructor(shipTexture, thrustAnimationFrames, data) {
     this.createHealthBarFilter();
     this.createEnergyBarFilter();
+
+    this.simulationFrame = new SimulationFrame(0, data);
+
     this.updateData(data);
     this.container = new PIXI.Container();
     this.sprite = new PIXI.Sprite(shipTexture);
@@ -48,22 +52,29 @@ export default class Spaceship {
     this.container.pivot.set(this.sprite.width / 2, this.sprite.height / 2);
   }
 
-  updateData({id, position, velocity, facing, inputThrust, hp, maxHp, energy, maxEnergy}) {
-    this.id = id;
-    this.position = position;
-    this.velocity = velocity;
-    this.facing = facing;
-    this.inputThrust = inputThrust;
-    this.hp = hp;
-    this.maxHp = maxHp;
-    this.energy = energy;
-    this.maxEnergy = maxEnergy;
+  updateData(data) {
+    this.simulationFrame.update(data)
+    this.position = this.simulationFrame.position;
+    this.facing = this.simulationFrame.facing;
+
+    this.id = data.id;
+    this.hp = data.hp;
+    this.maxHp = data.maxHp;
+    this.energy = data.energy;
+    this.maxEnergy = data.maxEnergy;
     this.updateHealthBar();
     this.updateEnergyBar();
   }
 
+  predict() {
+    console.log('PREDICT');
+    this.simulationFrame.predict();
+    this.position = this.simulationFrame.position;
+    this.facing = this.simulationFrame.facing;
+  }
+
   update(viewport) {
-    if (this.inputThrust) {
+    if (this.simulationFrame.inputThrust) {
       this.thrustAnimation.visible = true;
       this.thrustAnimation.play();
     } else {

@@ -105,6 +105,10 @@ const render = function () {
   renderer.render(stage);
 };
 
+window.setInterval(function() {
+  globalState.spaceshipMap.forEach((spaceship) => spaceship.predict());
+}, 20)
+
 // The main game loop
 const main = function () {
   render();
