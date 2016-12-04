@@ -32,6 +32,8 @@ type Spaceship struct {
 	TargetAngle             *float64
 	Fire                    bool
 	LastShotTime            time.Time
+	Dirty                   bool
+	LastSentOn              uint32
 	HP                      uint32
 	MaxHP                   uint32
 	Energy                  uint32
@@ -45,13 +47,15 @@ func NewSpaceship(clientId uint32, initialPosition *types.Point) *Spaceship {
 		ID:              clientId,
 		Position:        initialPosition,
 		Velocity:        types.ZeroVector(),
-		Facing:          math.Pi,
+		Facing:          0.0,
 		AngularVelocity: 0,
 		AngularVelocityDelta: 0,
 		InputThrust:     false,
 		InputDirection:  NONE,
 		Fire:            false,
 		LastShotTime:    time.Now(),
+		Dirty:           true,
+		LastSentOn:      0,
 		HP:              constants.SpaceshipInitialHP,
 		MaxHP:           constants.SpaceshipInitialHP,
 		Energy:          constants.SpaceshipInitialEnergy,
@@ -70,16 +74,21 @@ func (s *Spaceship) UpdateUserInput(userInput pb.UserInput) {
 	case pb.UserInput_CENTER:
 		s.InputDirection = NONE
 		s.TargetAngle = nil
+		s.Dirty = true
 	case pb.UserInput_LEFT:
 		s.InputDirection = LEFT
 		s.TargetAngle = nil
+		s.Dirty = true
 	case pb.UserInput_RIGHT:
 		s.InputDirection = RIGHT
 		s.TargetAngle = nil
+		s.Dirty = true
 	case pb.UserInput_THRUST_ON:
 		s.InputThrust = true
+		s.Dirty = true
 	case pb.UserInput_THRUST_OFF:
 		s.InputThrust = false
+		s.Dirty = true
 	case pb.UserInput_FIRE_START:
 		s.Fire = true
 	case pb.UserInput_FIRE_STOP:
@@ -88,6 +97,7 @@ func (s *Spaceship) UpdateUserInput(userInput pb.UserInput) {
 }
 
 func (s *Spaceship) UpdateTargetAngle(angle float64) {
+	s.Dirty = true
 	s.TargetAngle = &angle
 	s.InputDirection = NONE
 }
@@ -95,17 +105,17 @@ func (s *Spaceship) UpdateTargetAngle(angle float64) {
 // ToProto returns protobuf representation
 func (s *Spaceship) ToProto() *pb.Spaceship {
 	return &pb.Spaceship{
-		Id:           s.ID,
-		Position:     s.Position.ToProto(),
-		Velocity:     s.Velocity.ToProto(),
-		Facing:       s.Facing,
-		AngularSpeed: s.AngularVelocity,
-		Direction:    pb.Direction(s.InputDirection),
-		InputThrust:  s.InputThrust,
-		MaxHp:        s.MaxHP,
-		Hp:           s.HP,
-		MaxEnergy:    s.MaxEnergy,
-		Energy:       s.Energy,
+		Id:             s.ID,
+		Position:       s.Position.ToProto(),
+		Velocity:       s.Velocity.ToProto(),
+		Facing:         s.Facing,
+		AngularSpeed:   s.AngularVelocity,
+		InputDirection: pb.Direction(s.InputDirection),
+		InputThrust:    s.InputThrust,
+		MaxHp:          s.MaxHP,
+		Hp:             s.HP,
+		MaxEnergy:      s.MaxEnergy,
+		Energy:         s.Energy,
 	}
 }
 
@@ -133,6 +143,9 @@ func (s *Spaceship) Collide(other *Spaceship) {
 
 	s.Velocity = switchedV1.Rotate(-transformAngle)
 	other.Velocity = switchedV2.Rotate(-transformAngle)
+
+	s.Dirty = true
+	other.Dirty = true
 }
 
 func (s *Spaceship) ShootIfPossible() (canShoot bool) {

@@ -91,6 +91,4 @@ export const registerMessageHandler = (messageType, handler) => {
   messageHandlers.set(messageType, currentHandlers);
 };
 
-window.setInterval(function() {
-  sendPing();
-}, 1000)
+

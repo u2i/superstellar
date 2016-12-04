@@ -10,7 +10,7 @@ const SpaceshipMaxAngularSpeed = 0.12
 const SpaceshipAngularFriction = 0.2
 const SpaceshipMaxSpeed = 600
 
-const DIR_CENTER = 0;
+const DIR_CENTER = null;
 const DIR_RIGHT = 1;
 const DIR_LEFT = 2;
 

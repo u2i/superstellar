@@ -163,7 +163,7 @@
                 {
                     "rule": "optional",
                     "type": "Direction",
-                    "name": "direction",
+                    "name": "inputDirection",
                     "id": 6
                 },
                 {

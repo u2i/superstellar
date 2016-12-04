@@ -67,7 +67,6 @@ export default class Spaceship {
   }
 
   predict() {
-    console.log('PREDICT');
     this.simulationFrame.predict();
     this.position = this.simulationFrame.position;
     this.facing = this.simulationFrame.facing;
