@@ -22,8 +22,10 @@ func UpdatePhysics(space *state.Space, eventDispatcher *events.EventDispatcher) 
 func detectProjectileCollisions(space *state.Space, eventDispatcher *events.EventDispatcher) {
 	for projectile := range space.Projectiles {
 		for clientID, spaceship := range space.Spaceships {
-			if projectile.ClientID != clientID && projectile.DetectCollision(spaceship) {
+			collisionOccured, collisionPoint := projectile.DetectCollision(spaceship)
+			if projectile.ClientID != clientID && collisionOccured {
 				spaceship.CollideWithProjectile(projectile)
+				applyProjectileImpulse(spaceship, projectile, collisionPoint)
 				space.RemoveProjectile(projectile)
 				projectileHitMessage := &events.ProjectileHit{Projectile: projectile}
 				eventDispatcher.FireProjectileHit(projectileHitMessage)
@@ -106,7 +108,7 @@ func updateSpaceships(s *state.Space, eventDispatcher *events.EventDispatcher) {
 				spaceship.ApplyAngularFriction()
 			}
 		}
-		angle += spaceship.AngularSpeed
+		angle += spaceship.AngularVelocity
 
 		spaceship.Facing = types.NewVector(math.Cos(angle), math.Sin(angle))
 
@@ -192,6 +194,18 @@ func updateSpaceships(s *state.Space, eventDispatcher *events.EventDispatcher) {
 	// koniec kodu przeciwzakrzepowego
 
 	s.PhysicsFrameID++
+}
+
+func applyProjectileImpulse(spaceship *state.Spaceship, projectile *state.Projectile, collisionPoint *types.Point) {
+	impulse := projectile.Velocity.Multiply(constants.ProjectileImpulseStrength)
+
+	momentOfInertia := 0.5 * constants.SpaceshipSize * constants.SpaceshipSize * constants.SpaceshipMass
+	r := types.Point{X: collisionPoint.X - spaceship.Position.X, Y: collisionPoint.Y - spaceship.Position.Y}
+
+	torque := (impulse.X * float64(r.Y) - impulse.Y * float64(r.X)) * constants.ProjectileRotationalImpulse
+
+	spaceship.Velocity = spaceship.Velocity.Add(impulse.Multiply(1.0/constants.SpaceshipMass))
+	spaceship.AngularVelocity = spaceship.AngularVelocity - torque / momentOfInertia
 }
 
 func handleAutoRepair(spaceship *state.Spaceship) {

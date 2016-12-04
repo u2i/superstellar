@@ -26,13 +26,16 @@ const (
 	SpaceshipAcceleration = 50.0
 
 	// Maximum angular velocity added on user input.
-	SpaceshipMaxAngularSpeed = 0.12
+	SpaceshipMaxAngularVelocity = 0.12
 
 	SpaceshipLinearAngularAcceleration = 0.0001
 
 	SpaceshipNonlinearAngularAcceleration = 2
 
 	SpaceshipAngularFriction = 0.2
+
+	// SpaceshipMass is mass of the spaceship, used for calculating inertia
+	SpaceshipMass = 100.0
 
 	// SpaceshipTurnToAngleP is TurnToTarget propotional gain.
 	SpaceshipTurnToAngleP = 0.9
@@ -93,4 +96,10 @@ const (
 
 	// ProjectileDamage is the damage that is inflicted on a user upon colliding with projectile
 	ProjectileDamage = 50
+
+	// ProjectileImpulseStrength is the amount of push back projectile delivers on hit
+	ProjectileImpulseStrength = 100.0
+
+	// ProjectileRotationalImpulse is the ratio of impulse that will be applied to angular velocity
+	ProjectileRotationalImpulse = 0.2
 )

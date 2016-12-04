@@ -25,7 +25,7 @@ type Spaceship struct {
 	Position                *types.Point
 	Velocity                *types.Vector
 	Facing                  *types.Vector
-	AngularSpeed            float64
+	AngularVelocity         float64
 	InputThrust             bool
 	InputDirection          Direction
 	TargetAngle             *float64
@@ -45,7 +45,7 @@ func NewSpaceship(clientId uint32, initialPosition *types.Point) *Spaceship {
 		Position:        initialPosition,
 		Velocity:        types.ZeroVector(),
 		Facing:          types.NewVector(0.0, 1.0),
-		AngularSpeed:    0,
+		AngularVelocity: 0,
 		InputThrust:     false,
 		InputDirection:  NONE,
 		Fire:            false,
@@ -184,13 +184,13 @@ func (s *Spaceship) AutoEnergyRecharge() {
 }
 
 func (s *Spaceship) LeftTurn() {
-	s.AngularSpeed += s.angularSpeedDelta()
-	s.LimitAngularSpeed()
+	s.AngularVelocity += s.angularVelocityDelta()
+	s.LimitAngularVelocity()
 }
 
 func (s *Spaceship) RightTurn() {
-	s.AngularSpeed -= s.angularSpeedDelta()
-	s.LimitAngularSpeed()
+	s.AngularVelocity -= s.angularVelocityDelta()
+	s.LimitAngularVelocity()
 }
 
 func (s *Spaceship) TurnToTarget() {
@@ -201,23 +201,23 @@ func (s *Spaceship) TurnToTarget() {
 		offset -= math.Copysign(2 * math.Pi, offset)
 	}
 
-	s.AngularSpeed = -offset * constants.SpaceshipTurnToAngleP
+	s.AngularVelocity = -offset * constants.SpaceshipTurnToAngleP
 
-	s.LimitAngularSpeed()
+	s.LimitAngularVelocity()
 }
 
-func (s *Spaceship) LimitAngularSpeed() {
-	if (math.Abs(s.AngularSpeed) > constants.SpaceshipMaxAngularSpeed) {
-		s.AngularSpeed = math.Copysign(constants.SpaceshipMaxAngularSpeed, s.AngularSpeed)
+func (s *Spaceship) LimitAngularVelocity() {
+	if (math.Abs(s.AngularVelocity) > constants.SpaceshipMaxAngularVelocity) {
+		s.AngularVelocity = math.Copysign(constants.SpaceshipMaxAngularVelocity, s.AngularVelocity)
 	}
 }
 
 func (s *Spaceship) ApplyAngularFriction() {
-	s.AngularSpeed *= (1 - constants.SpaceshipAngularFriction)
+	s.AngularVelocity *= (1 - constants.SpaceshipAngularFriction)
 }
 
-func (s *Spaceship) angularSpeedDelta() float64 {
-	nonlinearPart := constants.SpaceshipNonlinearAngularAcceleration * math.Abs(s.AngularSpeed)
+func (s *Spaceship) angularVelocityDelta() float64 {
+	nonlinearPart := constants.SpaceshipNonlinearAngularAcceleration * math.Abs(s.AngularVelocity)
 	linearPart := constants.SpaceshipLinearAngularAcceleration
 	return nonlinearPart + linearPart
 }

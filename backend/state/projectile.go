@@ -67,7 +67,7 @@ func (projectile *Projectile) ToHitMessage() *pb.Message {
 	}
 }
 
-func (projectile *Projectile) DetectCollision(spaceship *Spaceship) bool {
+func (projectile *Projectile) DetectCollision(spaceship *Spaceship) (bool, *types.Point) {
 	vA := types.Point{X: projectile.Position.X - spaceship.Position.X, Y: projectile.Position.Y - spaceship.Position.Y}
 	distA := vA.Length()
 
@@ -75,5 +75,11 @@ func (projectile *Projectile) DetectCollision(spaceship *Spaceship) bool {
 	vB := types.Point{X: endPoint.X - spaceship.Position.X, Y: endPoint.Y - spaceship.Position.Y}
 	distB := vB.Length()
 
-	return distA < constants.SpaceshipSize || distB < constants.SpaceshipSize
+	if distA < constants.SpaceshipSize {
+		return true, projectile.Position
+	} else if distB < constants.SpaceshipSize {
+		return true, endPoint
+	}
+
+	return false, nil
 }
