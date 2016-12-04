@@ -270,6 +270,23 @@ func (dispatcher *EventDispatcher) panicWhenEventLoopRunning() {
 
 // PUBLIC EVENT DISPATCHER METHODS
 
+type QueueFilling struct {
+	CurrentLength int
+	Capacity      int
+}
+
+func (dispatcher *EventDispatcher) QueuesFilling() map[int]QueueFilling {
+	filling := make(map[int]QueueFilling)
+
+	filling[1] = QueueFilling{len(dispatcher.priority1EventsQueue), eventQueuesCapacity}
+
+	filling[2] = QueueFilling{len(dispatcher.priority2EventsQueue), eventQueuesCapacity}
+
+	filling[3] = QueueFilling{len(dispatcher.priority3EventsQueue), eventQueuesCapacity}
+
+	return filling
+}
+
 // TimeTick
 
 func (dispatcher *EventDispatcher) RegisterTimeTickListener(listener TimeTickListener) {

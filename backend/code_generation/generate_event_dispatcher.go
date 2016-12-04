@@ -20,15 +20,15 @@ const (
 )
 
 var supportedEvents = []EventType{
-	{eventTypeName: "TimeTick", priority: 1},
-	{eventTypeName: "CommunicationTimeTick", priority: 1},
-	{eventTypeName: "ProjectileFired", priority: 2},
-	{eventTypeName: "ProjectileHit", priority: 2},
-	{eventTypeName: "UserJoined", priority: 2},
-	{eventTypeName: "UserLeft", priority: 2},
-	{eventTypeName: "UserDied", priority: 2},
-	{eventTypeName: "UserInput", priority: 3},
-	{eventTypeName: "TargetAngle", priority: 3},
+	NewEventType("TimeTick", 1),
+	NewEventType("CommunicationTimeTick", 1),
+	NewEventType("ProjectileFired", 2),
+	NewEventType("ProjectileHit", 2),
+	NewEventType("UserJoined", 2),
+	NewEventType("UserLeft", 2),
+	NewEventType("UserDied", 2),
+	NewEventType("UserInput", 3),
+	NewEventType("TargetAngle", 3),
 }
 
 // END CONFIGURATION
@@ -39,9 +39,42 @@ func pascalCaseToCamel(str string) string {
 	return string(out)
 }
 
+type Priority struct {
+	Number uint;
+}
+
+// sort.Interface implementation
+
+type Priorites []Priority
+
+func (slice Priorites) Len() int {
+	return len(slice)
+}
+
+func (slice Priorites) Less(i, j int) bool {
+	return slice[i].Number < slice[j].Number;
+}
+
+func (slice Priorites) Swap(i, j int) {
+	slice[i], slice[j] = slice[j], slice[i]
+}
+
+// sort.Interface implementation end
+
+func (priority *Priority) QueueName() string {
+	return "priority" + strconv.Itoa(int(priority.Number)) + "EventsQueue"
+}
+
 type EventType struct {
 	eventTypeName string
-	priority      uint
+	priority      Priority
+}
+
+func NewEventType(typeName string, priority uint) EventType {
+	return EventType{
+		eventTypeName: typeName,
+		priority: Priority{priority},
+	}
 }
 
 func (et *EventType) TypeName() string {
@@ -54,14 +87,6 @@ func (et *EventType) ListenerTypeName() string {
 
 func (et *EventType) HandlerTypeName() string {
 	return pascalCaseToCamel(et.eventTypeName + "Handler")
-}
-
-func EventsQueueName(priority int) string {
-	return "priority" + strconv.Itoa(int(priority)) + "EventsQueue"
-}
-
-func (et *EventType) EventsQueueName() string {
-	return EventsQueueName(int(et.priority))
 }
 
 func (et *EventType) ListenerListName() string {
@@ -80,6 +105,10 @@ func (et *EventType) FireMethodName() string {
 	return "Fire" + et.eventTypeName
 }
 
+func (et *EventType) EventsQueueName() string {
+	return et.priority.QueueName()
+}
+
 type Metadata struct {
 	TypeName                     string
 	EventLoopMethodName          string
@@ -88,27 +117,22 @@ type Metadata struct {
 	EventTypes                   []EventType
 }
 
-func (et Metadata) OrderedPriorityQueueNames() []string {
-	priorities := make(map[uint]bool);
+func (et Metadata) OrderedPriorities() []Priority {
+	prioritiesSet := make(map[Priority]bool);
 
 	for _, eventType := range et.EventTypes {
-		priorities[eventType.priority] = true
+		prioritiesSet[eventType.priority] = true
 	}
 
-	sortedPriorities := make([]int, len(priorities))
+	uniqPriorities := make(Priorites, len(prioritiesSet))
 	i := 0
-	for priority := range priorities {
-		sortedPriorities[i] = int(priority)
+	for priority := range prioritiesSet {
+		uniqPriorities[i] = priority
 		i++
 	}
-	sort.Ints(sortedPriorities)
+	sort.Sort(uniqPriorities)
 
-	sortedQueueNames := make([]string, len(priorities))
-	for i, priority := range sortedPriorities {
-		sortedQueueNames[i] = EventsQueueName(priority)
-	}
-
-	return sortedQueueNames
+	return uniqPriorities
 }
 
 func checkError(err error) {
@@ -181,8 +205,8 @@ func main() {
 
 			// EVENT QUEUES
 
-			{{ range .OrderedPriorityQueueNames }}
-				{{ . }} chan {{ $.EventHandlerInterfaceName }}
+			{{ range .OrderedPriorities }}
+				{{ .QueueName }} chan {{ $.EventHandlerInterfaceName }}
 			{{ end }}
 
 			// LISTENER LISTS
@@ -200,8 +224,8 @@ func main() {
 
 				// EVENT QUEUES
 
-				{{ range .OrderedPriorityQueueNames }}
-					{{ . }}: make(chan {{ $.EventHandlerInterfaceName }}, eventQueuesCapacity),
+				{{ range .OrderedPriorities }}
+					{{ .QueueName }}: make(chan {{ $.EventHandlerInterfaceName }}, eventQueuesCapacity),
 				{{ end }}
 
 				// LISTENER LISTS
@@ -219,8 +243,8 @@ func main() {
 
 			for {
 				select {
-					{{ range .OrderedPriorityQueueNames }}
-						case handler := <-dispatcher.{{ . }}:
+					{{ range .OrderedPriorities }}
+						case handler := <-dispatcher.{{ .QueueName }}:
 							handler.handle()
 					{{ end }}
 				default:
@@ -236,6 +260,21 @@ func main() {
 		}
 
 		// PUBLIC EVENT DISPATCHER METHODS
+
+		type QueueFilling struct {
+			CurrentLength int
+			Capacity int
+		}
+
+		func (dispatcher *{{ $.TypeName }}) QueuesFilling() map[int]QueueFilling {
+			filling := make(map[int]QueueFilling)
+
+			{{ range .OrderedPriorities }}
+				filling[{{ .Number }}] = QueueFilling{len(dispatcher.{{ .QueueName }}), eventQueuesCapacity}
+			{{ end }}
+
+			return filling
+		}
 
 		{{ range .EventTypes }}
 			// {{ .TypeName }}
