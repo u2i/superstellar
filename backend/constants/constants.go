@@ -7,7 +7,7 @@ import (
 const (
 	PhysicsFrameDuration = 20 * time.Millisecond
 
-	UpdateSendInterval = 200 * time.Millisecond
+	UpdateSendInterval = 20 * time.Millisecond
 
 	// BoundaryAnnulusWidth is the width of boundary region (in .01 units), i.e. from WorldRadius till when no more movement is possible
 	BoundaryAnnulusWidth = 20000
