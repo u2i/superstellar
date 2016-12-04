@@ -1,11 +1,11 @@
 package simulation
 
 import (
-	"superstellar/backend/events"
-	"superstellar/backend/state"
-	"superstellar/backend/monitor"
-	"time"
 	"superstellar/backend/constants"
+	"superstellar/backend/events"
+	"superstellar/backend/monitor"
+	"superstellar/backend/state"
+	"time"
 )
 
 type Updater struct {
@@ -16,8 +16,8 @@ type Updater struct {
 
 func NewUpdater(space *state.Space, monitor *monitor.Monitor, eventDispatcher *events.EventDispatcher) *Updater {
 	return &Updater{
-		space: space,
-		monitor: monitor,
+		space:           space,
+		monitor:         monitor,
 		eventDispatcher: eventDispatcher,
 	}
 }

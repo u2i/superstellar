@@ -22,7 +22,7 @@ type Projectile struct {
 
 // NewProjectile returns new instance of Projectile
 func NewProjectile(ID, frameID uint32, spaceship *Spaceship) *Projectile {
-	facing := float32(math.Atan2(-spaceship.Facing.Y, spaceship.Facing.X))
+	facingVector := types.NewVector(math.Cos(spaceship.Facing), -math.Sin(spaceship.Facing))
 
 	return &Projectile{
 		ID:        ID,
@@ -31,8 +31,8 @@ func NewProjectile(ID, frameID uint32, spaceship *Spaceship) *Projectile {
 		FrameID:   frameID,
 		Origin:    spaceship.Position,
 		Position:  spaceship.Position,
-		Facing:    facing,
-		Velocity:  spaceship.Facing.Multiply(constants.ProjectileSpeed).Add(spaceship.Velocity),
+		Facing:    float32(spaceship.Facing),
+		Velocity:  facingVector.Multiply(constants.ProjectileSpeed).Add(spaceship.Velocity),
 		TTL:       constants.ProjectileDefaultTTL,
 	}
 }

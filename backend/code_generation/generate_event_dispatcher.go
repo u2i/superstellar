@@ -1,21 +1,21 @@
 package main
 
 import (
-	"text/template"
-	"go/format"
-	"unicode"
 	"bytes"
+	"go/format"
 	"io/ioutil"
-	"strconv"
 	"sort"
+	"strconv"
+	"text/template"
+	"unicode"
 )
 
 // BEGIN CONFIGURATION
 
 const (
-	targetTypeName = "EventDispatcher"
-	targetFilePath = "backend/events/event_dispatcher.go"
-	eventLoopMethodName = "RunEventLoop"
+	targetTypeName               = "EventDispatcher"
+	targetFilePath               = "backend/events/event_dispatcher.go"
+	eventLoopMethodName          = "RunEventLoop"
 	initialPriorityQueueCapacity = 100000
 )
 
@@ -40,7 +40,7 @@ func pascalCaseToCamel(str string) string {
 }
 
 type Priority struct {
-	Number uint;
+	Number uint
 }
 
 // sort.Interface implementation
@@ -52,7 +52,7 @@ func (slice Priorites) Len() int {
 }
 
 func (slice Priorites) Less(i, j int) bool {
-	return slice[i].Number < slice[j].Number;
+	return slice[i].Number < slice[j].Number
 }
 
 func (slice Priorites) Swap(i, j int) {
@@ -73,7 +73,7 @@ type EventType struct {
 func NewEventType(typeName string, priority uint) EventType {
 	return EventType{
 		eventTypeName: typeName,
-		priority: Priority{priority},
+		priority:      Priority{priority},
 	}
 }
 
@@ -118,7 +118,7 @@ type Metadata struct {
 }
 
 func (et Metadata) OrderedPriorities() []Priority {
-	prioritiesSet := make(map[Priority]bool);
+	prioritiesSet := make(map[Priority]bool)
 
 	for _, eventType := range et.EventTypes {
 		prioritiesSet[eventType.priority] = true
@@ -301,11 +301,11 @@ func main() {
 
 	var buffer bytes.Buffer
 	err = tpl.Execute(&buffer, Metadata{
-		TypeName: targetTypeName,
-		EventLoopMethodName: eventLoopMethodName,
+		TypeName:                     targetTypeName,
+		EventLoopMethodName:          eventLoopMethodName,
 		InitialPriorityQueueCapacity: initialPriorityQueueCapacity,
-		EventHandlerInterfaceName: "eventHandler",
-		EventTypes: supportedEvents,
+		EventHandlerInterfaceName:    "eventHandler",
+		EventTypes:                   supportedEvents,
 	})
 	checkError(err)
 

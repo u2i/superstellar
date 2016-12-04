@@ -93,3 +93,7 @@ func (fileWriter *FileWriter) close() {
 func (fileWriter *FileWriter) HandleCommunicationTimeTick(timeTickEvent *events.CommunicationTimeTick) {
 	fileWriter.ch <- fileWriter.space.ToProto()
 }
+
+func (fileWriter *FileWriter) HandleTimeTick(timeTickEvent *events.TimeTick) {
+	fileWriter.ch <- fileWriter.space.ToProto()
+}

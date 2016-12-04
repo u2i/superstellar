@@ -1,20 +1,20 @@
 package monitor
 
 import (
+	"bytes"
 	"log"
 	"math"
+	"strconv"
+	"superstellar/backend/events"
 	"sync/atomic"
 	"time"
-	"superstellar/backend/events"
-	"bytes"
-	"strconv"
 )
 
 const channelBufferSize = 100
 
 // Monitor struct holds collection of monitored variables
 type Monitor struct {
-	printCh         chan bool
+	printCh chan bool
 
 	sendTimeCh      chan time.Duration
 	sendTimes       []time.Duration
@@ -120,7 +120,7 @@ func (m *Monitor) printStats(durations []time.Duration, name string) {
 }
 
 func minMaxAvg(durations []time.Duration) (time.Duration, time.Duration,
-time.Duration) {
+	time.Duration) {
 	var max, sum time.Duration
 	min := durations[0]
 
