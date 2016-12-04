@@ -150,39 +150,51 @@
                 },
                 {
                     "rule": "optional",
-                    "type": "float",
+                    "type": "double",
                     "name": "facing",
                     "id": 4
                 },
                 {
                     "rule": "optional",
-                    "type": "bool",
-                    "name": "inputThrust",
+                    "type": "double",
+                    "name": "angularSpeed",
                     "id": 5
                 },
                 {
                     "rule": "optional",
-                    "type": "uint32",
-                    "name": "maxHp",
+                    "type": "Direction",
+                    "name": "direction",
                     "id": 6
                 },
                 {
                     "rule": "optional",
-                    "type": "uint32",
-                    "name": "hp",
+                    "type": "bool",
+                    "name": "inputThrust",
                     "id": 7
                 },
                 {
                     "rule": "optional",
                     "type": "uint32",
-                    "name": "maxEnergy",
+                    "name": "maxHp",
                     "id": 8
                 },
                 {
                     "rule": "optional",
                     "type": "uint32",
-                    "name": "energy",
+                    "name": "hp",
                     "id": 9
+                },
+                {
+                    "rule": "optional",
+                    "type": "uint32",
+                    "name": "maxEnergy",
+                    "id": 10
+                },
+                {
+                    "rule": "optional",
+                    "type": "uint32",
+                    "name": "energy",
+                    "id": 11
                 }
             ]
         },
@@ -491,6 +503,23 @@
         }
     ],
     "enums": [
+        {
+            "name": "Direction",
+            "values": [
+                {
+                    "name": "DIR_CENTER",
+                    "id": 0
+                },
+                {
+                    "name": "DIR_RIGHT",
+                    "id": 1
+                },
+                {
+                    "name": "DIR_LEFT",
+                    "id": 2
+                }
+            ]
+        },
         {
             "name": "UserInput",
             "values": [

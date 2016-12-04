@@ -16,7 +16,6 @@ const spaceHandler = (space) => {
 
   for (let i in ships) {
     const shipId = ships[i].id;
-    const ship = ships[i];
 
     if (!globalState.spaceshipMap.has(shipId)) {
       const newSpaceship = new Spaceship(shipTexture, shipThrustFrames, ships[i]);
