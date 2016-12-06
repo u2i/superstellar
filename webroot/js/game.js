@@ -37,7 +37,6 @@ function setup() {
   initializeHandlers();
   initializeConnection(HOST, PORT, PATH);
 
-
   const bgTexture = Assets.getTexture(Constants.BACKGROUND_TEXTURE);
 
   tilingSprite = new PIXI.extras.TilingSprite(bgTexture, renderer.width, renderer.height);
@@ -76,6 +75,9 @@ const defaultViewport = { vx: 0, vy: 0, width: renderer.width, height: renderer.
 
 // Draw everything
 const render = function () {
+  let currentFrameId = globalState.framesCalculator.currentFrameId();
+  globalState.spaceshipMap.forEach((spaceship) => spaceship.predictTo(currentFrameId));
+
   let myShip;
 
   if (globalState.spaceshipMap.size > 0) {
@@ -104,10 +106,6 @@ const render = function () {
 
   renderer.render(stage);
 };
-
-window.setInterval(function() {
-  globalState.spaceshipMap.forEach((spaceship) => spaceship.predict());
-}, 20)
 
 // The main game loop
 const main = function () {

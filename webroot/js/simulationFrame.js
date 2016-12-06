@@ -19,8 +19,8 @@ Victor.prototype.scalarMultiply = function(scalar) {
 }
 
 export default class SimulationFrame {
-  constructor(physicalFrameId, data) {
-    this.physicalFrameId = physicalFrameId;
+  constructor(frameId, data) {
+    this.frameId = frameId;
 
     this.update(data);
   }
@@ -45,6 +45,14 @@ export default class SimulationFrame {
     this.applyTurn();
 
     this.facing += this.angularSpeed;
+
+    this.frameId++;
+  }
+
+  predictTo(targetFrameId) {
+    while (this.frameId < targetFrameId) {
+      this.predict()
+    }
   }
 
   applyInputThrust() {
