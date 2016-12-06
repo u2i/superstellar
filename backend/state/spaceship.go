@@ -26,6 +26,7 @@ type Spaceship struct {
 	Velocity                *types.Vector
 	Facing                  *types.Vector
 	AngularVelocity         float64
+	AngularVelocityDelta    float64
 	InputThrust             bool
 	InputDirection          Direction
 	TargetAngle             *float64
@@ -41,20 +42,21 @@ type Spaceship struct {
 
 func NewSpaceship(clientId uint32, initialPosition *types.Point) *Spaceship {
 	return &Spaceship{
-		ID:              clientId,
-		Position:        initialPosition,
-		Velocity:        types.ZeroVector(),
-		Facing:          types.NewVector(0.0, 1.0),
-		AngularVelocity: 0,
-		InputThrust:     false,
-		InputDirection:  NONE,
-		Fire:            false,
-		LastShotTime:    time.Now(),
-		HP:              constants.SpaceshipInitialHP,
-		MaxHP:           constants.SpaceshipInitialHP,
-		Energy:          constants.SpaceshipInitialEnergy,
-		MaxEnergy:       constants.SpaceshipInitialEnergy,
-		AutoRepairDelay: constants.AutoRepairDelay,
+		ID:                   clientId,
+		Position:             initialPosition,
+		Velocity:             types.ZeroVector(),
+		Facing:               types.NewVector(0.0, 1.0),
+		AngularVelocity:      0,
+		AngularVelocityDelta: 0,
+		InputThrust:          false,
+		InputDirection:       NONE,
+		Fire:                 false,
+		LastShotTime:         time.Now(),
+		HP:                   constants.SpaceshipInitialHP,
+		MaxHP:                constants.SpaceshipInitialHP,
+		Energy:               constants.SpaceshipInitialEnergy,
+		MaxEnergy:            constants.SpaceshipInitialEnergy,
+		AutoRepairDelay:      constants.AutoRepairDelay,
 	}
 }
 
@@ -184,13 +186,13 @@ func (s *Spaceship) AutoEnergyRecharge() {
 }
 
 func (s *Spaceship) LeftTurn() {
-	s.AngularVelocity += s.angularVelocityDelta()
-	s.LimitAngularVelocity()
+	s.AngularVelocityDelta = s.angularVelocityDelta()
+	s.LimitAngularVelocityDelta()
 }
 
 func (s *Spaceship) RightTurn() {
-	s.AngularVelocity -= s.angularVelocityDelta()
-	s.LimitAngularVelocity()
+	s.AngularVelocityDelta = -s.angularVelocityDelta()
+	s.LimitAngularVelocityDelta()
 }
 
 func (s *Spaceship) TurnToTarget() {
@@ -201,14 +203,18 @@ func (s *Spaceship) TurnToTarget() {
 		offset -= math.Copysign(2 * math.Pi, offset)
 	}
 
-	s.AngularVelocity = -offset * constants.SpaceshipTurnToAngleP
+	targetAngularVelocity := -offset * constants.SpaceshipTurnToAngleP
+	s.AngularVelocityDelta = targetAngularVelocity - s.AngularVelocity
 
-	s.LimitAngularVelocity()
+	s.LimitAngularVelocityDelta()
 }
 
-func (s *Spaceship) LimitAngularVelocity() {
-	if (math.Abs(s.AngularVelocity) > constants.SpaceshipMaxAngularVelocity) {
-		s.AngularVelocity = math.Copysign(constants.SpaceshipMaxAngularVelocity, s.AngularVelocity)
+func (s *Spaceship) LimitAngularVelocityDelta() {
+	potentialAngularVelocity := s.AngularVelocity + s.AngularVelocityDelta;
+	diff := math.Abs(potentialAngularVelocity) - constants.SpaceshipMaxAngularVelocity
+
+	if (diff > 0) {
+		s.AngularVelocityDelta -= math.Copysign(diff, s.AngularVelocity)
 	}
 }
 

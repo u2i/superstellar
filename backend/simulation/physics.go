@@ -108,6 +108,10 @@ func updateSpaceships(s *state.Space, eventDispatcher *events.EventDispatcher) {
 				spaceship.ApplyAngularFriction()
 			}
 		}
+
+		spaceship.AngularVelocity += spaceship.AngularVelocityDelta
+		spaceship.AngularVelocityDelta = 0.0
+
 		angle += spaceship.AngularVelocity
 
 		spaceship.Facing = types.NewVector(math.Cos(angle), math.Sin(angle))
@@ -205,7 +209,7 @@ func applyProjectileImpulse(spaceship *state.Spaceship, projectile *state.Projec
 	torque := (impulse.X * float64(r.Y) - impulse.Y * float64(r.X)) * constants.ProjectileRotationalImpulse
 
 	spaceship.Velocity = spaceship.Velocity.Add(impulse.Multiply(1.0/constants.SpaceshipMass))
-	spaceship.AngularVelocity = spaceship.AngularVelocity - torque / momentOfInertia
+	spaceship.AngularVelocity -= torque / momentOfInertia
 }
 
 func handleAutoRepair(spaceship *state.Spaceship) {
