@@ -165,6 +165,8 @@ func (s *Spaceship) CollideWithProjectile(projectile *Projectile) {
 		s.HP -= constants.ProjectileDamage
 	}
 	s.AutoRepairDelay = constants.AutoRepairDelay
+
+	s.Dirty = true
 }
 
 func (s *Spaceship) AddReward(reward uint32) {
