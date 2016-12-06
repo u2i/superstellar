@@ -68,6 +68,10 @@ export default class Spaceship {
     this.moveFilter.predictTo(frameId);
     this.position = this.moveFilter.position();
     this.facing = this.moveFilter.facing();
+
+    if (window.printPositions) {
+      console.log(frameId, this.id, this.position.x, this.position.y)
+    }
   }
 
   update(viewport) {
