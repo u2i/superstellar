@@ -9,6 +9,9 @@ const SpaceshipLinearAngularAcceleration = 0.0001
 const SpaceshipMaxAngularVelocity = 0.12
 const SpaceshipAngularFriction = 0.2
 const SpaceshipMaxSpeed = 600
+const AutoRepairInterval = 1
+const AutoRepairAmount = 2
+const AutoEnergyRechargeAmount = 3
 
 const DIR_CENTER = null;
 const DIR_RIGHT = 1;
@@ -25,15 +28,20 @@ export default class SimulationFrame {
     this.update(data);
   }
 
-  update({id, position, velocity, facing, angularVelocity, inputDirection, inputThrust}) {
-    this.id = id;
-    this.position = Victor.fromObject(position);
-    this.velocity = Victor.fromObject(velocity);
-    this.facing = facing;
-    this.angularVelocity = angularVelocity;
+  update(data) {
+    this.id = data.id;
+    this.position = Victor.fromObject(data.position);
+    this.velocity = Victor.fromObject(data.velocity);
+    this.facing = data.facing;
+    this.angularVelocity = data.angularVelocity;
     this.angularVelocityDelta = 0.0;
-    this.inputDirection = inputDirection;
-    this.inputThrust = inputThrust;
+    this.inputDirection = data.inputDirection;
+    this.inputThrust = data.inputThrust;
+    this.hp = data.hp;
+    this.maxHp = data.maxHp;
+    this.energy = data.energy;
+    this.maxEnergy = data.maxEnergy;
+    this.autoRepairDelay = data.autoRepairDelay;
   }
 
   predict() {
@@ -45,6 +53,9 @@ export default class SimulationFrame {
 
     this.applyTurn();
     this.updateAngularVelocity();
+
+    this.applyAutoRepair();
+    this.applyAutoEnergyRecharge();
 
     this.frameId++;
   }
@@ -135,5 +146,18 @@ export default class SimulationFrame {
     }
   }
 
+  applyAutoRepair() {
+    if (this.autoRepairDelay == 0) {
+      if (this.hp < this.maxHp) {
+        this.hp = Math.min(this.hp + AutoRepairAmount, this.maxHp)
+        this.AutoRepairDelay = AutoRepairInterval;
+      }
+    } else {
+      this.autoRepairDelay--;
+    }
+  }
 
+  applyAutoEnergyRecharge() {
+    this.energy = Math.min(this.energy + AutoEnergyRechargeAmount, this.maxEnergy);
+  }
 }

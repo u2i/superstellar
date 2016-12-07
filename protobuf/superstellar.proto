@@ -45,6 +45,7 @@ message Spaceship {
   uint32    hp = 9;
   uint32    maxEnergy = 10;
   uint32    energy = 11;
+  uint32    autoRepairDelay = 12;
 }
 
 message ProjectileFired {

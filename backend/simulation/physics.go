@@ -222,14 +222,9 @@ func handleAutoRepair(spaceship *state.Spaceship) {
 }
 
 func handleAutoEnergyRecharge(spaceship *state.Spaceship) {
-	if spaceship.AutoEnergyRechargeDelay == 0 {
-		if spaceship.Energy < spaceship.MaxEnergy {
-			spaceship.AutoEnergyRecharge()
-		}
-	} else {
-		spaceship.AutoEnergyRechargeDelay--
+	if spaceship.Energy < spaceship.MaxEnergy {
+		spaceship.AutoEnergyRecharge()
 	}
-
 }
 
 func updateProjectiles(space *state.Space) {

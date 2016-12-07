@@ -73,9 +73,6 @@ const (
 	// AutoRepair is the amount of HP player will receive after AutoRepairDelay
 	AutoRepairAmount = 2
 
-	// Time between Energy renewal
-	AutoEnergyRechargeInterval = 1
-
 	// EnergyRecharge is the amount of Energy player will receive after AutoRepairDelay
 	AutoEnergyRechargeAmount = 3
 

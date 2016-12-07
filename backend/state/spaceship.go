@@ -21,25 +21,24 @@ const (
 
 // Spaceship struct describes a spaceship.
 type Spaceship struct {
-	ID                      uint32
-	Position                *types.Point
-	Velocity                *types.Vector
-	Facing                  float64
-	AngularVelocity         float64
-	AngularVelocityDelta    float64
-	InputThrust             bool
-	InputDirection          Direction
-	TargetAngle             *float64
-	Fire                    bool
-	LastShotTime            time.Time
-	Dirty                   bool
-	LastSentOn              uint32
-	HP                      uint32
-	MaxHP                   uint32
-	Energy                  uint32
-	MaxEnergy               uint32
-	AutoRepairDelay         uint32
-	AutoEnergyRechargeDelay uint32
+	ID                   uint32
+	Position             *types.Point
+	Velocity             *types.Vector
+	Facing               float64
+	AngularVelocity      float64
+	AngularVelocityDelta float64
+	InputThrust          bool
+	InputDirection       Direction
+	TargetAngle          *float64
+	Fire                 bool
+	LastShotTime         time.Time
+	Dirty                bool
+	LastSentOn           uint32
+	HP                   uint32
+	MaxHP                uint32
+	Energy               uint32
+	MaxEnergy            uint32
+	AutoRepairDelay      uint32
 }
 
 func NewSpaceship(clientId uint32, initialPosition *types.Point) *Spaceship {
@@ -117,6 +116,7 @@ func (s *Spaceship) ToProto() *pb.Spaceship {
 		Hp:              s.HP,
 		MaxEnergy:       s.MaxEnergy,
 		Energy:          s.Energy,
+		AutoRepairDelay: s.AutoRepairDelay,
 	}
 }
 
@@ -151,8 +151,9 @@ func (s *Spaceship) Collide(other *Spaceship) {
 
 func (s *Spaceship) ShootIfPossible() (canShoot bool) {
 	if s.Energy >= constants.BasicWeaponEnergyCost {
-		s.Energy -= constants.BasicWeaponEnergyCost
 		canShoot = true
+		s.Energy -= constants.BasicWeaponEnergyCost
+		s.Dirty = true
 	} else {
 		canShoot = false
 	}
@@ -199,7 +200,6 @@ func (s *Spaceship) AutoEnergyRecharge() {
 	if s.Energy > s.MaxEnergy {
 		s.Energy = s.MaxEnergy
 	}
-	s.AutoEnergyRechargeDelay = constants.AutoEnergyRechargeInterval
 }
 
 func (s *Spaceship) LeftTurn() {

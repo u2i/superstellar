@@ -27,4 +27,20 @@ export default class MoveFilter {
   inputThrust() {
     return this.simulationFrame.inputThrust;
   }
+
+  hp() {
+    return this.simulationFrame.hp;
+  }
+
+  maxHp() {
+    return this.simulationFrame.maxHp;
+  }
+
+  energy() {
+    return this.simulationFrame.energy;
+  }
+
+  maxEnergy() {
+    return this.simulationFrame.maxEnergy;
+  }
 }

@@ -54,12 +54,12 @@ export default class Spaceship {
     this.moveFilter.update(updateFrameId, data);
     this.position = this.moveFilter.position();
     this.facing = this.moveFilter.facing();
+    this.hp = this.moveFilter.hp();
+    this.maxHp = this.moveFilter.maxHp();
+    this.energy = this.moveFilter.energy();
+    this.maxEnergy = this.moveFilter.maxEnergy();
 
     this.id = data.id;
-    this.hp = data.hp;
-    this.maxHp = data.maxHp;
-    this.energy = data.energy;
-    this.maxEnergy = data.maxEnergy;
     this.updateHealthBar();
     this.updateEnergyBar();
   }
@@ -68,6 +68,13 @@ export default class Spaceship {
     this.moveFilter.predictTo(frameId);
     this.position = this.moveFilter.position();
     this.facing = this.moveFilter.facing();
+    this.hp = this.moveFilter.hp();
+    this.maxHp = this.moveFilter.maxHp();
+    this.energy = this.moveFilter.energy();
+    this.maxEnergy = this.moveFilter.maxEnergy();
+
+    this.updateHealthBar();
+    this.updateEnergyBar();
 
     if (window.printPositions) {
       console.log(frameId, this.id, this.position.x, this.position.y)
