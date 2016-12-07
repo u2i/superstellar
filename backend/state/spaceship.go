@@ -44,23 +44,23 @@ type Spaceship struct {
 
 func NewSpaceship(clientId uint32, initialPosition *types.Point) *Spaceship {
 	return &Spaceship{
-		ID:              clientId,
-		Position:        initialPosition,
-		Velocity:        types.ZeroVector(),
-		Facing:          0.0,
-		AngularVelocity: 0,
+		ID:                   clientId,
+		Position:             initialPosition,
+		Velocity:             types.ZeroVector(),
+		Facing:               0.0,
+		AngularVelocity:      0,
 		AngularVelocityDelta: 0,
-		InputThrust:     false,
-		InputDirection:  NONE,
-		Fire:            false,
-		LastShotTime:    time.Now(),
-		Dirty:           true,
-		LastSentOn:      0,
-		HP:              constants.SpaceshipInitialHP,
-		MaxHP:           constants.SpaceshipInitialHP,
-		Energy:          constants.SpaceshipInitialEnergy,
-		MaxEnergy:       constants.SpaceshipInitialEnergy,
-		AutoRepairDelay: constants.AutoRepairDelay,
+		InputThrust:          false,
+		InputDirection:       NONE,
+		Fire:                 false,
+		LastShotTime:         time.Now(),
+		Dirty:                true,
+		LastSentOn:           0,
+		HP:                   constants.SpaceshipInitialHP,
+		MaxHP:                constants.SpaceshipInitialHP,
+		Energy:               constants.SpaceshipInitialEnergy,
+		MaxEnergy:            constants.SpaceshipInitialEnergy,
+		AutoRepairDelay:      constants.AutoRepairDelay,
 	}
 }
 
@@ -105,17 +105,17 @@ func (s *Spaceship) UpdateTargetAngle(angle float64) {
 // ToProto returns protobuf representation
 func (s *Spaceship) ToProto() *pb.Spaceship {
 	return &pb.Spaceship{
-		Id:             s.ID,
-		Position:       s.Position.ToProto(),
-		Velocity:       s.Velocity.ToProto(),
-		Facing:         s.Facing,
-		AngularSpeed:   s.AngularVelocity,
-		InputDirection: pb.Direction(s.InputDirection),
-		InputThrust:    s.InputThrust,
-		MaxHp:          s.MaxHP,
-		Hp:             s.HP,
-		MaxEnergy:      s.MaxEnergy,
-		Energy:         s.Energy,
+		Id:              s.ID,
+		Position:        s.Position.ToProto(),
+		Velocity:        s.Velocity.ToProto(),
+		Facing:          s.Facing,
+		AngularVelocity: s.AngularVelocity,
+		InputDirection:  pb.Direction(s.InputDirection),
+		InputThrust:     s.InputThrust,
+		MaxHp:           s.MaxHP,
+		Hp:              s.HP,
+		MaxEnergy:       s.MaxEnergy,
+		Energy:          s.Energy,
 	}
 }
 
@@ -222,10 +222,10 @@ func (s *Spaceship) TurnToTarget() {
 }
 
 func (s *Spaceship) LimitAngularVelocityDelta() {
-	potentialAngularVelocity := s.AngularVelocity + s.AngularVelocityDelta;
+	potentialAngularVelocity := s.AngularVelocity + s.AngularVelocityDelta
 	diff := math.Abs(potentialAngularVelocity) - constants.SpaceshipMaxAngularVelocity
 
-	if (diff > 0) {
+	if diff > 0 {
 		s.AngularVelocityDelta -= math.Copysign(diff, s.AngularVelocity)
 	}
 }

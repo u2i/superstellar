@@ -6,7 +6,7 @@ const BoundaryAnnulusWidth = 20000
 const FrictionCoefficient = 0.005
 const SpaceshipNonlinearAngularAcceleration = 2
 const SpaceshipLinearAngularAcceleration = 0.0001
-const SpaceshipMaxAngularSpeed = 0.12
+const SpaceshipMaxAngularVelocity = 0.12
 const SpaceshipAngularFriction = 0.2
 const SpaceshipMaxSpeed = 600
 
@@ -25,12 +25,13 @@ export default class SimulationFrame {
     this.update(data);
   }
 
-  update({id, position, velocity, facing, angularSpeed, inputDirection, inputThrust}) {
+  update({id, position, velocity, facing, angularVelocity, inputDirection, inputThrust}) {
     this.id = id;
     this.position = Victor.fromObject(position);
     this.velocity = Victor.fromObject(velocity);
     this.facing = facing;
-    this.angularSpeed = angularSpeed;
+    this.angularVelocity = angularVelocity;
+    this.angularVelocityDelta = 0.0;
     this.inputDirection = inputDirection;
     this.inputThrust = inputThrust;
   }
@@ -43,8 +44,7 @@ export default class SimulationFrame {
     this.position.add(this.velocity);
 
     this.applyTurn();
-
-    this.facing += this.angularSpeed;
+    this.updateAngularVelocity();
 
     this.frameId++;
   }
@@ -100,29 +100,38 @@ export default class SimulationFrame {
     }
   }
 
+  updateAngularVelocity() {
+    this.angularVelocity += this.angularVelocityDelta
+    this.angularVelocityDelta = 0.0;
+    this.facing -= this.angularVelocity;
+  }
+
   applyAngularFriction() {
-    this.angularSpeed *= (1.0 - SpaceshipAngularFriction);
+    this.angularVelocity *= (1.0 - SpaceshipAngularFriction);
   }
 
   turnLeft() {
-    this.angularSpeed -= this.angularSpeedDelta();
-    this.limitAngularSpeed();
+    this.angularVelocityDelta = this.angularVelocityDeltaValue();
+    this.limitAngularVelocityDelta();
   }
 
   turnRight() {
-    this.angularSpeed += this.angularSpeedDelta();
-    this.limitAngularSpeed();
+    this.angularVelocityDelta = -this.angularVelocityDeltaValue();
+    this.limitAngularVelocityDelta();
   }
 
-  angularSpeedDelta() {
-    let nonlinearPart = SpaceshipNonlinearAngularAcceleration * Math.abs(this.angularSpeed);
+  angularVelocityDeltaValue() {
+    let nonlinearPart = SpaceshipNonlinearAngularAcceleration * Math.abs(this.angularVelocity);
     let linearPart = SpaceshipLinearAngularAcceleration;
     return nonlinearPart + linearPart;
   }
 
-  limitAngularSpeed() {
-    if (Math.abs(this.angularSpeed) > SpaceshipMaxAngularSpeed) {
-      this.angularSpeed = SpaceshipMaxAngularSpeed * Math.sign(this.angularSpeed);
+  limitAngularVelocityDelta() {
+    let potentialAngularVelocity = this.angularVelocity + this.angularVelocityDelta;
+    let diff = Math.abs(potentialAngularVelocity) - SpaceshipMaxAngularVelocity;
+
+    if (diff > 0) {
+      this.angularVelocityDelta -= Math.abs(diff) * Math.sign(this.angularVelocity);
     }
   }
 

@@ -157,7 +157,7 @@
                 {
                     "rule": "optional",
                     "type": "double",
-                    "name": "angularSpeed",
+                    "name": "angularVelocity",
                     "id": 5
                 },
                 {

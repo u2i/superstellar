@@ -38,7 +38,7 @@ message Spaceship {
   Point     position = 2;
   Vector    velocity = 3;
   double    facing = 4;
-  double    angularSpeed = 5;
+  double    angularVelocity = 5;
   Direction inputDirection = 6;
   bool      inputThrust = 7;
   uint32    maxHp = 8;
