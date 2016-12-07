@@ -91,8 +91,22 @@ message Space {
 message Hello {
   uint32 myId = 1;
   map<uint32, string> idToUsername = 2;
-  float worldRadius = 3;
-  float boundaryAnnulusWidth  = 4;
+  Constants constants = 3;
+}
+
+message Constants {
+  float worldRadius = 1;
+  float boundaryAnnulusWidth  = 2;
+  float spaceshipAcceleration = 3;
+  float frictionCoefficient = 4;
+  float spaceshipNonlinearAngularAcceleration = 5;
+  float spaceshipLinearAngularAcceleration = 6;
+  float spaceshipMaxAngularVelocity = 7;
+  float spaceshipAngularFriction = 8;
+  uint32 spaceshipMaxSpeed = 9;
+  uint32 autoRepairInterval = 10;
+  uint32 autoRepairAmount = 11;
+  uint32 autoEnergyRechargeAmount = 12;
 }
 
 message JoinGame {
@@ -103,7 +117,6 @@ message JoinGameAck {
   bool   success = 1;
   string error   = 2;
 }
-
 
 enum UserInput {
   CENTER = 0;

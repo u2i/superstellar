@@ -24,4 +24,6 @@ export const globalState = {
   framesCalculator: new FramesCalculator()
 };
 
+export var constants = {};
+
 export const leaderboardDialog = new LeaderboardDialog();

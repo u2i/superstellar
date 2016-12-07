@@ -96,13 +96,27 @@ func (sender *Sender) sendHelloMessage(clientID uint32) {
 		idToUsername[id] = client.username
 	}
 
+	constantsProto := &pb.Constants{
+		WorldRadius:                           constants.WorldRadius,
+		BoundaryAnnulusWidth:                  constants.BoundaryAnnulusWidth,
+		SpaceshipAcceleration:                 constants.SpaceshipAcceleration,
+		FrictionCoefficient:                   constants.FrictionCoefficient,
+		SpaceshipNonlinearAngularAcceleration: constants.SpaceshipNonlinearAngularAcceleration,
+		SpaceshipLinearAngularAcceleration:    constants.SpaceshipLinearAngularAcceleration,
+		SpaceshipMaxAngularVelocity:           constants.SpaceshipMaxAngularVelocity,
+		SpaceshipAngularFriction:              constants.SpaceshipAngularFriction,
+		SpaceshipMaxSpeed:                     constants.SpaceshipMaxSpeed,
+		AutoRepairInterval:                    constants.AutoRepairInterval,
+		AutoRepairAmount:                      constants.AutoRepairAmount,
+		AutoEnergyRechargeAmount:              constants.AutoEnergyRechargeAmount,
+	}
+
 	message := &pb.Message{
 		Content: &pb.Message_Hello{
 			Hello: &pb.Hello{
-				MyId:                 clientID,
-				IdToUsername:         idToUsername,
-				WorldRadius:          constants.WorldRadius / 100,
-				BoundaryAnnulusWidth: constants.BoundaryAnnulusWidth / 100,
+				MyId:         clientID,
+				IdToUsername: idToUsername,
+				Constants:    constantsProto,
 			},
 		},
 	}

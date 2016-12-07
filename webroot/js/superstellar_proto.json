@@ -358,15 +358,86 @@
                 },
                 {
                     "rule": "optional",
+                    "type": "Constants",
+                    "name": "constants",
+                    "id": 3
+                }
+            ]
+        },
+        {
+            "name": "Constants",
+            "fields": [
+                {
+                    "rule": "optional",
                     "type": "float",
                     "name": "worldRadius",
-                    "id": 3
+                    "id": 1
                 },
                 {
                     "rule": "optional",
                     "type": "float",
                     "name": "boundaryAnnulusWidth",
+                    "id": 2
+                },
+                {
+                    "rule": "optional",
+                    "type": "float",
+                    "name": "spaceshipAcceleration",
+                    "id": 3
+                },
+                {
+                    "rule": "optional",
+                    "type": "float",
+                    "name": "frictionCoefficient",
                     "id": 4
+                },
+                {
+                    "rule": "optional",
+                    "type": "float",
+                    "name": "spaceshipNonlinearAngularAcceleration",
+                    "id": 5
+                },
+                {
+                    "rule": "optional",
+                    "type": "float",
+                    "name": "spaceshipLinearAngularAcceleration",
+                    "id": 6
+                },
+                {
+                    "rule": "optional",
+                    "type": "float",
+                    "name": "spaceshipMaxAngularVelocity",
+                    "id": 7
+                },
+                {
+                    "rule": "optional",
+                    "type": "float",
+                    "name": "spaceshipAngularFriction",
+                    "id": 8
+                },
+                {
+                    "rule": "optional",
+                    "type": "uint32",
+                    "name": "spaceshipMaxSpeed",
+                    "id": 9
+                },
+                {
+                    "rule": "optional",
+                    "type": "uint32",
+                    "name": "autoRepairInterval",
+                    "id": 10
+                },
+                {
+                    "rule": "optional",
+                    "type": "uint32",
+                    "name": "autoRepairAmount",
+                    "id": 11
+                },
+                {
+                    "rule": "optional",
+                    "type": "uint32",
+                    "name": "autoEnergyRechargeAmount",
+                    "id": 12
                 }
             ]
         },

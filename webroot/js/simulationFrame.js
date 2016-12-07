@@ -1,17 +1,5 @@
+import { constants } from './globals';
 import Victor from 'victor';
-
-const SpaceshipAcceleration = 50.0
-const WorldRadius = 100000
-const BoundaryAnnulusWidth = 20000
-const FrictionCoefficient = 0.005
-const SpaceshipNonlinearAngularAcceleration = 2
-const SpaceshipLinearAngularAcceleration = 0.0001
-const SpaceshipMaxAngularVelocity = 0.12
-const SpaceshipAngularFriction = 0.2
-const SpaceshipMaxSpeed = 600
-const AutoRepairInterval = 1
-const AutoRepairAmount = 2
-const AutoEnergyRechargeAmount = 3
 
 const DIR_CENTER = null;
 const DIR_RIGHT = 1;
@@ -69,11 +57,11 @@ export default class SimulationFrame {
   applyInputThrust() {
     if (this.inputThrust) {
       let facingVector = new Victor(Math.cos(this.facing), -Math.sin(this.facing));
-      let deltaVelocity = facingVector.scalarMultiply(SpaceshipAcceleration);
+      let deltaVelocity = facingVector.scalarMultiply(constants.spaceshipAcceleration);
       this.velocity.add(deltaVelocity);
     } else {
       if (this.velocity.length() > 0) {
-        this.velocity.scalarMultiply(1.0 - FrictionCoefficient);
+        this.velocity.scalarMultiply(1.0 - constants.frictionCoefficient);
       }
 
       if (this.velocity.length() < 1.0) {
@@ -83,17 +71,17 @@ export default class SimulationFrame {
   }
 
   applyAnnulus() {
-    if (this.position.length() > WorldRadius) {
-      let outreachLength = this.position.length() - WorldRadius;
-      let gravityAcceleration = -(outreachLength / BoundaryAnnulusWidth) * SpaceshipAcceleration;
+    if (this.position.length() > constants.worldRadius) {
+      let outreachLength = this.position.length() - constants.worldRadius;
+      let gravityAcceleration = -(outreachLength / constants.boundaryAnnulusWidth) * constants.spaceshipAcceleration;
       let deltaVelocity = this.position.clone().normalize().scalarMultiply(gravityAcceleration);
       this.velocity.add(deltaVelocity);
     }
   }
 
   limitMaxSpeed() {
-    if (this.velocity.length() > SpaceshipMaxSpeed) {
-      this.velocity.normalize().scalarMultiply(SpaceshipMaxSpeed);
+    if (this.velocity.length() > constants.spaceshipMaxSpeed) {
+      this.velocity.normalize().scalarMultiply(constants.spaceshipMaxSpeed);
     }
   }
 
@@ -118,7 +106,7 @@ export default class SimulationFrame {
   }
 
   applyAngularFriction() {
-    this.angularVelocity *= (1.0 - SpaceshipAngularFriction);
+    this.angularVelocity *= (1.0 - constants.spaceshipAngularFriction);
   }
 
   turnLeft() {
@@ -132,14 +120,14 @@ export default class SimulationFrame {
   }
 
   angularVelocityDeltaValue() {
-    let nonlinearPart = SpaceshipNonlinearAngularAcceleration * Math.abs(this.angularVelocity);
-    let linearPart = SpaceshipLinearAngularAcceleration;
+    let nonlinearPart = constants.spaceshipNonlinearAngularAcceleration * Math.abs(this.angularVelocity);
+    let linearPart = constants.spaceshipLinearAngularAcceleration;
     return nonlinearPart + linearPart;
   }
 
   limitAngularVelocityDelta() {
     let potentialAngularVelocity = this.angularVelocity + this.angularVelocityDelta;
-    let diff = Math.abs(potentialAngularVelocity) - SpaceshipMaxAngularVelocity;
+    let diff = Math.abs(potentialAngularVelocity) - constants.spaceshipMaxAngularVelocity;
 
     if (diff > 0) {
       this.angularVelocityDelta -= Math.abs(diff) * Math.sign(this.angularVelocity);
@@ -147,10 +135,10 @@ export default class SimulationFrame {
   }
 
   applyAutoRepair() {
-    if (this.autoRepairDelay == 0) {
+    if (this.autoRepairDelay === 0) {
       if (this.hp < this.maxHp) {
-        this.hp = Math.min(this.hp + AutoRepairAmount, this.maxHp)
-        this.AutoRepairDelay = AutoRepairInterval;
+        this.hp = Math.min(this.hp + constants.autoRepairAmount, this.maxHp)
+        this.autoRepairDelay = constants.autoRepairInterval;
       }
     } else {
       this.autoRepairDelay--;
@@ -158,6 +146,6 @@ export default class SimulationFrame {
   }
 
   applyAutoEnergyRecharge() {
-    this.energy = Math.min(this.energy + AutoEnergyRechargeAmount, this.maxEnergy);
+    this.energy = Math.min(this.energy + constants.autoEnergyRechargeAmount, this.maxEnergy);
   }
 }

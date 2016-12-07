@@ -30,7 +30,7 @@ const (
 
 	SpaceshipLinearAngularAcceleration = 0.0001
 
-	SpaceshipNonlinearAngularAcceleration = 2
+	SpaceshipNonlinearAngularAcceleration = 2.0
 
 	SpaceshipAngularFriction = 0.2
 
