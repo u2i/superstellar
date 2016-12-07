@@ -91,6 +91,7 @@ func (s *Spaceship) UpdateUserInput(userInput pb.UserInput) {
 		s.Dirty = true
 	case pb.UserInput_FIRE_START:
 		s.Fire = true
+		s.Dirty = true
 	case pb.UserInput_FIRE_STOP:
 		s.Fire = false
 	}
@@ -172,11 +173,15 @@ func (s *Spaceship) CollideWithProjectile(projectile *Projectile) {
 func (s *Spaceship) AddReward(reward uint32) {
 	s.HP += reward
 	s.MaxHP += reward
+
+	s.Dirty = true
 }
 
 func (s *Spaceship) AddEnergyReward(reward uint32) {
 	s.Energy += reward
 	s.MaxEnergy += reward
+
+	s.Dirty = true
 }
 
 func (s *Spaceship) AutoRepair() {
