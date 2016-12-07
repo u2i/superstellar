@@ -4,9 +4,10 @@ import Assets from '../assets';
 import * as Constants from '../constants';
 
 const spaceHandler = (space) => {
-  globalState.physicsFrameID = space.physicsFrameID;
   const ships = space.spaceships;
   const shipTexture = Assets.getTexture(Constants.SHIP_TEXTURE);
+
+  globalState.framesCalculator.receivedFrameId(space.physicsFrameID);
 
   let shipThrustFrames = [];
 
@@ -16,15 +17,13 @@ const spaceHandler = (space) => {
 
   for (let i in ships) {
     const shipId = ships[i].id;
-    const ship = ships[i];
 
     if (!globalState.spaceshipMap.has(shipId)) {
-      const newSpaceship = new Spaceship(shipTexture, shipThrustFrames, ships[i]);
+      const newSpaceship = new Spaceship(shipTexture, shipThrustFrames, space.physicsFrameID, ships[i]);
 
       globalState.spaceshipMap.set(shipId, newSpaceship);
-    } else {
-      globalState.spaceshipMap.get(shipId).updateData(ships[i]);
     }
+    globalState.spaceshipMap.get(shipId).updateData(space.physicsFrameID, ships[i]);
   }
 };
 

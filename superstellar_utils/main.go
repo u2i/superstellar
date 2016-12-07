@@ -59,7 +59,6 @@ func runClient(botId uint, host string) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	var msg = make([]byte, 1024)
 
 	botName := fmt.Sprintf("%c %v", botEmoji, botId)
 
@@ -72,9 +71,7 @@ func runClient(botId uint, host string) {
 	userInput := pb.UserInput_CENTER
 
 	for {
-		if _, err = ws.Read(msg); err != nil {
-			log.Fatal(err)
-		}
+		time.Sleep(time.Duration(1) * time.Second)
 
 		if rand.Int()%100 < 5 {
 			thrust = !thrust

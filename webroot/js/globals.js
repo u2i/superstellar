@@ -1,6 +1,7 @@
 import { getCurrentWindowSize } from './utils';
 import LeaderboardDialog from "./leaderboardDialog";
 import AnnulusFilter from './annulusFilter';
+import FramesCalculator from './framesCalculator.js'
 
 const windowSize = getCurrentWindowSize();
 
@@ -19,7 +20,8 @@ export const globalState = {
   dialog: null,
   killedBy: null,
   worldSizeFilter: new AnnulusFilter(),
-  ping: null
+  ping: null,
+  framesCalculator: new FramesCalculator()
 };
 
 export const leaderboardDialog = new LeaderboardDialog();

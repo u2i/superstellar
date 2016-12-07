@@ -60,20 +60,25 @@ func (space *Space) NextProjectileID() uint32 {
 }
 
 // ToProto returns protobuf representation
-func (space *Space) ToProto() *pb.Space {
+func (space *Space) ToProto(fullUpdate bool) *pb.Space {
 	protoSpaceships := make([]*pb.Spaceship, 0, len(space.Spaceships))
 	for _, spaceship := range space.Spaceships {
-		protoSpaceships = append(protoSpaceships, spaceship.ToProto())
+		if fullUpdate || spaceship.Dirty {
+			protoSpaceships = append(protoSpaceships, spaceship.ToProto())
+			if !fullUpdate {
+				spaceship.Dirty = false
+			}
+		}
 	}
 
 	return &pb.Space{Spaceships: protoSpaceships, PhysicsFrameID: space.PhysicsFrameID}
 }
 
 // ToMessage returns protobuffer Message object with Space set.
-func (space *Space) ToMessage() *pb.Message {
+func (space *Space) ToMessage(fullUpdate bool) *pb.Message {
 	return &pb.Message{
 		Content: &pb.Message_Space{
-			Space: space.ToProto(),
+			Space: space.ToProto(fullUpdate),
 		},
 	}
 }

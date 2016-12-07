@@ -34,9 +34,9 @@ func detectProjectileCollisions(space *state.Space, eventDispatcher *events.Even
 					space.RemoveSpaceship(clientID)
 
 					userDiedMessage := &events.UserDied{
-						ClientID: clientID,
-						Shooter: projectile.Spaceship,
-						KilledBy: projectile.ClientID,
+						ClientID:      clientID,
+						Shooter:       projectile.Spaceship,
+						KilledBy:      projectile.ClientID,
 						ShotSpaceship: spaceship,
 					}
 					eventDispatcher.FireUserDied(userDiedMessage)
@@ -69,7 +69,7 @@ func updateSpaceships(s *state.Space, eventDispatcher *events.EventDispatcher) {
 		}
 
 		if spaceship.InputThrust {
-			deltaVelocity := spaceship.NormalizedFacing().Multiply(constants.SpaceshipAcceleration)
+			deltaVelocity := types.NewVector(math.Cos(spaceship.Facing), -math.Sin(spaceship.Facing)).Multiply(constants.SpaceshipAcceleration)
 			spaceship.Velocity = spaceship.Velocity.Add(deltaVelocity)
 		} else {
 			if spaceship.Velocity.Length() != 0 {
@@ -94,9 +94,7 @@ func updateSpaceships(s *state.Space, eventDispatcher *events.EventDispatcher) {
 
 		spaceship.Position = spaceship.Position.Add(spaceship.Velocity)
 
-		angle := math.Atan2(spaceship.Facing.Y, spaceship.Facing.X)
-
-		if (spaceship.TargetAngle != nil) {
+		if spaceship.TargetAngle != nil {
 			spaceship.TurnToTarget()
 		} else {
 			switch spaceship.InputDirection {
@@ -112,9 +110,10 @@ func updateSpaceships(s *state.Space, eventDispatcher *events.EventDispatcher) {
 		spaceship.AngularVelocity += spaceship.AngularVelocityDelta
 		spaceship.AngularVelocityDelta = 0.0
 
-		angle += spaceship.AngularVelocity
-
-		spaceship.Facing = types.NewVector(math.Cos(angle), math.Sin(angle))
+		spaceship.Facing -= spaceship.AngularVelocity
+		if math.Abs(spaceship.Facing) > math.Pi {
+			spaceship.Facing = spaceship.Facing - math.Copysign(2*math.Pi, spaceship.Facing)
+		}
 
 		handleAutoRepair(spaceship)
 		handleAutoEnergyRecharge(spaceship)
@@ -206,15 +205,15 @@ func applyProjectileImpulse(spaceship *state.Spaceship, projectile *state.Projec
 	momentOfInertia := 0.5 * constants.SpaceshipSize * constants.SpaceshipSize * constants.SpaceshipMass
 	r := types.Point{X: collisionPoint.X - spaceship.Position.X, Y: collisionPoint.Y - spaceship.Position.Y}
 
-	torque := (impulse.X * float64(r.Y) - impulse.Y * float64(r.X)) * constants.ProjectileRotationalImpulse
+	torque := (impulse.X*float64(r.Y) - impulse.Y*float64(r.X)) * constants.ProjectileRotationalImpulse
 
-	spaceship.Velocity = spaceship.Velocity.Add(impulse.Multiply(1.0/constants.SpaceshipMass))
+	spaceship.Velocity = spaceship.Velocity.Add(impulse.Multiply(1.0 / constants.SpaceshipMass))
 	spaceship.AngularVelocity -= torque / momentOfInertia
 }
 
 func handleAutoRepair(spaceship *state.Spaceship) {
-	if (spaceship.AutoRepairDelay == 0) {
-		if (spaceship.HP < spaceship.MaxHP) {
+	if spaceship.AutoRepairDelay == 0 {
+		if spaceship.HP < spaceship.MaxHP {
 			spaceship.AutoRepair()
 		}
 	} else {
@@ -223,8 +222,8 @@ func handleAutoRepair(spaceship *state.Spaceship) {
 }
 
 func handleAutoEnergyRecharge(spaceship *state.Spaceship) {
-	if (spaceship.AutoEnergyRechargeDelay == 0) {
-		if (spaceship.Energy < spaceship.MaxEnergy) {
+	if spaceship.AutoEnergyRechargeDelay == 0 {
+		if spaceship.Energy < spaceship.MaxEnergy {
 			spaceship.AutoEnergyRecharge()
 		}
 	} else {

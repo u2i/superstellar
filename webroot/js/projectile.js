@@ -25,13 +25,13 @@ export default class Projectile {
     stage.addChild(this.animation);
   }
 
-  update (viewport) {
-    if(globalState.physicsFrameID > this.frameId + this.ttl) {
+  update (viewport, currentFrameId) {
+    if (currentFrameId > this.frameId + this.ttl) {
       this.remove();
       globalState.projectilesMap.delete(this.id);
     }
 
-    this._updatePosition();
+    this._updatePosition(currentFrameId);
     this.animation.play();
 
     const translatedPosition = Utils.translateToViewport(
@@ -47,8 +47,8 @@ export default class Projectile {
     stage.removeChild(this.animation);
   }
 
-  _updatePosition() {
-    const frameOffset = globalState.physicsFrameID - this.frameId;
+  _updatePosition(currentFrameId) {
+    const frameOffset = currentFrameId - this.frameId;
 
     this.position.set(this.origin.x + this.velocity.x * frameOffset, this.origin.y + this.velocity.y * frameOffset);
   }

@@ -1,15 +1,17 @@
 import * as Utils from './utils.js';
 import CircleBarFilter from './circleBarFilter';
 import {globalState, renderer, stage} from './globals.js';
+import MoveFilter from './moveFilter.js';
 
 const healthBarRadius = 40;
 const energyBarRadius = 50;
 
 export default class Spaceship {
-  constructor(shipTexture, thrustAnimationFrames, data) {
+  constructor(shipTexture, thrustAnimationFrames, frameId) {
     this.createHealthBarFilter();
     this.createEnergyBarFilter();
-    this.updateData(data);
+    this.moveFilter = new MoveFilter(frameId);
+
     this.container = new PIXI.Container();
     this.sprite = new PIXI.Sprite(shipTexture);
     this.thrustAnimation = new PIXI.extras.MovieClip(thrustAnimationFrames);
@@ -48,22 +50,32 @@ export default class Spaceship {
     this.container.pivot.set(this.sprite.width / 2, this.sprite.height / 2);
   }
 
-  updateData({id, position, velocity, facing, inputThrust, hp, maxHp, energy, maxEnergy}) {
-    this.id = id;
-    this.position = position;
-    this.velocity = velocity;
-    this.facing = facing;
-    this.inputThrust = inputThrust;
-    this.hp = hp;
-    this.maxHp = maxHp;
-    this.energy = energy;
-    this.maxEnergy = maxEnergy;
+  updateData(updateFrameId, data) {
+    this.moveFilter.update(updateFrameId, data);
+    this.position = this.moveFilter.position();
+    this.facing = this.moveFilter.facing();
+
+    this.id = data.id;
+    this.hp = data.hp;
+    this.maxHp = data.maxHp;
+    this.energy = data.energy;
+    this.maxEnergy = data.maxEnergy;
     this.updateHealthBar();
     this.updateEnergyBar();
   }
 
+  predictTo(frameId) {
+    this.moveFilter.predictTo(frameId);
+    this.position = this.moveFilter.position();
+    this.facing = this.moveFilter.facing();
+
+    if (window.printPositions) {
+      console.log(frameId, this.id, this.position.x, this.position.y)
+    }
+  }
+
   update(viewport) {
-    if (this.inputThrust) {
+    if (this.moveFilter.inputThrust()) {
       this.thrustAnimation.visible = true;
       this.thrustAnimation.play();
     } else {

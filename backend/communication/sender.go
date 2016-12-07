@@ -43,6 +43,7 @@ func (sender *Sender) HandleProjectileHit(projectileHitEvent *events.ProjectileH
 func (sender *Sender) HandleUserJoined(userJoinedEvent *events.UserJoined) {
 	sender.sendHelloMessage(userJoinedEvent.ClientID)
 	sender.sendUserJoinedMessage(userJoinedEvent.ClientID, userJoinedEvent.UserName)
+	sender.server.SendToClient(userJoinedEvent.ClientID, sender.space.ToMessage(true))
 }
 
 func (sender *Sender) HandleUserLeft(userLeftEvent *events.UserLeft) {
@@ -60,7 +61,10 @@ func (sender *Sender) HandleUserDied(userDiedEvent *events.UserDied) {
 }
 
 func (sender *Sender) sendSpace() {
-	sender.server.SendToAllClients(sender.space.ToMessage())
+	message := sender.space.ToMessage(false)
+	if len(message.GetSpace().GetSpaceships()) > 0 {
+		sender.server.SendToAllClients(message)
+	}
 }
 
 func (sender *Sender) sendLeaderboard() {

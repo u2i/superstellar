@@ -62,7 +62,7 @@ func main() {
 			panic(err)
 		}
 
-		eventDispatcher.RegisterCommunicationTimeTickListener(fileWriter)
+		eventDispatcher.RegisterTimeTickListener(fileWriter)
 		go fileWriter.Run()
 	}
 

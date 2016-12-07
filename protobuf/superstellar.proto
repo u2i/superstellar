@@ -27,16 +27,24 @@ message Vector {
   float y = 2;
 }
 
+enum Direction {
+  DIR_CENTER = 0;
+  DIR_RIGHT = 1;
+  DIR_LEFT = 2;
+}
+
 message Spaceship {
   uint32    id = 1;
   Point     position = 2;
   Vector    velocity = 3;
-  float     facing = 4;
-  bool      inputThrust = 5;
-  uint32    maxHp = 6;
-  uint32    hp = 7;
-  uint32    maxEnergy = 8;
-  uint32    energy = 9;
+  double    facing = 4;
+  double    angularVelocity = 5;
+  Direction inputDirection = 6;
+  bool      inputThrust = 7;
+  uint32    maxHp = 8;
+  uint32    hp = 9;
+  uint32    maxEnergy = 10;
+  uint32    energy = 11;
 }
 
 message ProjectileFired {
