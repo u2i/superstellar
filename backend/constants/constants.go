@@ -53,7 +53,7 @@ const (
 	SpaceshipInitialHP = 500
 
 	// SpaceshipInitialEnergy spaceship Energy
-	SpaceshipInitialEnergy = 300
+	SpaceshipInitialEnergy = 2000
 
 	// Part of killed player's Max HP that killing player receives
 	KillRewardRatio = 0.2
@@ -68,7 +68,7 @@ const (
 	WorldRadius = 100000
 
 	// AutoRepairDelay is time after which spaceship will repair itself
-	AutoRepairDelay = 250
+	AutoRepairDelay = 1000
 
 	// AutoRepairInterval is the time between repairs
 	AutoRepairInterval = 1
