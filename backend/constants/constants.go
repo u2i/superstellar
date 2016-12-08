@@ -9,6 +9,9 @@ const (
 
 	UpdateSendInterval = 10 * time.Millisecond
 
+	// DirtyFramesTimeout is a timeout measured in frames after which the ship is marked dirty.
+	DirtyFramesTimeout = 50
+
 	// BoundaryAnnulusWidth is the width of boundary region (in .01 units), i.e. from WorldRadius till when no more movement is possible
 	BoundaryAnnulusWidth = 20000
 

@@ -115,8 +115,7 @@ func updateSpaceships(s *state.Space, eventDispatcher *events.EventDispatcher) {
 			spaceship.Facing = spaceship.Facing - math.Copysign(2*math.Pi, spaceship.Facing)
 		}
 
-		handleAutoRepair(spaceship)
-		handleAutoEnergyRecharge(spaceship)
+		spaceship.NotifyAboutNewFrame()
 	}
 
 	collided := make(map[*state.Spaceship]bool)
@@ -209,22 +208,6 @@ func applyProjectileImpulse(spaceship *state.Spaceship, projectile *state.Projec
 
 	spaceship.Velocity = spaceship.Velocity.Add(impulse.Multiply(1.0 / constants.SpaceshipMass))
 	spaceship.AngularVelocity -= torque / momentOfInertia
-}
-
-func handleAutoRepair(spaceship *state.Spaceship) {
-	if spaceship.AutoRepairDelay == 0 {
-		if spaceship.HP < spaceship.MaxHP {
-			spaceship.AutoRepair()
-		}
-	} else {
-		spaceship.AutoRepairDelay--
-	}
-}
-
-func handleAutoEnergyRecharge(spaceship *state.Spaceship) {
-	if spaceship.Energy < spaceship.MaxEnergy {
-		spaceship.AutoEnergyRecharge()
-	}
 }
 
 func updateProjectiles(space *state.Space) {

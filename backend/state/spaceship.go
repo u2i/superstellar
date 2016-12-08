@@ -6,6 +6,7 @@ import (
 	"superstellar/backend/constants"
 	"superstellar/backend/pb"
 	"superstellar/backend/types"
+	"superstellar/backend/utils"
 	"time"
 )
 
@@ -33,6 +34,7 @@ type Spaceship struct {
 	Fire                 bool
 	LastShotTime         time.Time
 	Dirty                bool
+	DirtyFramesTimeout   uint32
 	LastSentOn           uint32
 	HP                   uint32
 	MaxHP                uint32
@@ -54,6 +56,7 @@ func NewSpaceship(clientId uint32, initialPosition *types.Point) *Spaceship {
 		Fire:                 false,
 		LastShotTime:         time.Now(),
 		Dirty:                true,
+		DirtyFramesTimeout:   0,
 		LastSentOn:           0,
 		HP:                   constants.SpaceshipInitialHP,
 		MaxHP:                constants.SpaceshipInitialHP,
@@ -73,27 +76,38 @@ func (s *Spaceship) UpdateUserInput(userInput pb.UserInput) {
 	case pb.UserInput_CENTER:
 		s.InputDirection = NONE
 		s.TargetAngle = nil
-		s.Dirty = true
+		s.MarkDirty()
 	case pb.UserInput_LEFT:
 		s.InputDirection = LEFT
 		s.TargetAngle = nil
-		s.Dirty = true
+		s.MarkDirty()
 	case pb.UserInput_RIGHT:
 		s.InputDirection = RIGHT
 		s.TargetAngle = nil
-		s.Dirty = true
+		s.MarkDirty()
 	case pb.UserInput_THRUST_ON:
 		s.InputThrust = true
-		s.Dirty = true
+		s.MarkDirty()
 	case pb.UserInput_THRUST_OFF:
 		s.InputThrust = false
-		s.Dirty = true
+		s.MarkDirty()
 	case pb.UserInput_FIRE_START:
 		s.Fire = true
-		s.Dirty = true
+		s.MarkDirty()
 	case pb.UserInput_FIRE_STOP:
 		s.Fire = false
 	}
+}
+
+func (s *Spaceship) MarkDirty() {
+	s.Dirty = true
+	s.DirtyFramesTimeout = constants.DirtyFramesTimeout
+}
+
+func (s *Spaceship) NotifyAboutNewFrame() {
+	s.handleDirtyTimeout()
+	s.handleAutoEnergyRecharge()
+	s.handleAutoRepair()
 }
 
 func (s *Spaceship) UpdateTargetAngle(angle float64) {
@@ -145,8 +159,8 @@ func (s *Spaceship) Collide(other *Spaceship) {
 	s.Velocity = switchedV1.Rotate(-transformAngle)
 	other.Velocity = switchedV2.Rotate(-transformAngle)
 
-	s.Dirty = true
-	other.Dirty = true
+	s.MarkDirty()
+	other.MarkDirty()
 }
 
 func (s *Spaceship) ShootIfPossible() (canShoot bool) {
@@ -168,38 +182,41 @@ func (s *Spaceship) CollideWithProjectile(projectile *Projectile) {
 	}
 	s.AutoRepairDelay = constants.AutoRepairDelay
 
-	s.Dirty = true
+	s.MarkDirty()
 }
 
 func (s *Spaceship) AddReward(reward uint32) {
 	s.HP += reward
 	s.MaxHP += reward
 
-	s.Dirty = true
+	s.MarkDirty()
 }
 
 func (s *Spaceship) AddEnergyReward(reward uint32) {
 	s.Energy += reward
 	s.MaxEnergy += reward
 
-	s.Dirty = true
+	s.MarkDirty()
 }
 
-func (s *Spaceship) AutoRepair() {
-	s.HP += constants.AutoRepairAmount
-
-	if s.HP > s.MaxHP {
-		s.HP = s.MaxHP
+func (s *Spaceship) handleDirtyTimeout() {
+	if s.DirtyFramesTimeout == 0 {
+		s.MarkDirty()
+	} else {
+		s.DirtyFramesTimeout--
 	}
-	s.AutoRepairDelay = constants.AutoRepairInterval
 }
 
-func (s *Spaceship) AutoEnergyRecharge() {
-	s.Energy += constants.AutoEnergyRechargeAmount
-
-	if s.Energy > s.MaxEnergy {
-		s.Energy = s.MaxEnergy
+func (s *Spaceship) handleAutoRepair() {
+	if s.AutoRepairDelay == 0 {
+		s.HP = utils.Min(s.HP+constants.AutoRepairAmount, s.MaxHP)
+	} else {
+		s.AutoRepairDelay--
 	}
+}
+
+func (s *Spaceship) handleAutoEnergyRecharge() {
+	s.Energy = utils.Min(s.Energy+constants.AutoEnergyRechargeAmount, s.MaxEnergy)
 }
 
 func (s *Spaceship) LeftTurn() {
