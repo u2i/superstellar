@@ -21,7 +21,7 @@ const (
 
 var supportedEvents = []EventType{
 	NewEventType("TimeTick", 1),
-	NewEventType("CommunicationTimeTick", 1),
+	NewEventType("PhysicsReady", 1),
 	NewEventType("ProjectileFired", 2),
 	NewEventType("ProjectileHit", 2),
 	NewEventType("UserJoined", 2),

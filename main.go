@@ -32,7 +32,6 @@ func main() {
 
 	eventDispatcher := events.NewEventDispatcher()
 	physicsTicker := game.NewPhysicsTicker(eventDispatcher)
-	communicationTicker := communication.NewTicker(eventDispatcher)
 
 	monitor := monitor.NewMonitor(eventDispatcher)
 
@@ -49,7 +48,7 @@ func main() {
 	eventDispatcher.RegisterUserLeftListener(srv)
 
 	sender := communication.NewSender(srv, space)
-	eventDispatcher.RegisterCommunicationTimeTickListener(sender)
+	eventDispatcher.RegisterPhysicsReadyListener(sender)
 	eventDispatcher.RegisterProjectileFiredListener(sender)
 	eventDispatcher.RegisterProjectileHitListener(sender)
 	eventDispatcher.RegisterUserLeftListener(sender)
@@ -71,7 +70,6 @@ func main() {
 
 	go eventDispatcher.RunEventLoop()
 	go physicsTicker.Run()
-	go communicationTicker.Run()
 
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }

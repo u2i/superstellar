@@ -196,6 +196,7 @@ func updateSpaceships(s *state.Space, eventDispatcher *events.EventDispatcher) {
 	// koniec kodu przeciwzakrzepowego
 
 	s.PhysicsFrameID++
+	eventDispatcher.FirePhysicsReady(&events.PhysicsReady{})
 }
 
 func applyProjectileImpulse(spaceship *state.Spaceship, projectile *state.Projectile, collisionPoint *types.Point) {

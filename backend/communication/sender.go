@@ -22,7 +22,7 @@ func NewSender(server *Server, space *state.Space) *Sender {
 	}
 }
 
-func (sender *Sender) HandleCommunicationTimeTick(timeTickEvent *events.CommunicationTimeTick) {
+func (sender *Sender) HandlePhysicsReady(physicsReadyEvent *events.PhysicsReady) {
 	sender.sendSpace()
 	sender.leaderboardCounter++
 

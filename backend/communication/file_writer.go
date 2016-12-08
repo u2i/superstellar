@@ -2,7 +2,6 @@ package communication
 
 import (
 	"encoding/binary"
-	"github.com/golang/protobuf/proto"
 	"log"
 	"os"
 	"path"
@@ -10,6 +9,8 @@ import (
 	"superstellar/backend/pb"
 	"superstellar/backend/state"
 	"time"
+
+	"github.com/golang/protobuf/proto"
 )
 
 const (
@@ -90,7 +91,7 @@ func (fileWriter *FileWriter) close() {
 	fileWriter.file.Close()
 }
 
-func (fileWriter *FileWriter) HandleCommunicationTimeTick(timeTickEvent *events.CommunicationTimeTick) {
+func (fileWriter *FileWriter) HandlePhysicsReady(physicsReadyEvent *events.PhysicsReady) {
 	fileWriter.ch <- fileWriter.space.ToProto(true)
 }
 

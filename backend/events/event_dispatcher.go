@@ -22,8 +22,8 @@ type TimeTickListener interface {
 	HandleTimeTick(*TimeTick)
 }
 
-type CommunicationTimeTickListener interface {
-	HandleCommunicationTimeTick(*CommunicationTimeTick)
+type PhysicsReadyListener interface {
+	HandlePhysicsReady(*PhysicsReady)
 }
 
 type ProjectileFiredListener interface {
@@ -81,14 +81,14 @@ func (handler *timeTickHandler) handle() {
 	}
 }
 
-type communicationTimeTickHandler struct {
-	event          *CommunicationTimeTick
-	eventListeners []CommunicationTimeTickListener
+type physicsReadyHandler struct {
+	event          *PhysicsReady
+	eventListeners []PhysicsReadyListener
 }
 
-func (handler *communicationTimeTickHandler) handle() {
+func (handler *physicsReadyHandler) handle() {
 	for _, listener := range handler.eventListeners {
-		listener.HandleCommunicationTimeTick(handler.event)
+		listener.HandlePhysicsReady(handler.event)
 	}
 }
 
@@ -186,7 +186,7 @@ type EventDispatcher struct {
 
 	timeTickListeners []TimeTickListener
 
-	communicationTimeTickListeners []CommunicationTimeTickListener
+	physicsReadyListeners []PhysicsReadyListener
 
 	projectileFiredListeners []ProjectileFiredListener
 
@@ -221,7 +221,7 @@ func NewEventDispatcher() *EventDispatcher {
 
 		timeTickListeners: []TimeTickListener{},
 
-		communicationTimeTickListeners: []CommunicationTimeTickListener{},
+		physicsReadyListeners: []PhysicsReadyListener{},
 
 		projectileFiredListeners: []ProjectileFiredListener{},
 
@@ -304,18 +304,18 @@ func (dispatcher *EventDispatcher) FireTimeTick(event *TimeTick) {
 	dispatcher.priority1EventsQueue <- handler
 }
 
-// CommunicationTimeTick
+// PhysicsReady
 
-func (dispatcher *EventDispatcher) RegisterCommunicationTimeTickListener(listener CommunicationTimeTickListener) {
+func (dispatcher *EventDispatcher) RegisterPhysicsReadyListener(listener PhysicsReadyListener) {
 	dispatcher.panicWhenEventLoopRunning()
 
-	dispatcher.communicationTimeTickListeners = append(dispatcher.communicationTimeTickListeners, listener)
+	dispatcher.physicsReadyListeners = append(dispatcher.physicsReadyListeners, listener)
 }
 
-func (dispatcher *EventDispatcher) FireCommunicationTimeTick(event *CommunicationTimeTick) {
-	handler := &communicationTimeTickHandler{
+func (dispatcher *EventDispatcher) FirePhysicsReady(event *PhysicsReady) {
+	handler := &physicsReadyHandler{
 		event:          event,
-		eventListeners: dispatcher.communicationTimeTickListeners,
+		eventListeners: dispatcher.physicsReadyListeners,
 	}
 
 	dispatcher.priority1EventsQueue <- handler
