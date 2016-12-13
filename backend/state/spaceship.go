@@ -29,6 +29,7 @@ type Spaceship struct {
 	AngularVelocity      float64
 	AngularVelocityDelta float64
 	InputThrust          bool
+	InputBoost           bool
 	InputDirection       Direction
 	TargetAngle          *float64
 	Fire                 bool
@@ -96,6 +97,14 @@ func (s *Spaceship) UpdateUserInput(userInput pb.UserInput) {
 		s.MarkDirty()
 	case pb.UserInput_FIRE_STOP:
 		s.Fire = false
+	case pb.UserInput_BOOST_ON:
+		s.InputThrust = true
+		s.InputBoost = true
+		s.MarkDirty()
+	case pb.UserInput_BOOST_OFF:
+		s.InputThrust = false
+		s.InputBoost = false
+		s.MarkDirty()
 	}
 }
 
@@ -126,6 +135,7 @@ func (s *Spaceship) ToProto() *pb.Spaceship {
 		AngularVelocity: s.AngularVelocity,
 		InputDirection:  pb.Direction(s.InputDirection),
 		InputThrust:     s.InputThrust,
+		InputBoost:      s.InputBoost,
 		MaxHp:           s.MaxHP,
 		Hp:              s.HP,
 		MaxEnergy:       s.MaxEnergy,

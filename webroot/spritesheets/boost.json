@@ -1,0 +1,28 @@
+{"frames": {
+
+"boost_01.png":
+{
+	"frame": {"x":0,"y":0,"w":94,"h":132},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":94,"h":132},
+	"sourceSize": {"w":94,"h":132}
+},
+"boost_02.png":
+{
+	"frame": {"x":0,"y":132,"w":94,"h":132},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":94,"h":132},
+	"sourceSize": {"w":94,"h":132}
+}},
+"meta": {
+	"app": "http://www.codeandweb.com/texturepacker",
+	"version": "1.0",
+	"image": "boost.png",
+	"format": "RGBA8888",
+	"size": {"w":94,"h":264},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:2a3d12d1080e45e3145774a585ac0e92:c568264366a78d4821b710d7133e8d5a:22a2f32adef199f4d7eb58e8fe8d2d39$"
+}
+}

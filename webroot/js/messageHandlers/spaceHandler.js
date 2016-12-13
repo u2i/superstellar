@@ -10,16 +10,21 @@ const spaceHandler = (space) => {
   globalState.framesCalculator.receivedFrameId(space.physicsFrameID);
 
   let shipThrustFrames = [];
+  let shipBoostFrames = [];
 
   Constants.FLAME_SPRITESHEET_FRAME_NAMES.forEach((frameName) =>  {
     shipThrustFrames.push(Assets.getTextureFromFrame(frameName));
+  });
+
+  Constants.BOOST_SPRITESHEET_FRAME_NAMES.forEach((frameName) =>  {
+    shipBoostFrames.push(Assets.getTextureFromFrame(frameName));
   });
 
   for (let i in ships) {
     const shipId = ships[i].id;
 
     if (!globalState.spaceshipMap.has(shipId)) {
-      const newSpaceship = new Spaceship(shipTexture, shipThrustFrames, space.physicsFrameID, ships[i]);
+      const newSpaceship = new Spaceship(shipTexture, shipThrustFrames, shipBoostFrames, space.physicsFrameID, ships[i]);
 
       globalState.spaceshipMap.set(shipId, newSpaceship);
     }

@@ -88,8 +88,14 @@ func updateSpaceships(s *state.Space, eventDispatcher *events.EventDispatcher) {
 			spaceship.Velocity = spaceship.Velocity.Add(deltaVelocity)
 		}
 
-		if spaceship.Velocity.Length() > constants.SpaceshipMaxSpeed {
-			spaceship.Velocity = spaceship.Velocity.Normalize().Multiply(constants.SpaceshipMaxSpeed)
+		maxVelocity := float64(constants.SpaceshipMaxSpeed)
+		if spaceship.InputBoost {
+			maxVelocity *= constants.SpaceshipBoostFactor
+		}
+
+		if spaceship.Velocity.Length() > maxVelocity {
+			spaceship.Velocity = spaceship.Velocity.Normalize().Multiply(maxVelocity)
+			// TODO: add easing when returning to base velocity
 		}
 
 		spaceship.Position = spaceship.Position.Add(spaceship.Velocity)

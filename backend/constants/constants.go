@@ -46,6 +46,9 @@ const (
 	// MaxSpeed maximum speed of the spacecraft
 	SpaceshipMaxSpeed = 600
 
+	// SpaceshipBoostFactor is the multiplier for maximum speed when boost is active
+	SpaceshipBoostFactor = 2.5
+
 	// SpaceshipSize is spaceship's radius
 	SpaceshipSize = 2200
 

@@ -41,11 +41,12 @@ message Spaceship {
   double    angularVelocity = 5;
   Direction inputDirection = 6;
   bool      inputThrust = 7;
-  uint32    maxHp = 8;
-  uint32    hp = 9;
-  uint32    maxEnergy = 10;
-  uint32    energy = 11;
-  uint32    autoRepairDelay = 12;
+  bool      inputBoost = 8;
+  uint32    maxHp = 9;
+  uint32    hp = 10;
+  uint32    maxEnergy = 11;
+  uint32    energy = 12;
+  uint32    autoRepairDelay = 13;
 }
 
 message ProjectileFired {
@@ -104,9 +105,10 @@ message Constants {
   float spaceshipMaxAngularVelocity = 7;
   float spaceshipAngularFriction = 8;
   uint32 spaceshipMaxSpeed = 9;
-  uint32 autoRepairInterval = 10;
-  uint32 autoRepairAmount = 11;
-  uint32 autoEnergyRechargeAmount = 12;
+  float spaceshipBoostFactor = 10;
+  uint32 autoRepairInterval = 11;
+  uint32 autoRepairAmount = 12;
+  uint32 autoEnergyRechargeAmount = 13;
 }
 
 message JoinGame {
@@ -126,6 +128,8 @@ enum UserInput {
   THRUST_OFF = 4;
   FIRE_START = 5;
   FIRE_STOP = 6;
+  BOOST_ON = 7;
+  BOOST_OFF = 8;
 }
 
 message UserAction {

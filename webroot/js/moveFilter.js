@@ -28,6 +28,10 @@ export default class MoveFilter {
     return this.simulationFrame.inputThrust;
   }
 
+  inputBoost() {
+    return this.simulationFrame.inputBoost;
+  }
+
   hp() {
     return this.simulationFrame.hp;
   }

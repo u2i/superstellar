@@ -25,6 +25,7 @@ export default class SimulationFrame {
     this.angularVelocityDelta = 0.0;
     this.inputDirection = data.inputDirection;
     this.inputThrust = data.inputThrust;
+    this.inputBoost = data.inputBoost;
     this.hp = data.hp;
     this.maxHp = data.maxHp;
     this.energy = data.energy;
@@ -80,8 +81,13 @@ export default class SimulationFrame {
   }
 
   limitMaxSpeed() {
-    if (this.velocity.length() > constants.spaceshipMaxSpeed) {
-      this.velocity.normalize().scalarMultiply(constants.spaceshipMaxSpeed);
+    let maxVelocity = constants.spaceshipMaxSpeed;
+    if (this.inputBoost) {
+      maxVelocity *= constants.spaceshipBoostFactor;
+    }
+
+    if (this.velocity.length() > maxVelocity) {
+      this.velocity.normalize().scalarMultiply(maxVelocity);
     }
   }
 

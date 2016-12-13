@@ -24,7 +24,12 @@ const loadProgressHandler = (loader) => {
 };
 
 PIXI.loader.
-  add([Constants.SHIP_TEXTURE, Constants.BACKGROUND_TEXTURE, Constants.FLAME_SPRITESHEET, Constants.PROJECTILE_SPRITESHEET]).
+  add(
+  [
+    Constants.SHIP_TEXTURE, Constants.BACKGROUND_TEXTURE,
+    Constants.FLAME_SPRITESHEET, Constants.PROJECTILE_SPRITESHEET,
+    Constants.BOOST_SPRITESHEET
+  ]).
   on("progress", loadProgressHandler).
   load(setup);
 

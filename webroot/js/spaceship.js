@@ -7,7 +7,7 @@ const healthBarRadius = 40;
 const energyBarRadius = 50;
 
 export default class Spaceship {
-  constructor(shipTexture, thrustAnimationFrames, frameId) {
+  constructor(shipTexture, thrustAnimationFrames, boostAnimationFrames, frameId) {
     this.createHealthBarFilter();
     this.createEnergyBarFilter();
     this.moveFilter = new MoveFilter(frameId);
@@ -15,9 +15,14 @@ export default class Spaceship {
     this.container = new PIXI.Container();
     this.sprite = new PIXI.Sprite(shipTexture);
     this.thrustAnimation = new PIXI.extras.MovieClip(thrustAnimationFrames);
+    this.boostAnimation = new PIXI.extras.MovieClip(boostAnimationFrames);
 
     this.thrustAnimation.position.set(-27, 7);
     this.thrustAnimation.animationSpeed = 0.5;
+
+    this.boostAnimation.rotation = Math.PI / 2;
+    this.boostAnimation.animationSpeed = 0.3;
+    this.boostAnimation.position.set(70, -24);
 
     if (__DEBUG__) {
       this.collisionSphere = new PIXI.Graphics();
@@ -36,6 +41,7 @@ export default class Spaceship {
     this.label = new PIXI.Text('', this.labelTextStyle);
 
     stage.addChild(this.container);
+    this.container.addChild(this.boostAnimation);
     this.container.addChild(this.sprite);
     this.container.addChild(this.thrustAnimation);
     this.addHealthBar();
@@ -88,6 +94,14 @@ export default class Spaceship {
     } else {
       this.thrustAnimation.visible = false;
       this.thrustAnimation.stop();
+    }
+
+    if (this.moveFilter.inputBoost()) {
+      this.boostAnimation.visible = true;
+      this.boostAnimation.play();
+    } else {
+      this.boostAnimation.visible = false;
+      this.boostAnimation.stop();
     }
 
     const {x, y} = Utils.translateToViewport(

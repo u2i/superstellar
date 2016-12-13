@@ -106,6 +106,7 @@ func (sender *Sender) sendHelloMessage(clientID uint32) {
 		SpaceshipMaxAngularVelocity:           constants.SpaceshipMaxAngularVelocity,
 		SpaceshipAngularFriction:              constants.SpaceshipAngularFriction,
 		SpaceshipMaxSpeed:                     constants.SpaceshipMaxSpeed,
+		SpaceshipBoostFactor:                  constants.SpaceshipBoostFactor,
 		AutoRepairInterval:                    constants.AutoRepairInterval,
 		AutoRepairAmount:                      constants.AutoRepairAmount,
 		AutoEnergyRechargeAmount:              constants.AutoEnergyRechargeAmount,

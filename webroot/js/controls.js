@@ -11,6 +11,7 @@ const KEY_RIGHT = 39;
 const KEY_W     = 87;
 const KEY_A     = 65;
 const KEY_D     = 68;
+const KEY_SHIFT = 16;
 
 const keysDown = new Map();
 
@@ -21,6 +22,7 @@ keysDown.set(KEY_RIGHT, false);
 keysDown.set(KEY_W, false);
 keysDown.set(KEY_A, false);
 keysDown.set(KEY_D, false);
+keysDown.set(KEY_SHIFT, false);
 
 const updateKeysState = (keyCode, isPressed) => {
   const lastState = keysDown.get(keyCode);
@@ -51,14 +53,17 @@ const sendInput = (keyCode, isPressed) => {
     break;
   case KEY_LEFT:
   case KEY_A:
-    userInput = isPressed ? "LEFT" : "CENTER"
+    userInput = isPressed ? "LEFT" : "CENTER";
     break;
   case KEY_RIGHT:
   case KEY_D:
-    userInput = isPressed ? "RIGHT" : "CENTER"
+    userInput = isPressed ? "RIGHT" : "CENTER";
     break;
   case KEY_SPACE:
-    userInput = isPressed ? "FIRE_START" : "FIRE_STOP"
+    userInput = isPressed ? "FIRE_START" : "FIRE_STOP";
+    break;
+  case KEY_SHIFT:
+    userInput = isPressed ? "BOOST_ON" : "BOOST_OFF";
     break;
   }
 

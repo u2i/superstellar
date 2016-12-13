@@ -174,33 +174,39 @@
                 },
                 {
                     "rule": "optional",
-                    "type": "uint32",
-                    "name": "maxHp",
+                    "type": "bool",
+                    "name": "inputBoost",
                     "id": 8
                 },
                 {
                     "rule": "optional",
                     "type": "uint32",
-                    "name": "hp",
+                    "name": "maxHp",
                     "id": 9
                 },
                 {
                     "rule": "optional",
                     "type": "uint32",
-                    "name": "maxEnergy",
+                    "name": "hp",
                     "id": 10
                 },
                 {
                     "rule": "optional",
                     "type": "uint32",
-                    "name": "energy",
+                    "name": "maxEnergy",
                     "id": 11
                 },
                 {
                     "rule": "optional",
                     "type": "uint32",
-                    "name": "autoRepairDelay",
+                    "name": "energy",
                     "id": 12
+                },
+                {
+                    "rule": "optional",
+                    "type": "uint32",
+                    "name": "autoRepairDelay",
+                    "id": 13
                 }
             ]
         },
@@ -423,21 +429,27 @@
                 },
                 {
                     "rule": "optional",
-                    "type": "uint32",
-                    "name": "autoRepairInterval",
+                    "type": "float",
+                    "name": "spaceshipBoostFactor",
                     "id": 10
                 },
                 {
                     "rule": "optional",
                     "type": "uint32",
-                    "name": "autoRepairAmount",
+                    "name": "autoRepairInterval",
                     "id": 11
                 },
                 {
                     "rule": "optional",
                     "type": "uint32",
-                    "name": "autoEnergyRechargeAmount",
+                    "name": "autoRepairAmount",
                     "id": 12
+                },
+                {
+                    "rule": "optional",
+                    "type": "uint32",
+                    "name": "autoEnergyRechargeAmount",
+                    "id": 13
                 }
             ]
         },
@@ -627,6 +639,14 @@
                 {
                     "name": "FIRE_STOP",
                     "id": 6
+                },
+                {
+                    "name": "BOOST_ON",
+                    "id": 7
+                },
+                {
+                    "name": "BOOST_OFF",
+                    "id": 8
                 }
             ]
         }

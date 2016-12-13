@@ -10,6 +10,9 @@ export const FLAME_SPRITESHEET_FRAME_NAMES = [0, 1, 2, 3].map((i) => `thrust_yel
 export const PROJECTILE_SPRITESHEET = "spritesheets/projectile.json";
 export const PROJECTILE_SPRITESHEET_FRAME_NAMES = [1, 2, 3].map((i) => `bullet${i}.png`);
 
+export const BOOST_SPRITESHEET = "spritesheets/boost.json";
+export const BOOST_SPRITESHEET_FRAME_NAMES = [1, 2].map((i) => `boost_0${i}.png`);
+
 // ********** PROTOBUFS **********
 export const PROTOBUF_DEFINITION      = "js/superstellar_proto.json";
 export const SPACE_DEFINITION         = "superstellar.Space";
