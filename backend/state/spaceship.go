@@ -184,6 +184,16 @@ func (s *Spaceship) ShootIfPossible() (canShoot bool) {
 	return canShoot
 }
 
+func (s *Spaceship) BoostIfPossible() (canBoost bool) {
+	if s.Energy >= constants.BoostPerFrameEnergyCost {
+		canBoost = true
+		s.Energy -= constants.BoostPerFrameEnergyCost
+	} else {
+		canBoost = false
+	}
+	return canBoost
+}
+
 func (s *Spaceship) CollideWithProjectile(projectile *Projectile) {
 	if s.HP < constants.ProjectileDamage {
 		s.HP = 0

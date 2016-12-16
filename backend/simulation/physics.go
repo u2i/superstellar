@@ -88,8 +88,17 @@ func updateSpaceships(s *state.Space, eventDispatcher *events.EventDispatcher) {
 			spaceship.Velocity = spaceship.Velocity.Add(deltaVelocity)
 		}
 
-		maxVelocity := float64(constants.SpaceshipMaxSpeed)
+
+		boostActive := false
+
 		if spaceship.InputBoost {
+			boostActive = spaceship.BoostIfPossible()
+		}
+
+		spaceship.InputBoost = boostActive
+
+		maxVelocity := float64(constants.SpaceshipMaxSpeed)
+		if boostActive {
 			maxVelocity *= constants.SpaceshipBoostFactor
 		}
 

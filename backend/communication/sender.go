@@ -110,6 +110,7 @@ func (sender *Sender) sendHelloMessage(clientID uint32) {
 		AutoRepairInterval:                    constants.AutoRepairInterval,
 		AutoRepairAmount:                      constants.AutoRepairAmount,
 		AutoEnergyRechargeAmount:              constants.AutoEnergyRechargeAmount,
+		BoostPerFrameEnergyCost:               constants.BoostPerFrameEnergyCost,
 	}
 
 	message := &pb.Message{

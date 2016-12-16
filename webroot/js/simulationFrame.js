@@ -81,8 +81,19 @@ export default class SimulationFrame {
   }
 
   limitMaxSpeed() {
-    let maxVelocity = constants.spaceshipMaxSpeed;
+    let boostActive = false;
+
     if (this.inputBoost) {
+      if (this.energy >= constants.boostPerFrameEnergyCost) {
+        this.energy -= constants.boostPerFrameEnergyCost;
+        boostActive = true;
+      }
+    }
+
+    this.inputBoost = boostActive;
+
+    let maxVelocity = constants.spaceshipMaxSpeed;
+    if (boostActive) {
       maxVelocity *= constants.spaceshipBoostFactor;
     }
 

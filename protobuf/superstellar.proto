@@ -109,6 +109,7 @@ message Constants {
   uint32 autoRepairInterval = 11;
   uint32 autoRepairAmount = 12;
   uint32 autoEnergyRechargeAmount = 13;
+  uint32 boostPerFrameEnergyCost = 14;
 }
 
 message JoinGame {

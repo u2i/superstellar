@@ -450,6 +450,12 @@
                     "type": "uint32",
                     "name": "autoEnergyRechargeAmount",
                     "id": 13
+                },
+                {
+                    "rule": "optional",
+                    "type": "uint32",
+                    "name": "boostPerFrameEnergyCost",
+                    "id": 14
                 }
             ]
         },

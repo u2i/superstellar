@@ -67,6 +67,9 @@ const (
 	// Energy cost of a single shot
 	BasicWeaponEnergyCost = 100
 
+	// Energy cost of frame of boosting
+	BoostPerFrameEnergyCost = 20
+
 	// WorldRadius is the radius of playable world (in .01 units)
 	WorldRadius = 100000
 
