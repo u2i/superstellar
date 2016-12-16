@@ -56,7 +56,7 @@ export default class SimulationFrame {
   }
 
   applyInputThrust() {
-    if (this.inputThrust) {
+    if (this.inputThrust || this.inputBoost) {
       let facingVector = new Victor(Math.cos(this.facing), -Math.sin(this.facing));
       let deltaVelocity = facingVector.scalarMultiply(constants.spaceshipAcceleration);
       this.velocity.add(deltaVelocity);

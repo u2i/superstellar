@@ -88,7 +88,7 @@ export default class Spaceship {
   }
 
   update(viewport) {
-    if (this.moveFilter.inputThrust()) {
+    if (this.moveFilter.inputThrust() || this.moveFilter.inputBoost()) {
       this.thrustAnimation.visible = true;
       this.thrustAnimation.play();
     } else {

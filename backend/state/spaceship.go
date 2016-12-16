@@ -98,11 +98,9 @@ func (s *Spaceship) UpdateUserInput(userInput pb.UserInput) {
 	case pb.UserInput_FIRE_STOP:
 		s.Fire = false
 	case pb.UserInput_BOOST_ON:
-		s.InputThrust = true
 		s.InputBoost = true
 		s.MarkDirty()
 	case pb.UserInput_BOOST_OFF:
-		s.InputThrust = false
 		s.InputBoost = false
 		s.MarkDirty()
 	}

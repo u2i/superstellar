@@ -68,7 +68,7 @@ func updateSpaceships(s *state.Space, eventDispatcher *events.EventDispatcher) {
 			}
 		}
 
-		if spaceship.InputThrust {
+		if spaceship.InputThrust || spaceship.InputBoost {
 			deltaVelocity := types.NewVector(math.Cos(spaceship.Facing), -math.Sin(spaceship.Facing)).Multiply(constants.SpaceshipAcceleration)
 			spaceship.Velocity = spaceship.Velocity.Add(deltaVelocity)
 		} else {
