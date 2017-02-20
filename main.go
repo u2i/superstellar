@@ -18,6 +18,8 @@ import (
 	"superstellar/backend/monitor"
 	"superstellar/backend/simulation"
 	"superstellar/backend/state"
+	"superstellar/backend/ai"
+	"superstellar/backend/utils"
 )
 
 func main() {
@@ -44,7 +46,9 @@ func main() {
 	eventDispatcher.RegisterUserDiedListener(updater)
 	eventDispatcher.RegisterTargetAngleListener(updater)
 
-	srv := communication.NewServer("/superstellar", monitor, eventDispatcher)
+	clientIdSequencer := utils.NewIdSequencer()
+
+	srv := communication.NewServer("/superstellar", monitor, eventDispatcher, clientIdSequencer)
 	eventDispatcher.RegisterUserLeftListener(srv)
 
 	sender := communication.NewSender(srv, space)
@@ -54,6 +58,13 @@ func main() {
 	eventDispatcher.RegisterUserLeftListener(sender)
 	eventDispatcher.RegisterUserJoinedListener(sender)
 	eventDispatcher.RegisterUserDiedListener(sender)
+
+	botManager := ai.NewBotManager(space, clientIdSequencer)
+	botManager.CreateNewBot()
+	botManager.CreateNewBot()
+	botManager.CreateNewBot()
+	botManager.CreateNewBot()
+	eventDispatcher.RegisterTimeTickListener(botManager)
 
 	if debug {
 		fileWriter, err := communication.NewFileWriter(space)

@@ -8,8 +8,8 @@ import (
 
 	"golang.org/x/net/websocket"
 	"superstellar/backend/events"
-	"sync/atomic"
 	"superstellar/backend/monitor"
+	"superstellar/backend/utils"
 )
 
 // Server struct holds server variables.
@@ -19,16 +19,18 @@ type Server struct {
 	monitor          *monitor.Monitor
 	clientID         uint32
 	eventsDispatcher *events.EventDispatcher
+	clientIdSeq      *utils.IdSequencer
 }
 
 // NewServer initializes a new server.
-func NewServer(pattern string, monitor *monitor.Monitor, eventDispatcher *events.EventDispatcher) *Server {
+func NewServer(pattern string, monitor *monitor.Monitor, eventDispatcher *events.EventDispatcher, clientIdSeq *utils.IdSequencer) *Server {
 	return &Server{
 		pattern:      pattern,
 		clients:      make(map[uint32]*Client),
 		monitor:      monitor,
 		clientID:     0,
 		eventsDispatcher: eventDispatcher,
+		clientIdSeq:  clientIdSeq,
 	}
 }
 
@@ -44,7 +46,7 @@ func (s *Server) Listen() {
 			}
 		}()
 
-		client := NewClient(ws, s.monitor, s.eventsDispatcher, s.nextClientID())
+		client := NewClient(ws, s.monitor, s.eventsDispatcher, s.clientIdSeq.NextId())
 		s.clients[client.id] = client
 
 		log.Println("Added new client. Now", len(s.clients), "clients connected.")
@@ -75,8 +77,4 @@ func (s *Server) SendToClient(clientID uint32, message proto.Message) {
 
 func (s *Server) HandleUserLeft(userLeftEvent *events.UserLeft) {
 	delete(s.clients, userLeftEvent.ClientID)
-}
-
-func (s *Server) nextClientID() uint32 {
-	return atomic.AddUint32(&s.clientID, 1)
 }

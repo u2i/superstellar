@@ -27,9 +27,10 @@ func NewSpace() *Space {
 }
 
 // NewSpaceship creates a new spaceship and adds it to the space.
-func (space *Space) NewSpaceship(clientID uint32) {
+func (space *Space) NewSpaceship(clientID uint32) *Spaceship {
 	spaceship := NewSpaceship(clientID, space.randomEmptyPosition())
 	space.AddSpaceship(clientID, spaceship)
+	return spaceship
 }
 
 // AddSpaceship adds new spaceship to the space.
