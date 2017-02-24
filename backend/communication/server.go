@@ -78,3 +78,12 @@ func (s *Server) SendToClient(clientID uint32, message proto.Message) {
 func (s *Server) HandleUserLeft(userLeftEvent *events.UserLeft) {
 	delete(s.clients, userLeftEvent.ClientID)
 }
+
+func (s *Server) ClientIDs() []uint32 {
+	clientIDs := make([]uint32, 0, len(s.clients))
+	for k := range s.clients {
+		clientIDs = append(clientIDs, k)
+	}
+
+	return clientIDs
+}

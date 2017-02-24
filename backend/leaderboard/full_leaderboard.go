@@ -11,11 +11,14 @@ type FullLeaderboard struct {
 	ranks []Rank
 }
 
-func FullLeaderboardFromSpace(space *state.Space) *FullLeaderboard {
+func FullLeaderboardFromSpace(space *state.Space, clients []uint32) *FullLeaderboard {
 	size := len(space.Spaceships)
 	ranks := make([]Rank, 0, size)
-	for _, spaceship := range space.Spaceships {
-		ranks = append(ranks, Rank{spaceship.ID, spaceship.MaxHP})
+	for _, client := range clients {
+		spaceship, ok := space.Spaceships[client]
+		if ok {
+			ranks = append(ranks, Rank{client, spaceship.MaxHP})
+		}
 	}
 	sort.Stable(sort.Reverse(SortableByScore(ranks)))
 	return &FullLeaderboard{ranks: ranks}
