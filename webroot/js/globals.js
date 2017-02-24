@@ -21,7 +21,8 @@ export const globalState = {
   killedBy: null,
   worldSizeFilter: new AnnulusFilter(),
   ping: null,
-  framesCalculator: new FramesCalculator()
+  framesCalculator: new FramesCalculator(),
+  asteroidsMap: new Map()
 };
 
 export var constants = {};

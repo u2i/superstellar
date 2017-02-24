@@ -10,6 +10,7 @@ import { initializeHandlers } from './messageHandlers';
 import Hud from './hud';
 import UsernameDialog from "./dialogs/usernameDialog";
 import Radar from './radar';
+import Asteroid from './asteroid'
 
 const HOST = window.location.hostname;
 const PORT = BACKEND_PORT;
@@ -63,6 +64,7 @@ function setup() {
   dialog.show()
 
   leaderboardDialog.show();
+  globalState.asteroidsMap.set(1, new Asteroid(1));
 
   main();
 }
@@ -96,6 +98,7 @@ const render = function () {
 
   globalState.spaceshipMap.forEach((spaceship) => spaceship.update(viewport));
   globalState.projectilesMap.forEach((projectile) => projectile.update(viewport, currentFrameId));
+  globalState.asteroidsMap.forEach((asteroid) => asteroid.update(viewport));
 
   if(myShip) {
     radar.update(myShip, viewport);
