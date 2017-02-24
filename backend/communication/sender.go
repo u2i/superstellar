@@ -68,7 +68,7 @@ func (sender *Sender) sendSpace() {
 }
 
 func (sender *Sender) sendLeaderboard() {
-	fullLeaderboard := leaderboard.FullLeaderboardFromSpace(sender.space)
+	fullLeaderboard := leaderboard.FullLeaderboardFromSpace(sender.space, sender.server.ClientIDs())
 	leaderboards := fullLeaderboard.BuildLeaderboards()
 
 	for _, l := range leaderboards {
