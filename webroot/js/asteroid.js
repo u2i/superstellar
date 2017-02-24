@@ -1,6 +1,11 @@
-import { stage } from './globals.js';
-import { ASTEROID_01_TEXTURE } from './constants.js';
+import { stage, constants } from './globals.js';
+import { ASTEROID_01_TEXTURE } from './constants.js'
 import * as Utils from './utils.js';
+import Victor from 'victor';
+
+Victor.prototype.scalarMultiply = function(scalar) {
+  return this.multiply(new Victor(scalar, scalar));
+}
 
 export default class Asteroid {
   constructor (id) {
@@ -8,9 +13,8 @@ export default class Asteroid {
 
     this.sprite = new PIXI.Sprite(PIXI.Texture.fromImage(ASTEROID_01_TEXTURE));
 
-    this.position = new PIXI.Point();
-    this.position.x = 200;
-    this.position.y = 200;
+    this.position = new Victor(200, 200);
+    this.velocity = new Victor(900, 0);
 
     this.container = new PIXI.Container();
     this.container.position = this.position
@@ -20,8 +24,10 @@ export default class Asteroid {
   }
 
   update (viewport) {
+    this._updatePosition();
+
     const translatedPosition = Utils.translateToViewport(
-      this.position.x + 1 / 100,
+      this.position.x / 100,
       this.position.y / 100,
       viewport
     )
@@ -30,6 +36,20 @@ export default class Asteroid {
 
   remove () {
     stage.removeChild(this.container);
+  }
+
+  _updatePosition() {
+    this._applyAnnulus()
+    this.position = new Victor(this.position.x + this.velocity.x, this.position.y + this.velocity.y);
+  }
+
+  _applyAnnulus() {
+    if (this.position.length() > constants.worldRadius) {
+      let outreachLength = this.position.length() - constants.worldRadius;
+      let gravityAcceleration = -(outreachLength / constants.boundaryAnnulusWidth) * constants.spaceshipAcceleration;
+      let deltaVelocity = this.position.clone().normalize().scalarMultiply(gravityAcceleration);
+      this.velocity.add(deltaVelocity);
+    }
   }
 }
 

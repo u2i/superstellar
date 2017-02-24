@@ -88,7 +88,6 @@ func updateSpaceships(s *state.Space, eventDispatcher *events.EventDispatcher) {
 			spaceship.Velocity = spaceship.Velocity.Add(deltaVelocity)
 		}
 
-
 		boostActive := false
 
 		if spaceship.InputBoost {

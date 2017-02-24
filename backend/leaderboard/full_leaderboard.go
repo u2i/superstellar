@@ -1,10 +1,10 @@
 package leaderboard
 
 import (
-	"superstellar/backend/state"
-	"superstellar/backend/constants"
-	. "superstellar/math"
 	"sort"
+	"superstellar/backend/constants"
+	"superstellar/backend/state"
+	. "superstellar/math"
 )
 
 type FullLeaderboard struct {
@@ -25,10 +25,10 @@ func (fullLeaderboard *FullLeaderboard) BuildLeaderboard(userRank Rank, userPosi
 	size := Min(len(fullLeaderboard.ranks), constants.LeaderboardLength)
 
 	leaderboard := Leaderboard{
-		ClientId: userRank.clientId,
+		ClientId:     userRank.clientId,
 		userPosition: userPosition,
-		userScore: userRank.score,
-		ranks: fullLeaderboard.ranks[0:size:size],
+		userScore:    userRank.score,
+		ranks:        fullLeaderboard.ranks[0:size:size],
 	}
 	return &leaderboard
 }
@@ -38,7 +38,7 @@ func (fullLeaderboard *FullLeaderboard) BuildLeaderboards() []*Leaderboard {
 	leaderboards := make([]*Leaderboard, size, size)
 
 	for i, userRank := range fullLeaderboard.ranks {
-		leaderboard := fullLeaderboard.BuildLeaderboard(userRank, uint16(i + 1))
+		leaderboard := fullLeaderboard.BuildLeaderboard(userRank, uint16(i+1))
 		leaderboards[i] = leaderboard
 	}
 

@@ -1,12 +1,12 @@
 package simulation
 
 import (
+	"log"
 	"superstellar/backend/constants"
 	"superstellar/backend/events"
 	"superstellar/backend/monitor"
 	"superstellar/backend/state"
 	"time"
-	"log"
 )
 
 type Updater struct {
@@ -45,7 +45,7 @@ func (updater *Updater) HandleTimeTick(*events.TimeTick) {
 	UpdatePhysics(updater.space, updater.eventDispatcher)
 
 	if updater.space.PhysicsFrameID == 1 {
-		log.Println("Simulation start timestamp:", time.Now().UnixNano() / time.Millisecond.Nanoseconds())
+		log.Println("Simulation start timestamp:", time.Now().UnixNano()/time.Millisecond.Nanoseconds())
 	}
 
 	elapsed := time.Since(before)

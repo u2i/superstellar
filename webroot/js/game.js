@@ -48,6 +48,8 @@ function setup() {
   tilingSprite = new PIXI.extras.TilingSprite(bgTexture, renderer.width, renderer.height);
   stage.addChild(tilingSprite);
 
+  //globalState.asteroidsMap.set(1, new Asteroid(1));
+
   overlay = new PIXI.Graphics();
   overlay.drawRect(0, 0, 10, 10);
   overlay.filterArea = new PIXI.Rectangle(0, 0, renderer.width, renderer.height);
@@ -64,7 +66,6 @@ function setup() {
   dialog.show()
 
   leaderboardDialog.show();
-  globalState.asteroidsMap.set(1, new Asteroid(1));
 
   main();
 }
@@ -98,7 +99,7 @@ const render = function () {
 
   globalState.spaceshipMap.forEach((spaceship) => spaceship.update(viewport));
   globalState.projectilesMap.forEach((projectile) => projectile.update(viewport, currentFrameId));
-  globalState.asteroidsMap.forEach((asteroid) => asteroid.update(viewport));
+  globalState.asteroidsMap.forEach((asteroid) => asteroid.update(viewport, currentFrameId));
 
   if(myShip) {
     radar.update(myShip, viewport);
