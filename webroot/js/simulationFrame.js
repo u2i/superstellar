@@ -38,9 +38,9 @@ export default class SimulationFrame {
     this.applyAnnulus();
     this.limitMaxSpeed();
 
-    this.position.add(this.velocity);
-
     this.applyTurn();
+
+    this.position.add(this.velocity);
     this.updateAngularVelocity();
 
     this.applyAutoRepair();

@@ -16,6 +16,7 @@ import (
 func UpdatePhysics(space *state.Space, eventDispatcher *events.EventDispatcher) {
 	detectProjectileCollisions(space, eventDispatcher)
 	updateSpaceships(space, eventDispatcher)
+	updateObjectsStates(space)
 	checkCollisions(space)
 
 	space.PhysicsFrameID++
@@ -55,9 +56,6 @@ func updateSpaceships(s *state.Space, eventDispatcher *events.EventDispatcher) {
 	now := time.Now()
 
 	for _, spaceship := range s.Spaceships {
-		var object state.Object
-		object = spaceship
-
 		// FIRING
 
 		if spaceship.Fire {
@@ -125,11 +123,6 @@ func updateSpaceships(s *state.Space, eventDispatcher *events.EventDispatcher) {
 			// TODO: add easing when returning to base velocity
 		}
 
-		// POSITION UPDATE
-
-		object.SetPosition(object.Position().Add(object.Velocity()))
-
-
 		// TURNING
 
 		if spaceship.TargetAngle != nil {
@@ -144,20 +137,29 @@ func updateSpaceships(s *state.Space, eventDispatcher *events.EventDispatcher) {
 				spaceship.ApplyAngularFriction()
 			}
 		}
+	}
+}
+
+func updateObjectsStates(s *state.Space) {
+	for _, object := range s.Objects {
+
+		// POSITION UPDATE
+
+		object.SetPosition(object.Position().Add(object.Velocity()))
 
 		// APPLY ANGULAR VELOCITY
 
-		spaceship.SetAngularVelocity(spaceship.AngularVelocity() + spaceship.AngularVelocityDelta)
-		spaceship.AngularVelocityDelta = 0.0
+		object.SetAngularVelocity(object.AngularVelocity() + object.AngularVelocityDelta())
+		object.SetAngularVelocityDelta(0.0)
 
-		spaceship.SetFacing(spaceship.Facing() - spaceship.AngularVelocity())
-		if math.Abs(spaceship.Facing()) > math.Pi {
-			spaceship.SetFacing(spaceship.Facing() - math.Copysign(2*math.Pi, spaceship.Facing()))
+		object.SetFacing(object.Facing() - object.AngularVelocity())
+		if math.Abs(object.Facing()) > math.Pi {
+			object.SetFacing(object.Facing() - math.Copysign(2*math.Pi, object.Facing()))
 		}
 
 		// NOTIFY ABOUT NEW FRAME
 
-		spaceship.NotifyAboutNewFrame()
+		object.NotifyAboutNewFrame()
 	}
 }
 
@@ -195,19 +197,19 @@ func checkCollisions(s *state.Space) {
 	}
 
 	for e := queue.Front(); e != nil; e = e.Next() {
-		spaceship := e.Value.(*state.Spaceship)
-		collidedThisTurn[spaceship] = true
-		spaceship.SetPosition(spaceship.Position().Add(oldVelocity[spaceship]))
+		object := e.Value.(state.Object)
+		collidedThisTurn[object] = true
+		object.SetPosition(object.Position().Add(oldVelocity[object]))
 
 		for _, otherObject := range s.Objects {
-			if !collidedThisTurn[otherObject] && spaceship.DetectCollision(otherObject) {
+			if !collidedThisTurn[otherObject] && object.DetectCollision(otherObject) {
 				oldVelocity[otherObject] = otherObject.Velocity().Multiply(-1.0)
 				if !visited[otherObject] {
 					visited[otherObject] = true
 					queue.PushBack(otherObject)
 				}
 
-				spaceship.Collide(otherObject)
+				object.Collide(otherObject)
 			}
 		}
 	}

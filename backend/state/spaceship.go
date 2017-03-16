@@ -23,7 +23,6 @@ const (
 // Spaceship struct describes a spaceship.
 type Spaceship struct {
 	ObjectState
-	AngularVelocityDelta float64
 	InputThrust          bool
 	InputBoost           bool
 	InputDirection       Direction
@@ -42,7 +41,6 @@ func NewSpaceship(clientId uint32, initialPosition *types.Point) *Spaceship {
 
 	return &Spaceship{
 		ObjectState:               *objectState,
-		AngularVelocityDelta:      0,
 		InputThrust:               false,
 		InputDirection:            NONE,
 		Fire:                      false,
@@ -96,7 +94,7 @@ func (s *Spaceship) UpdateUserInput(userInput pb.UserInput) {
 
 func (s *Spaceship) NotifyAboutNewFrame() {
 	s.ObjectState.NotifyAboutNewFrame()
-	
+
 	s.handleAutoEnergyRecharge()
 	s.handleAutoRepair()
 }
@@ -185,12 +183,12 @@ func (s *Spaceship) handleAutoEnergyRecharge() {
 }
 
 func (s *Spaceship) LeftTurn() {
-	s.AngularVelocityDelta = s.angularVelocityDelta()
+	s.SetAngularVelocityDelta(s.angularVelocityDelta())
 	s.LimitAngularVelocityDelta()
 }
 
 func (s *Spaceship) RightTurn() {
-	s.AngularVelocityDelta = -s.angularVelocityDelta()
+	s.SetAngularVelocityDelta(-s.angularVelocityDelta())
 	s.LimitAngularVelocityDelta()
 }
 
@@ -203,17 +201,17 @@ func (s *Spaceship) TurnToTarget() {
 	}
 
 	targetAngularVelocity := -offset * constants.SpaceshipTurnToAngleP
-	s.AngularVelocityDelta = targetAngularVelocity - s.AngularVelocity()
+	s.SetAngularVelocityDelta(targetAngularVelocity - s.AngularVelocity())
 
 	s.LimitAngularVelocityDelta()
 }
 
 func (s *Spaceship) LimitAngularVelocityDelta() {
-	potentialAngularVelocity := s.AngularVelocity() + s.AngularVelocityDelta
+	potentialAngularVelocity := s.AngularVelocity() + s.AngularVelocityDelta()
 	diff := math.Abs(potentialAngularVelocity) - constants.SpaceshipMaxAngularVelocity
 
 	if diff > 0 {
-		s.AngularVelocityDelta -= math.Copysign(diff, s.AngularVelocity())
+		s.SetAngularVelocityDelta(s.AngularVelocityDelta() - math.Copysign(diff, s.AngularVelocity()))
 	}
 }
 
