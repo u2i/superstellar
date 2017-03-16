@@ -22,17 +22,17 @@ type Projectile struct {
 
 // NewProjectile returns new instance of Projectile
 func NewProjectile(ID, frameID uint32, spaceship *Spaceship) *Projectile {
-	facingVector := types.NewVector(math.Cos(spaceship.Facing), -math.Sin(spaceship.Facing))
+	facingVector := types.NewVector(math.Cos(spaceship.Facing()), -math.Sin(spaceship.Facing()))
 
 	return &Projectile{
 		ID:        ID,
-		ClientID:  spaceship.ID,
+		ClientID:  spaceship.Id(),
 		Spaceship: spaceship,
 		FrameID:   frameID,
-		Origin:    spaceship.Position,
-		Position:  spaceship.Position,
-		Facing:    float32(spaceship.Facing),
-		Velocity:  facingVector.Multiply(constants.ProjectileSpeed).Add(spaceship.Velocity),
+		Origin:    spaceship.Position(),
+		Position:  spaceship.Position(),
+		Facing:    float32(spaceship.Facing()),
+		Velocity:  facingVector.Multiply(constants.ProjectileSpeed).Add(spaceship.Velocity()),
 		TTL:       constants.ProjectileDefaultTTL,
 	}
 }
@@ -68,11 +68,11 @@ func (projectile *Projectile) ToHitMessage() *pb.Message {
 }
 
 func (projectile *Projectile) DetectCollision(spaceship *Spaceship) (bool, *types.Point) {
-	vA := types.Point{X: projectile.Position.X - spaceship.Position.X, Y: projectile.Position.Y - spaceship.Position.Y}
+	vA := types.Point{X: projectile.Position.X - spaceship.Position().X, Y: projectile.Position.Y - spaceship.Position().Y}
 	distA := vA.Length()
 
 	endPoint := projectile.Position.Add(projectile.Velocity)
-	vB := types.Point{X: endPoint.X - spaceship.Position.X, Y: endPoint.Y - spaceship.Position.Y}
+	vB := types.Point{X: endPoint.X - spaceship.Position().X, Y: endPoint.Y - spaceship.Position().Y}
 	distB := vB.Length()
 
 	if distA < constants.SpaceshipSize {

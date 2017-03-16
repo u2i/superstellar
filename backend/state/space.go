@@ -63,10 +63,10 @@ func (space *Space) NextProjectileID() uint32 {
 func (space *Space) ToProto(fullUpdate bool) *pb.Space {
 	protoSpaceships := make([]*pb.Spaceship, 0, len(space.Spaceships))
 	for _, spaceship := range space.Spaceships {
-		if fullUpdate || spaceship.Dirty {
+		if fullUpdate || spaceship.Dirty() {
 			protoSpaceships = append(protoSpaceships, spaceship.ToProto())
 			if !fullUpdate {
-				spaceship.Dirty = false
+				spaceship.MarkClean()
 			}
 		}
 	}
@@ -116,7 +116,7 @@ func (space *Space) allObjectsPositions() []*types.Point {
 	var positions []*types.Point
 
 	for _, spaceship := range space.Spaceships {
-		positions = append(positions, spaceship.Position)
+		positions = append(positions, spaceship.Position())
 	}
 
 	for projectile := range space.Projectiles {
