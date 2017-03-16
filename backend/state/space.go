@@ -10,6 +10,7 @@ import (
 
 // Space struct holds entire game state.
 type Space struct {
+	Objects               map[uint32]Object
 	Spaceships            map[uint32]*Spaceship
 	Projectiles           map[*Projectile]bool
 	PhysicsFrameID        uint32
@@ -19,6 +20,7 @@ type Space struct {
 // NewSpace initializes new Space.
 func NewSpace() *Space {
 	return &Space{
+		Objects:               make(map[uint32]Object),
 		Spaceships:            make(map[uint32]*Spaceship),
 		Projectiles:           make(map[*Projectile]bool),
 		PhysicsFrameID:        0,
@@ -35,11 +37,14 @@ func (space *Space) NewSpaceship(clientID uint32) {
 // AddSpaceship adds new spaceship to the space.
 func (space *Space) AddSpaceship(clientID uint32, spaceship *Spaceship) {
 	space.Spaceships[clientID] = spaceship
+	space.Objects[clientID] = spaceship
+
 }
 
 // RemoveSpaceship removes spaceship from the space.
 func (space *Space) RemoveSpaceship(clientID uint32) {
 	delete(space.Spaceships, clientID)
+	delete(space.Objects, clientID)
 }
 
 // AddProjectile adds projectile to the space.``

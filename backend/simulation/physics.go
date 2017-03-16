@@ -16,6 +16,11 @@ import (
 func UpdatePhysics(space *state.Space, eventDispatcher *events.EventDispatcher) {
 	detectProjectileCollisions(space, eventDispatcher)
 	updateSpaceships(space, eventDispatcher)
+	checkCollisions(space)
+
+	space.PhysicsFrameID++
+	eventDispatcher.FirePhysicsReady(&events.PhysicsReady{})
+
 	updateProjectiles(space)
 }
 
@@ -50,6 +55,11 @@ func updateSpaceships(s *state.Space, eventDispatcher *events.EventDispatcher) {
 	now := time.Now()
 
 	for _, spaceship := range s.Spaceships {
+		var object state.Object
+		object = spaceship
+
+		// FIRING
+
 		if spaceship.Fire {
 			timeSinceLastShot := now.Sub(spaceship.LastShotTime)
 			if timeSinceLastShot >= constants.MinFireInterval {
@@ -68,6 +78,8 @@ func updateSpaceships(s *state.Space, eventDispatcher *events.EventDispatcher) {
 			}
 		}
 
+		// THRUST
+
 		if spaceship.InputThrust || spaceship.InputBoost {
 			deltaVelocity := types.NewVector(math.Cos(spaceship.Facing()), -math.Sin(spaceship.Facing())).Multiply(constants.SpaceshipAcceleration)
 			spaceship.SetVelocity(spaceship.Velocity().Add(deltaVelocity))
@@ -81,6 +93,8 @@ func updateSpaceships(s *state.Space, eventDispatcher *events.EventDispatcher) {
 			}
 		}
 
+		// ANNULUS
+
 		if spaceship.Position().Add(spaceship.Velocity()).Length() > constants.WorldRadius {
 			outreachLength := spaceship.Position().Length() - constants.WorldRadius
 			gravityAcceleration := -(outreachLength / constants.BoundaryAnnulusWidth) * constants.SpaceshipAcceleration
@@ -88,6 +102,7 @@ func updateSpaceships(s *state.Space, eventDispatcher *events.EventDispatcher) {
 			spaceship.SetVelocity(spaceship.Velocity().Add(deltaVelocity))
 		}
 
+		// BOOST
 
 		boostActive := false
 
@@ -102,12 +117,20 @@ func updateSpaceships(s *state.Space, eventDispatcher *events.EventDispatcher) {
 			maxVelocity *= constants.SpaceshipBoostFactor
 		}
 
+
+		// VELOCITY LIMITING
+
 		if spaceship.Velocity().Length() > maxVelocity {
 			spaceship.SetVelocity(spaceship.Velocity().Normalize().Multiply(maxVelocity))
 			// TODO: add easing when returning to base velocity
 		}
 
-		spaceship.SetPosition(spaceship.Position().Add(spaceship.Velocity()))
+		// POSITION UPDATE
+
+		object.SetPosition(object.Position().Add(object.Velocity()))
+
+
+		// TURNING
 
 		if spaceship.TargetAngle != nil {
 			spaceship.TurnToTarget()
@@ -122,6 +145,8 @@ func updateSpaceships(s *state.Space, eventDispatcher *events.EventDispatcher) {
 			}
 		}
 
+		// APPLY ANGULAR VELOCITY
+
 		spaceship.SetAngularVelocity(spaceship.AngularVelocity() + spaceship.AngularVelocityDelta)
 		spaceship.AngularVelocityDelta = 0.0
 
@@ -130,39 +155,43 @@ func updateSpaceships(s *state.Space, eventDispatcher *events.EventDispatcher) {
 			spaceship.SetFacing(spaceship.Facing() - math.Copysign(2*math.Pi, spaceship.Facing()))
 		}
 
+		// NOTIFY ABOUT NEW FRAME
+
 		spaceship.NotifyAboutNewFrame()
 	}
+}
 
-	collided := make(map[*state.Spaceship]bool)
-	oldVelocity := make(map[*state.Spaceship]*types.Vector)
+func checkCollisions(s *state.Space) {
+	collided := make(map[state.Object]bool)
+	oldVelocity := make(map[state.Object]*types.Vector)
 
-	for _, spaceship := range s.Spaceships {
+	for _, object := range s.Objects {
 
-		collided[spaceship] = true
+		collided[object] = true
 
-		for _, otherSpaceship := range s.Spaceships {
-			if !collided[otherSpaceship] && spaceship.DetectCollision(otherSpaceship) {
-				if _, exists := oldVelocity[spaceship]; !exists {
-					oldVelocity[spaceship] = spaceship.Velocity().Multiply(-1.0)
+		for _, otherObject := range s.Spaceships {
+			if !collided[otherObject] && object.DetectCollision(otherObject) {
+				if _, exists := oldVelocity[object]; !exists {
+					oldVelocity[object] = object.Velocity().Multiply(-1.0)
 				}
 
-				if _, exists := oldVelocity[otherSpaceship]; !exists {
-					oldVelocity[otherSpaceship] = otherSpaceship.Velocity().Multiply(-1.0)
+				if _, exists := oldVelocity[otherObject]; !exists {
+					oldVelocity[otherObject] = otherObject.Velocity().Multiply(-1.0)
 				}
 
-				spaceship.Collide(otherSpaceship)
+				object.Collide(otherObject)
 			}
 		}
 	}
 
 	queue := list.New()
-	collidedThisTurn := make(map[*state.Spaceship]bool)
-	visited := make(map[*state.Spaceship]bool)
+	collidedThisTurn := make(map[state.Object]bool)
+	visited := make(map[state.Object]bool)
 
-	for spaceship := range oldVelocity {
-		queue.PushBack(spaceship)
-		collidedThisTurn[spaceship] = true
-		visited[spaceship] = true
+	for object := range oldVelocity {
+		queue.PushBack(object)
+		collidedThisTurn[object] = true
+		visited[object] = true
 	}
 
 	for e := queue.Front(); e != nil; e = e.Next() {
@@ -170,48 +199,45 @@ func updateSpaceships(s *state.Space, eventDispatcher *events.EventDispatcher) {
 		collidedThisTurn[spaceship] = true
 		spaceship.SetPosition(spaceship.Position().Add(oldVelocity[spaceship]))
 
-		for _, otherSpaceship := range s.Spaceships {
-			if !collidedThisTurn[otherSpaceship] && spaceship.DetectCollision(otherSpaceship) {
-				oldVelocity[otherSpaceship] = otherSpaceship.Velocity().Multiply(-1.0)
-				if !visited[otherSpaceship] {
-					visited[otherSpaceship] = true
-					queue.PushBack(otherSpaceship)
+		for _, otherObject := range s.Objects {
+			if !collidedThisTurn[otherObject] && spaceship.DetectCollision(otherObject) {
+				oldVelocity[otherObject] = otherObject.Velocity().Multiply(-1.0)
+				if !visited[otherObject] {
+					visited[otherObject] = true
+					queue.PushBack(otherObject)
 				}
 
-				spaceship.Collide(otherSpaceship)
+				spaceship.Collide(otherObject)
 			}
 		}
 	}
 
 	// TODO kod przeciwzakrzepowy - wywalic jak zrobimy losowe spawnowanie
-	collided2 := make(map[*state.Spaceship]bool)
+	collided2 := make(map[state.Object]bool)
 
-	for _, spaceship := range s.Spaceships {
-		collided2[spaceship] = true
-		for _, otherSpaceship := range s.Spaceships {
-			if !collided2[otherSpaceship] && spaceship.DetectCollision(otherSpaceship) {
+	for _, object := range s.Objects {
+		collided2[object] = true
+		for _, otherObject := range s.Objects {
+			if !collided2[otherObject] && object.DetectCollision(otherObject) {
 				log.Printf("COLLISON")
-				if val, exists := oldVelocity[spaceship]; exists {
+				if val, exists := oldVelocity[object]; exists {
 					log.Printf("ov1: %f %f", val.X, val.Y)
 				}
-				if val, exists := oldVelocity[otherSpaceship]; exists {
+				if val, exists := oldVelocity[otherObject]; exists {
 					log.Printf("ov2: %f %f", val.X, val.Y)
 				}
-				log.Printf("v1: %f %f", spaceship.Velocity().X, spaceship.Velocity().Y)
-				log.Printf("v2: %f %f", otherSpaceship.Velocity().X, otherSpaceship.Velocity().Y)
-				log.Printf("p1: %d %d", spaceship.Position().X, spaceship.Position().Y)
-				log.Printf("p2: %d %d", otherSpaceship.Position().X, otherSpaceship.Position().Y)
+				log.Printf("v1: %f %f", object.Velocity().X, object.Velocity().Y)
+				log.Printf("v2: %f %f", otherObject.Velocity().X, otherObject.Velocity().Y)
+				log.Printf("p1: %d %d", object.Position().X, object.Position().Y)
+				log.Printf("p2: %d %d", otherObject.Position().X, otherObject.Position().Y)
 
 				randAngle := rand.Float64() * 2 * math.Pi
 				randMove := types.NewVector(5000, 0).Rotate(randAngle)
-				spaceship.SetPosition(spaceship.Position().Add(randMove))
+				object.SetPosition(object.Position().Add(randMove))
 			}
 		}
 	}
 	// koniec kodu przeciwzakrzepowego
-
-	s.PhysicsFrameID++
-	eventDispatcher.FirePhysicsReady(&events.PhysicsReady{})
 }
 
 func applyProjectileImpulse(spaceship *state.Spaceship, projectile *state.Projectile, collisionPoint *types.Point) {
