@@ -15,7 +15,7 @@ type Direction int
 
 // Constants describing user input on spaceship rotation.
 const (
-	NONE  Direction = iota
+	NONE Direction = iota
 	RIGHT
 	LEFT
 )
@@ -23,33 +23,33 @@ const (
 // Spaceship struct describes a spaceship.
 type Spaceship struct {
 	ObjectState
-	InputThrust          bool
-	InputBoost           bool
-	InputDirection       Direction
-	TargetAngle          *float64
-	Fire                 bool
-	LastShotTime         time.Time
-	HP                   uint32
-	MaxHP                uint32
-	Energy               uint32
-	MaxEnergy            uint32
-	AutoRepairDelay      uint32
+	InputThrust     bool
+	InputBoost      bool
+	InputDirection  Direction
+	TargetAngle     *float64
+	Fire            bool
+	LastShotTime    time.Time
+	HP              uint32
+	MaxHP           uint32
+	Energy          uint32
+	MaxEnergy       uint32
+	AutoRepairDelay uint32
 }
 
 func NewSpaceship(clientId uint32, initialPosition *types.Point) *Spaceship {
 	objectState := NewObjectState(clientId, initialPosition, types.ZeroVector())
 
 	return &Spaceship{
-		ObjectState:               *objectState,
-		InputThrust:               false,
-		InputDirection:            NONE,
-		Fire:                      false,
-		LastShotTime:              time.Now(),
-		HP:                        constants.SpaceshipInitialHP,
-		MaxHP:                     constants.SpaceshipInitialHP,
-		Energy:                    constants.SpaceshipInitialEnergy,
-		MaxEnergy:                 constants.SpaceshipInitialEnergy,
-		AutoRepairDelay:           constants.AutoRepairDelay,
+		ObjectState:     *objectState,
+		InputThrust:     false,
+		InputDirection:  NONE,
+		Fire:            false,
+		LastShotTime:    time.Now(),
+		HP:              constants.SpaceshipInitialHP,
+		MaxHP:           constants.SpaceshipInitialHP,
+		Energy:          constants.SpaceshipInitialEnergy,
+		MaxEnergy:       constants.SpaceshipInitialEnergy,
+		AutoRepairDelay: constants.AutoRepairDelay,
 	}
 }
 

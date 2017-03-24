@@ -1,25 +1,27 @@
 package simulation
 
 import (
+	"log"
 	"superstellar/backend/constants"
 	"superstellar/backend/events"
 	"superstellar/backend/monitor"
 	"superstellar/backend/state"
 	"time"
-	"log"
 )
 
 type Updater struct {
-	space           *state.Space
-	monitor         *monitor.Monitor
-	eventDispatcher *events.EventDispatcher
+	space            *state.Space
+	collisionManager *CollisionManager
+	monitor          *monitor.Monitor
+	eventDispatcher  *events.EventDispatcher
 }
 
 func NewUpdater(space *state.Space, monitor *monitor.Monitor, eventDispatcher *events.EventDispatcher) *Updater {
 	return &Updater{
-		space:           space,
-		monitor:         monitor,
-		eventDispatcher: eventDispatcher,
+		space:            space,
+		collisionManager: NewCollisionManager(),
+		monitor:          monitor,
+		eventDispatcher:  eventDispatcher,
 	}
 }
 
@@ -42,10 +44,10 @@ func (updater *Updater) HandleTargetAngle(targetAngleEvent *events.TargetAngle) 
 func (updater *Updater) HandleTimeTick(*events.TimeTick) {
 	before := time.Now()
 
-	UpdatePhysics(updater.space, updater.eventDispatcher)
+	UpdatePhysics(updater.space, updater.eventDispatcher, updater.collisionManager)
 
 	if updater.space.PhysicsFrameID == 1 {
-		log.Println("Simulation start timestamp:", time.Now().UnixNano() / time.Millisecond.Nanoseconds())
+		log.Println("Simulation start timestamp:", time.Now().UnixNano()/time.Millisecond.Nanoseconds())
 	}
 
 	elapsed := time.Since(before)

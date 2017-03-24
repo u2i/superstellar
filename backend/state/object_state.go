@@ -1,9 +1,8 @@
 package state
 
 import (
-	"superstellar/backend/types"
 	"superstellar/backend/constants"
-	"math"
+	"superstellar/backend/types"
 )
 
 type ObjectState struct {
@@ -19,14 +18,14 @@ type ObjectState struct {
 
 func NewObjectState(ID uint32, position *types.Point, velocity *types.Vector) *ObjectState {
 	return &ObjectState{
-		id:                        ID,
-		position:                  position,
-		velocity:                  velocity,
-		facing:                    0.0,
-		angularVelocity:           0,
-		angularVelocityDelta:      0,
-		dirty:                     true,
-		dirtyFramesTimeout:        0,
+		id:                   ID,
+		position:             position,
+		velocity:             velocity,
+		facing:               0.0,
+		angularVelocity:      0,
+		angularVelocityDelta: 0,
+		dirty:                true,
+		dirtyFramesTimeout:   0,
 	}
 }
 
@@ -109,21 +108,5 @@ func (object *ObjectState) DetectCollision(other Object) bool {
 
 // Collide transforms colliding ships' parameters.
 func (object *ObjectState) Collide(other Object) {
-	v := types.Point{
-		X: object.Position().X - other.Position().X,
-		Y: object.Position().Y - other.Position().Y,
-	}
 
-	transformAngle := -math.Atan2(float64(v.Y), float64(v.X))
-	newV1 := object.Velocity().Rotate(transformAngle)
-	newV2 := other.Velocity().Rotate(transformAngle)
-
-	switchedV1 := types.Vector{X: newV2.X, Y: newV1.Y}
-	switchedV2 := types.Vector{X: newV1.X, Y: newV2.Y}
-
-	object.SetVelocity(switchedV1.Rotate(-transformAngle))
-	other.SetVelocity(switchedV2.Rotate(-transformAngle))
-
-	object.MarkDirty()
-	other.MarkDirty()
 }
