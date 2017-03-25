@@ -10,7 +10,6 @@ import { initializeHandlers } from './messageHandlers';
 import Hud from './hud';
 import UsernameDialog from "./dialogs/usernameDialog";
 import Radar from './radar';
-import Asteroid from './asteroid'
 
 const HOST = window.location.hostname;
 const PORT = BACKEND_PORT;
@@ -47,8 +46,6 @@ function setup() {
 
   tilingSprite = new PIXI.extras.TilingSprite(bgTexture, renderer.width, renderer.height);
   stage.addChild(tilingSprite);
-
-  //globalState.asteroidsMap.set(1, new Asteroid(1));
 
   overlay = new PIXI.Graphics();
   overlay.drawRect(0, 0, 10, 10);

@@ -9,7 +9,7 @@ Victor.prototype.scalarMultiply = function(scalar) {
   return this.multiply(new Victor(scalar, scalar));
 }
 
-export default class SimulationFrame {
+export default class SpaceshipSimulationFrame {
   constructor(frameId, data) {
     this.frameId = frameId;
 

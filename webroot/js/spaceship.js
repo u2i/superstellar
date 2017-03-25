@@ -1,7 +1,7 @@
 import * as Utils from './utils.js';
 import CircleBarFilter from './circleBarFilter';
 import {globalState, renderer, stage} from './globals.js';
-import MoveFilter from './moveFilter.js';
+import SpaceshipMoveFilter from './spaceshipMoveFilter.js';
 
 const healthBarRadius = 40;
 const energyBarRadius = 50;
@@ -10,7 +10,7 @@ export default class Spaceship {
   constructor(shipTexture, thrustAnimationFrames, boostAnimationFrames, frameId) {
     this.createHealthBarFilter();
     this.createEnergyBarFilter();
-    this.moveFilter = new MoveFilter(frameId);
+    this.moveFilter = new SpaceshipMoveFilter(frameId);
 
     this.container = new PIXI.Container();
     this.sprite = new PIXI.Sprite(shipTexture);
@@ -59,6 +59,7 @@ export default class Spaceship {
   updateData(updateFrameId, data) {
     this.moveFilter.update(updateFrameId, data);
     this.position = this.moveFilter.position();
+    this.velocity = this.moveFilter.velocity();
     this.facing = this.moveFilter.facing();
     this.hp = this.moveFilter.hp();
     this.maxHp = this.moveFilter.maxHp();
@@ -73,6 +74,7 @@ export default class Spaceship {
   predictTo(frameId) {
     this.moveFilter.predictTo(frameId);
     this.position = this.moveFilter.position();
+    this.velocity = this.moveFilter.velocity();
     this.facing = this.moveFilter.facing();
     this.hp = this.moveFilter.hp();
     this.maxHp = this.moveFilter.maxHp();

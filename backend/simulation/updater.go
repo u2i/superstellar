@@ -27,7 +27,7 @@ func NewUpdater(space *state.Space, monitor *monitor.Monitor, eventDispatcher *e
 		objectManager:     NewObjectManager(space),
 		collisionManager:  NewCollisionManager(space),
 		projectileManager: NewProjectileManager(space, eventDispatcher),
-		asteroidManager:   NewAsteroidManager(),
+		asteroidManager:   NewAsteroidManager(space),
 		monitor:           monitor,
 		eventDispatcher:   eventDispatcher,
 	}
@@ -64,6 +64,7 @@ func (updater *Updater) HandleTimeTick(*events.TimeTick) {
 
 func (updater *Updater) updatePhysics() {
 	updater.projectileManager.detectProjectileCollisions()
+	updater.asteroidManager.updateAsteroids()
 	updater.spaceshipManager.updateSpaceships()
 	updater.objectManager.updateObjects()
 	updater.collisionManager.resolveCollisions()

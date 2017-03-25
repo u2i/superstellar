@@ -1,13 +1,13 @@
-import SimulationFrame from './simulationFrame.js';
+import SpaceshipSimulationFrame from './spaceshipSimulationFrame.js';
 
-export default class MoveFilter {
+export default class SpaceshipMoveFilter {
   constructor(frameId) {
     this.frameId = frameId;
     this.simulationFrame = null;
   }
 
   update(updateFrameId, data) {
-    this.simulationFrame = new SimulationFrame(updateFrameId, data);
+    this.simulationFrame = new SpaceshipSimulationFrame(updateFrameId, data);
     this.simulationFrame.predictTo(this.frameId);
   }
 
@@ -18,6 +18,10 @@ export default class MoveFilter {
 
   position() {
     return this.simulationFrame.position;
+  }
+
+  velocity() {
+    return this.simulationFrame.velocity;
   }
 
   facing() {
