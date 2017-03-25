@@ -10,18 +10,26 @@ import (
 )
 
 type Updater struct {
-	space            *state.Space
-	collisionManager *CollisionManager
-	monitor          *monitor.Monitor
-	eventDispatcher  *events.EventDispatcher
+	space             *state.Space
+	spaceshipManager  *SpaceshipManager
+	objectManager     *ObjectManager
+	collisionManager  *CollisionManager
+	projectileManager *ProjectileManager
+	asteroidManager   *AsteroidManager
+	monitor           *monitor.Monitor
+	eventDispatcher   *events.EventDispatcher
 }
 
 func NewUpdater(space *state.Space, monitor *monitor.Monitor, eventDispatcher *events.EventDispatcher) *Updater {
 	return &Updater{
-		space:            space,
-		collisionManager: NewCollisionManager(),
-		monitor:          monitor,
-		eventDispatcher:  eventDispatcher,
+		space:             space,
+		spaceshipManager:  NewSpaceshipManager(space, eventDispatcher),
+		objectManager:     NewObjectManager(space),
+		collisionManager:  NewCollisionManager(space),
+		projectileManager: NewProjectileManager(space, eventDispatcher),
+		asteroidManager:   NewAsteroidManager(),
+		monitor:           monitor,
+		eventDispatcher:   eventDispatcher,
 	}
 }
 
@@ -44,7 +52,7 @@ func (updater *Updater) HandleTargetAngle(targetAngleEvent *events.TargetAngle) 
 func (updater *Updater) HandleTimeTick(*events.TimeTick) {
 	before := time.Now()
 
-	UpdatePhysics(updater.space, updater.eventDispatcher, updater.collisionManager)
+	updater.updatePhysics()
 
 	if updater.space.PhysicsFrameID == 1 {
 		log.Println("Simulation start timestamp:", time.Now().UnixNano()/time.Millisecond.Nanoseconds())
@@ -52,6 +60,18 @@ func (updater *Updater) HandleTimeTick(*events.TimeTick) {
 
 	elapsed := time.Since(before)
 	updater.monitor.AddPhysicsTime(elapsed)
+}
+
+func (updater *Updater) updatePhysics() {
+	updater.projectileManager.detectProjectileCollisions()
+	updater.spaceshipManager.updateSpaceships()
+	updater.objectManager.updateObjects()
+	updater.collisionManager.resolveCollisions()
+
+	updater.space.PhysicsFrameID++
+	updater.eventDispatcher.FirePhysicsReady(&events.PhysicsReady{})
+
+	updater.projectileManager.updateProjectiles()
 }
 
 func (updater *Updater) HandleUserJoined(userJoinedEvent *events.UserJoined) {

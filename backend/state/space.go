@@ -40,7 +40,12 @@ func (space *Space) NewSpaceship(clientID uint32) {
 func (space *Space) AddSpaceship(clientID uint32, spaceship *Spaceship) {
 	space.Spaceships[clientID] = spaceship
 	space.Objects[clientID] = spaceship
+}
 
+// AddAsteroid adds new spaceship to the space.
+func (space *Space) AddAsteroid(asteroid *Asteroid) {
+	space.Asteroids[asteroid.id] = asteroid
+	space.Objects[asteroid.id] = asteroid
 }
 
 // RemoveSpaceship removes spaceship from the space.

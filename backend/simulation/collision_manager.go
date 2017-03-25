@@ -9,22 +9,24 @@ import (
 )
 
 type CollisionManager struct {
+	space *state.Space
 }
 
-func NewCollisionManager() *CollisionManager {
-	collisionManager := CollisionManager{}
-	return &collisionManager
+func NewCollisionManager(space *state.Space) *CollisionManager {
+	return &CollisionManager{
+		space: space,
+	}
 }
 
-func (manager *CollisionManager) resolveCollisions(space *state.Space) {
+func (manager *CollisionManager) resolveCollisions() {
 	collided := make(map[state.Object]bool)
 	oldVelocity := make(map[state.Object]*types.Vector)
 
-	for _, object := range space.Objects {
+	for _, object := range manager.space.Objects {
 
 		collided[object] = true
 
-		for _, otherObject := range space.Objects {
+		for _, otherObject := range manager.space.Objects {
 			if !collided[otherObject] && object.DetectCollision(otherObject) {
 				if _, exists := oldVelocity[object]; !exists {
 					oldVelocity[object] = object.Velocity().Multiply(-1.0)
@@ -54,7 +56,7 @@ func (manager *CollisionManager) resolveCollisions(space *state.Space) {
 		collidedThisTurn[object] = true
 		object.SetPosition(object.Position().Add(oldVelocity[object]))
 
-		for _, otherObject := range space.Objects {
+		for _, otherObject := range manager.space.Objects {
 			if !collidedThisTurn[otherObject] && object.DetectCollision(otherObject) {
 				oldVelocity[otherObject] = otherObject.Velocity().Multiply(-1.0)
 				if !visited[otherObject] {
