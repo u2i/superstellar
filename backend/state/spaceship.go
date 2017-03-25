@@ -124,6 +124,10 @@ func (s *Spaceship) ToProto() *pb.Spaceship {
 	}
 }
 
+func (s *Spaceship) AddToProtoSpace(space *pb.Space) {
+	space.Spaceships = append(space.Spaceships, s.ToProto())
+}
+
 func (s *Spaceship) ShootIfPossible() (canShoot bool) {
 	if s.Energy >= constants.BasicWeaponEnergyCost {
 		canShoot = true

@@ -12,6 +12,7 @@ import (
 type Space struct {
 	Objects               map[uint32]Object
 	Spaceships            map[uint32]*Spaceship
+	Asteroids             map[uint32]*Asteroid
 	Projectiles           map[*Projectile]bool
 	PhysicsFrameID        uint32
 	NextProjectileIDValue uint32
@@ -22,6 +23,7 @@ func NewSpace() *Space {
 	return &Space{
 		Objects:               make(map[uint32]Object),
 		Spaceships:            make(map[uint32]*Spaceship),
+		Asteroids:             make(map[uint32]*Asteroid),
 		Projectiles:           make(map[*Projectile]bool),
 		PhysicsFrameID:        0,
 		NextProjectileIDValue: 0,
@@ -67,16 +69,20 @@ func (space *Space) NextProjectileID() uint32 {
 // ToProto returns protobuf representation
 func (space *Space) ToProto(fullUpdate bool) *pb.Space {
 	protoSpaceships := make([]*pb.Spaceship, 0, len(space.Spaceships))
-	for _, spaceship := range space.Spaceships {
-		if fullUpdate || spaceship.Dirty() {
-			protoSpaceships = append(protoSpaceships, spaceship.ToProto())
+	protoAsteroids := make([]*pb.Asteroid, 0, len(space.Asteroids))
+
+	protoSpace := &pb.Space{Spaceships: protoSpaceships, Asteroids: protoAsteroids, PhysicsFrameID: space.PhysicsFrameID}
+
+	for _, object := range space.Objects {
+		if fullUpdate || object.Dirty() {
+			object.AddToProtoSpace(protoSpace)
 			if !fullUpdate {
-				spaceship.MarkClean()
+				object.MarkClean()
 			}
 		}
 	}
 
-	return &pb.Space{Spaceships: protoSpaceships, PhysicsFrameID: space.PhysicsFrameID}
+	return protoSpace
 }
 
 // ToMessage returns protobuffer Message object with Space set.

@@ -1,6 +1,9 @@
 package state
 
-import "superstellar/backend/types"
+import (
+	"superstellar/backend/types"
+	"superstellar/backend/pb"
+)
 
 type Object interface {
 	Position() *types.Point
@@ -23,4 +26,5 @@ type Object interface {
 	Collide(other Object)
 
 	NotifyAboutNewFrame()
+	AddToProtoSpace(*pb.Space)
 }

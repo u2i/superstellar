@@ -211,6 +211,41 @@
             ]
         },
         {
+            "name": "Asteroid",
+            "fields": [
+                {
+                    "rule": "optional",
+                    "type": "uint32",
+                    "name": "id",
+                    "id": 1
+                },
+                {
+                    "rule": "optional",
+                    "type": "Point",
+                    "name": "position",
+                    "id": 2
+                },
+                {
+                    "rule": "optional",
+                    "type": "Vector",
+                    "name": "velocity",
+                    "id": 3
+                },
+                {
+                    "rule": "optional",
+                    "type": "double",
+                    "name": "facing",
+                    "id": 4
+                },
+                {
+                    "rule": "optional",
+                    "type": "double",
+                    "name": "angularVelocity",
+                    "id": 5
+                }
+            ]
+        },
+        {
             "name": "ProjectileFired",
             "fields": [
                 {
@@ -343,6 +378,12 @@
                     "type": "Spaceship",
                     "name": "spaceships",
                     "id": 2
+                },
+                {
+                    "rule": "repeated",
+                    "type": "Asteroid",
+                    "name": "asteroids",
+                    "id": 3
                 }
             ]
         },
