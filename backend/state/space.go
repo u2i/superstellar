@@ -54,6 +54,12 @@ func (space *Space) RemoveSpaceship(clientID uint32) {
 	delete(space.Objects, clientID)
 }
 
+// RemoveAsteroid removes spaceship from the space.
+func (space *Space) RemoveAsteroid(clientID uint32) {
+	delete(space.Asteroids, clientID)
+	delete(space.Objects, clientID)
+}
+
 // AddProjectile adds projectile to the space.``
 func (space *Space) AddProjectile(projectile *Projectile) {
 	space.Projectiles[projectile] = true

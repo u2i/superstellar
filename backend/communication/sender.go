@@ -62,7 +62,7 @@ func (sender *Sender) HandleUserDied(userDiedEvent *events.UserDied) {
 
 func (sender *Sender) sendSpace() {
 	message := sender.space.ToMessage(false)
-	if len(message.GetSpace().GetSpaceships()) > 0 {
+	if len(message.GetSpace().GetSpaceships()) > 0 || len(message.GetSpace().GetAsteroids()) > 0 {
 		sender.server.SendToAllClients(message)
 	}
 }

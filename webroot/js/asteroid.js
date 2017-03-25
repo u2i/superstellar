@@ -1,4 +1,4 @@
-import { stage } from './globals.js';
+import { stage, constants } from './globals.js';
 import { ASTEROID_01_TEXTURE } from './constants.js'
 import * as Utils from './utils.js';
 import AsteroidMoveFilter from './asteroidMoveFilter.js';
@@ -44,6 +44,10 @@ export default class Asteroid {
 
   remove () {
     stage.removeChild(this.container);
+  }
+
+  obsolete() {
+    this.position.length() > constants.worldRadius * 2
   }
 }
 

@@ -81,7 +81,9 @@ const defaultViewport = { vx: 0, vy: 0, width: renderer.width, height: renderer.
 // Draw everything
 const render = function () {
   let currentFrameId = globalState.framesCalculator.currentFrameId();
+
   globalState.spaceshipMap.forEach((spaceship) => spaceship.predictTo(currentFrameId));
+  globalState.asteroidsMap.forEach((asteroid) => asteroid.predictTo(currentFrameId));
 
   let myShip;
 
@@ -95,8 +97,8 @@ const render = function () {
   tilingSprite.tilePosition.set(backgroundPos.x, backgroundPos.y);
 
   globalState.spaceshipMap.forEach((spaceship) => spaceship.update(viewport));
+  globalState.asteroidsMap.forEach((asteroid) => asteroid.update(viewport));
   globalState.projectilesMap.forEach((projectile) => projectile.update(viewport, currentFrameId));
-  globalState.asteroidsMap.forEach((asteroid) => asteroid.update(viewport, currentFrameId));
 
   if(myShip) {
     radar.update(myShip, viewport);

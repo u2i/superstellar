@@ -2,7 +2,6 @@ package simulation
 
 import (
 	"container/list"
-	"fmt"
 	"reflect"
 	"superstellar/backend/state"
 	"superstellar/backend/types"
@@ -75,16 +74,19 @@ func (manager *CollisionManager) collide(objectA state.Object, objectB state.Obj
 	typeB := reflect.TypeOf(objectA)
 
 	spaceshipType := reflect.TypeOf(&state.Spaceship{})
-	simplaeCollision := &SimpleCollision{}
+	simpleCollision := &SimpleCollision{}
 
 	var collision Collision
 
-	fmt.Println(typeA)
-	fmt.Println(typeB)
+	collision = simpleCollision
 
 	if typeA == spaceshipType && typeB == spaceshipType {
-		collision = simplaeCollision
+		collision = simpleCollision
+	} else {
+		collision = simpleCollision
 	}
 
-	collision.collide(objectA, objectB)
+	if collision != nil {
+		collision.collide(objectA, objectB)
+	}
 }

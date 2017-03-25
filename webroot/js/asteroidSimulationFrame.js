@@ -1,4 +1,3 @@
-import { constants } from './globals';
 import Victor from 'victor';
 
 Victor.prototype.scalarMultiply = function(scalar) {
@@ -23,7 +22,6 @@ export default class AsteroidSimulationFrame {
 
   predict() {
     this.position.add(this.velocity);
-    //this.applyAngularFriction();
     this.updateAngularVelocity();
 
     this.frameId++;
@@ -39,9 +37,5 @@ export default class AsteroidSimulationFrame {
     this.angularVelocity += this.angularVelocityDelta
     this.angularVelocityDelta = 0.0;
     this.facing -= this.angularVelocity;
-  }
-
-  applyAngularFriction() {
-    this.angularVelocity *= (1.0 - constants.spaceshipAngularFriction);
   }
 }
