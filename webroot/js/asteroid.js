@@ -8,6 +8,8 @@ export default class Asteroid {
     this.moveFilter = new AsteroidMoveFilter(frameId);
 
     this.sprite = new PIXI.Sprite(PIXI.Texture.fromImage(ASTEROID_01_TEXTURE));
+    this.sprite.width = 50;
+    this.sprite.height = 50;
 
     this.container = new PIXI.Container();
     this.container.addChild(this.sprite);
