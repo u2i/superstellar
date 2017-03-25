@@ -1,8 +1,6 @@
-import { sendMessage, UserAction, TargetAngle } from './communicationLayer';
-import { renderer } from './globals';
+import { sendMessage, UserAction } from './communicationLayer';
 
 var mouseDown = false;
-var lastTargetAngle = null;
 
 const KEY_SPACE = 32;
 const KEY_UP    = 38;
@@ -37,7 +35,7 @@ const updateKeysState = (keyCode, isPressed) => {
 }
 
 const updateMouseState = (isDown) => {
-  if (mouseDown != isDown) {
+  if (mouseDown !== isDown) {
     mouseDown = isDown;
     sendInput(KEY_SPACE, isDown);
   }
