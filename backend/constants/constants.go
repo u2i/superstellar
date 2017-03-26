@@ -108,4 +108,16 @@ const (
 
 	// ProjectileRotationalImpulse is the ratio of impulse that will be applied to angular velocity
 	ProjectileRotationalImpulse = 0.2
+
+	// AsteroidVelocity defines asteroids' initial velocity
+	AsteroidVelocity = 100
+
+	// AsteroidSpawnRadius defines the radius of the circle on which asteroids spawn
+	AsteroidSpawnRadius = WorldRadius * 2
+
+	// AsteroidPresenceBoundary defines the radius of the circle beyond which asteroids are removed
+	AsteroidRemoveRadius = AsteroidSpawnRadius + 100
+
+	// AsteroidCountLimit limits the number of asteroids
+	AsteroidCountLimit = 20
 )
