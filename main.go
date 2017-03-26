@@ -12,13 +12,13 @@ import (
 import (
 	_ "net/http/pprof"
 	"os"
+	"superstellar/backend/ai"
 	"superstellar/backend/communication"
 	"superstellar/backend/events"
 	"superstellar/backend/game"
 	"superstellar/backend/monitor"
 	"superstellar/backend/simulation"
 	"superstellar/backend/state"
-	"superstellar/backend/ai"
 	"superstellar/backend/utils"
 )
 
@@ -37,8 +37,9 @@ func main() {
 
 	monitor := monitor.NewMonitor(eventDispatcher)
 
+	idSequencer := utils.NewIdSequencer()
 	space := state.NewSpace()
-	updater := simulation.NewUpdater(space, monitor, eventDispatcher)
+	updater := simulation.NewUpdater(space, monitor, eventDispatcher, idSequencer)
 	eventDispatcher.RegisterUserInputListener(updater)
 	eventDispatcher.RegisterTimeTickListener(updater)
 	eventDispatcher.RegisterUserJoinedListener(updater)
@@ -46,9 +47,7 @@ func main() {
 	eventDispatcher.RegisterUserDiedListener(updater)
 	eventDispatcher.RegisterTargetAngleListener(updater)
 
-	clientIdSequencer := utils.NewIdSequencer()
-
-	srv := communication.NewServer("/superstellar", monitor, eventDispatcher, clientIdSequencer)
+	srv := communication.NewServer("/superstellar", monitor, eventDispatcher, idSequencer)
 	eventDispatcher.RegisterUserLeftListener(srv)
 
 	sender := communication.NewSender(srv, space)
@@ -59,7 +58,7 @@ func main() {
 	eventDispatcher.RegisterUserJoinedListener(sender)
 	eventDispatcher.RegisterUserDiedListener(sender)
 
-	botManager := ai.NewBotManager(space, clientIdSequencer)
+	botManager := ai.NewBotManager(space, idSequencer)
 	botManager.CreateNewBot()
 	botManager.CreateNewBot()
 	botManager.CreateNewBot()

@@ -6,6 +6,7 @@ import (
 	"superstellar/backend/events"
 	"superstellar/backend/monitor"
 	"superstellar/backend/state"
+	"superstellar/backend/utils"
 	"time"
 )
 
@@ -18,18 +19,21 @@ type Updater struct {
 	asteroidManager   *AsteroidManager
 	monitor           *monitor.Monitor
 	eventDispatcher   *events.EventDispatcher
+	idSequencer       *utils.IdSequencer
 }
 
-func NewUpdater(space *state.Space, monitor *monitor.Monitor, eventDispatcher *events.EventDispatcher) *Updater {
+func NewUpdater(space *state.Space, monitor *monitor.Monitor, eventDispatcher *events.EventDispatcher,
+	idSequencer *utils.IdSequencer) *Updater {
 	return &Updater{
 		space:             space,
 		spaceshipManager:  NewSpaceshipManager(space, eventDispatcher),
 		objectManager:     NewObjectManager(space),
 		collisionManager:  NewCollisionManager(space),
 		projectileManager: NewProjectileManager(space, eventDispatcher),
-		asteroidManager:   NewAsteroidManager(space),
+		asteroidManager:   NewAsteroidManager(space, idSequencer),
 		monitor:           monitor,
 		eventDispatcher:   eventDispatcher,
+		idSequencer:       idSequencer,
 	}
 }
 

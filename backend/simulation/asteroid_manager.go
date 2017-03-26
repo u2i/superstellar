@@ -6,20 +6,21 @@ import (
 	"superstellar/backend/constants"
 	"superstellar/backend/state"
 	"superstellar/backend/types"
+	"superstellar/backend/utils"
 	"time"
 )
 
 type AsteroidManager struct {
-	space  *state.Space
-	lastId uint32
-	rand   *rand.Rand
+	space       *state.Space
+	idSequencer *utils.IdSequencer
+	rand        *rand.Rand
 }
 
-func NewAsteroidManager(space *state.Space) *AsteroidManager {
+func NewAsteroidManager(space *state.Space, idSequencer *utils.IdSequencer) *AsteroidManager {
 	return &AsteroidManager{
-		space:  space,
-		lastId: 1000,
-		rand:   rand.New(rand.NewSource(time.Now().UnixNano())),
+		space:       space,
+		idSequencer: idSequencer,
+		rand:        rand.New(rand.NewSource(time.Now().UnixNano())),
 	}
 }
 
@@ -43,8 +44,7 @@ func (manager *AsteroidManager) newAsteroid() *state.Asteroid {
 
 	direction := types.NewVector(constants.AsteroidVelocity, 0.0).Rotate(directionAngle)
 
-	manager.lastId++
-	return state.NewAsteroid(manager.lastId, circlePosition, direction)
+	return state.NewAsteroid(manager.idSequencer.NextId(), circlePosition, direction)
 }
 
 func (manager *AsteroidManager) removeObsoleteAsteroids() {
