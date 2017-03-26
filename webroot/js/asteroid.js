@@ -15,6 +15,8 @@ export default class Asteroid {
     this.container.addChild(this.sprite);
 
     stage.addChild(this.container);
+
+    this.container.pivot.set(this.sprite.width / 2, this.sprite.height / 2);
   }
 
   updateData(updateFrameId, data) {
@@ -47,7 +49,7 @@ export default class Asteroid {
   }
 
   obsolete() {
-    this.position.length() > constants.worldRadius * 2
+    return this.position.length() > constants.worldRadius * 2
   }
 }
 

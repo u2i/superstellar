@@ -82,6 +82,13 @@ const defaultViewport = { vx: 0, vy: 0, width: renderer.width, height: renderer.
 const render = function () {
   let currentFrameId = globalState.framesCalculator.currentFrameId();
 
+  globalState.asteroidsMap.forEach((asteroid, asteroidId) => {
+    if (asteroid.obsolete()) {
+      asteroid.remove()
+      globalState.asteroidsMap.delete(asteroidId)
+    }
+  });
+
   globalState.spaceshipMap.forEach((spaceship) => spaceship.predictTo(currentFrameId));
   globalState.asteroidsMap.forEach((asteroid) => asteroid.predictTo(currentFrameId));
 
