@@ -2,6 +2,9 @@ package simulation
 
 import (
 	"container/list"
+	"log"
+	"math"
+	"math/rand"
 	"reflect"
 	"superstellar/backend/state"
 	"superstellar/backend/types"
@@ -67,6 +70,33 @@ func (manager *CollisionManager) resolveCollisions() {
 			}
 		}
 	}
+
+	// TODO kod przeciwzakrzepowy - wywalic jak zrobimy losowe spawnowanie
+	collided2 := make(map[state.Object]bool)
+
+	for _, object := range manager.space.Objects {
+		collided2[object] = true
+		for _, otherObject := range manager.space.Objects {
+			if !collided2[otherObject] && object.DetectCollision(otherObject) {
+				log.Printf("COLLISON")
+				if val, exists := oldVelocity[object]; exists {
+					log.Printf("ov1: %f %f", val.X, val.Y)
+				}
+				if val, exists := oldVelocity[otherObject]; exists {
+					log.Printf("ov2: %f %f", val.X, val.Y)
+				}
+				log.Printf("v1: %f %f", object.Velocity().X, object.Velocity().Y)
+				log.Printf("v2: %f %f", otherObject.Velocity().X, otherObject.Velocity().Y)
+				log.Printf("p1: %d %d", object.Position().X, object.Position().Y)
+				log.Printf("p2: %d %d", otherObject.Position().X, otherObject.Position().Y)
+
+				randAngle := rand.Float64() * 2 * math.Pi
+				randMove := types.NewVector(5000, 0).Rotate(randAngle)
+				object.SetPosition(object.Position().Add(randMove))
+			}
+		}
+	}
+	// koniec kodu przeciwzakrzepowego
 }
 
 func (manager *CollisionManager) collide(objectA state.Object, objectB state.Object) {
