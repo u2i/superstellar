@@ -3,6 +3,8 @@ package state
 import (
 	"superstellar/backend/constants"
 	"superstellar/backend/types"
+
+	"time"
 )
 
 type ObjectState struct {
@@ -14,6 +16,7 @@ type ObjectState struct {
 	angularVelocityDelta float64
 	dirty                bool
 	dirtyFramesTimeout   uint32
+	spawnTimestamp       time.Time
 }
 
 func NewObjectState(ID uint32, position *types.Point, velocity *types.Vector) *ObjectState {
@@ -26,6 +29,7 @@ func NewObjectState(ID uint32, position *types.Point, velocity *types.Vector) *O
 		angularVelocityDelta: 0,
 		dirty:                true,
 		dirtyFramesTimeout:   0,
+		spawnTimestamp:       time.Now(),
 	}
 }
 
@@ -75,6 +79,10 @@ func (objectState *ObjectState) SetAngularVelocityDelta(angularVelocityDelta flo
 
 func (objectState *ObjectState) Dirty() bool {
 	return objectState.dirty
+}
+
+func (objectState *ObjectState) Timestamp() time.Time {
+	return objectState.spawnTimestamp
 }
 
 func (objectState *ObjectState) MarkDirty() {

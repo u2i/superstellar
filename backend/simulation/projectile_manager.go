@@ -36,8 +36,10 @@ func (manager *ProjectileManager) detectProjectileCollisions() {
 			collisionOccured, collisionPoint := projectile.DetectCollision(spaceship)
 			if projectile.ClientID != clientID && collisionOccured {
 				spaceship.CollideWithProjectile(projectile)
+				projectile.Spaceship.ProjectileHitOtherSpaceship(spaceship)
 				manager.applyProjectileImpulse(spaceship, projectile, collisionPoint)
 				manager.space.RemoveProjectile(projectile)
+
 				projectileHitMessage := &events.ProjectileHit{Projectile: projectile}
 				manager.eventDispatcher.FireProjectileHit(projectileHitMessage)
 

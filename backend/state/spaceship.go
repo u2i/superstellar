@@ -34,6 +34,11 @@ type Spaceship struct {
 	Energy          uint32
 	MaxEnergy       uint32
 	AutoRepairDelay uint32
+
+	Hits             uint32
+	HitsReceived     uint32
+	ProjectilesFired uint32
+	Kills            uint32
 }
 
 func NewSpaceship(clientId uint32, initialPosition *types.Point) *Spaceship {
@@ -132,6 +137,7 @@ func (s *Spaceship) ShootIfPossible() (canShoot bool) {
 	if s.Energy >= constants.BasicWeaponEnergyCost {
 		canShoot = true
 		s.Energy -= constants.BasicWeaponEnergyCost
+		s.ProjectilesFired++
 		s.MarkDirty()
 	} else {
 		canShoot = false
@@ -156,22 +162,36 @@ func (s *Spaceship) CollideWithProjectile(projectile *Projectile) {
 		s.HP -= constants.ProjectileDamage
 	}
 	s.AutoRepairDelay = constants.AutoRepairDelay
+	s.HitsReceived++
 
 	s.MarkDirty()
 }
 
-func (s *Spaceship) AddReward(reward uint32) {
+func (s *Spaceship) ProjectileHitOtherSpaceship(otherSpaceship *Spaceship) {
+	s.Hits++
+}
+
+func (s *Spaceship) SpaceshipKilled(killedSpaceship *Spaceship) {
+	killedSpaceshipMaxHp := killedSpaceship.MaxHP
+
+	reward := uint32(float32(killedSpaceshipMaxHp) * constants.KillRewardRatio)
+	energyReward := uint32(float32(killedSpaceshipMaxHp) * constants.KillEnergyRewardRatio)
+
+	s.Kills++
+	s.addReward(reward)
+	s.addEnergyReward(energyReward)
+
+	s.MarkDirty()
+}
+
+func (s *Spaceship) addReward(reward uint32) {
 	s.HP += reward
 	s.MaxHP += reward
-
-	s.MarkDirty()
 }
 
-func (s *Spaceship) AddEnergyReward(reward uint32) {
+func (s *Spaceship) addEnergyReward(reward uint32) {
 	s.Energy += reward
 	s.MaxEnergy += reward
-
-	s.MarkDirty()
 }
 
 func (s *Spaceship) handleAutoRepair() {
