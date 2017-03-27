@@ -67,6 +67,10 @@ func (c *Client) Listen() {
 	c.listenRead()
 }
 
+func (c *Client) UserName() string {
+	return c.username
+}
+
 // Listen write request via chanel
 func (c *Client) listenWrite() {
 	log.Println("Listening write to client")

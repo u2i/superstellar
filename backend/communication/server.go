@@ -6,10 +6,11 @@ import (
 
 	"github.com/golang/protobuf/proto"
 
-	"golang.org/x/net/websocket"
 	"superstellar/backend/events"
 	"superstellar/backend/monitor"
 	"superstellar/backend/utils"
+
+	"golang.org/x/net/websocket"
 )
 
 // Server struct holds server variables.
@@ -25,12 +26,12 @@ type Server struct {
 // NewServer initializes a new server.
 func NewServer(pattern string, monitor *monitor.Monitor, eventDispatcher *events.EventDispatcher, clientIdSeq *utils.IdSequencer) *Server {
 	return &Server{
-		pattern:      pattern,
-		clients:      make(map[uint32]*Client),
-		monitor:      monitor,
-		clientID:     0,
+		pattern:          pattern,
+		clients:          make(map[uint32]*Client),
+		monitor:          monitor,
+		clientID:         0,
 		eventsDispatcher: eventDispatcher,
-		clientIdSeq:  clientIdSeq,
+		clientIdSeq:      clientIdSeq,
 	}
 }
 
@@ -86,4 +87,9 @@ func (s *Server) ClientIDs() []uint32 {
 	}
 
 	return clientIDs
+}
+
+func (s *Server) GetClient(clientId uint32) (*Client, bool) {
+	client, ok := s.clients[clientId]
+	return client, ok
 }

@@ -17,6 +17,7 @@ import (
 	"superstellar/backend/events"
 	"superstellar/backend/game"
 	"superstellar/backend/monitor"
+	"superstellar/backend/persistence"
 	"superstellar/backend/simulation"
 	"superstellar/backend/state"
 	"superstellar/backend/utils"
@@ -47,16 +48,22 @@ func main() {
 	eventDispatcher.RegisterUserDiedListener(updater)
 	eventDispatcher.RegisterTargetAngleListener(updater)
 
-	srv := communication.NewServer("/superstellar", monitor, eventDispatcher, idSequencer)
-	eventDispatcher.RegisterUserLeftListener(srv)
+	server := communication.NewServer("/superstellar", monitor, eventDispatcher, idSequencer)
+	eventDispatcher.RegisterUserLeftListener(server)
 
-	sender := communication.NewSender(srv, space)
+	sender := communication.NewSender(server, space)
 	eventDispatcher.RegisterPhysicsReadyListener(sender)
 	eventDispatcher.RegisterProjectileFiredListener(sender)
 	eventDispatcher.RegisterProjectileHitListener(sender)
 	eventDispatcher.RegisterUserLeftListener(sender)
 	eventDispatcher.RegisterUserJoinedListener(sender)
 	eventDispatcher.RegisterUserDiedListener(sender)
+
+	if _, found := os.LookupEnv("DYNAMODB_ENDPOINT"); found {
+		adapter := persistence.NewDynamoDbWriter()
+		scoreBoardSerializer := persistence.NewScoreBoardSerializer(server, adapter)
+		eventDispatcher.RegisterUserDiedListener(scoreBoardSerializer)
+	}
 
 	botManager := ai.NewBotManager(space, idSequencer)
 	botManager.CreateNewBot()
@@ -76,7 +83,7 @@ func main() {
 	}
 
 	monitor.Run()
-	go srv.Listen()
+	go server.Listen()
 
 	go eventDispatcher.RunEventLoop()
 	go physicsTicker.Run()

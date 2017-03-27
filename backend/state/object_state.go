@@ -81,7 +81,7 @@ func (objectState *ObjectState) Dirty() bool {
 	return objectState.dirty
 }
 
-func (objectState *ObjectState) Timestamp() time.Time {
+func (objectState *ObjectState) SpawnTimestamp() time.Time {
 	return objectState.spawnTimestamp
 }
 

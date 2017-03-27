@@ -5,6 +5,7 @@ import (
 	"superstellar/backend/events"
 	"superstellar/backend/state"
 	"superstellar/backend/types"
+	"time"
 )
 
 type ProjectileManager struct {
@@ -51,6 +52,7 @@ func (manager *ProjectileManager) detectProjectileCollisions() {
 						Shooter:       projectile.Spaceship,
 						KilledBy:      projectile.ClientID,
 						ShotSpaceship: spaceship,
+						Timestamp:     time.Now(),
 					}
 					manager.eventDispatcher.FireUserDied(userDiedMessage)
 				}
