@@ -53,7 +53,7 @@ const (
 	SpaceshipSize = 2200
 
 	// SpaceshipInitialHP spaceship HP
-	SpaceshipInitialHP = 10
+	SpaceshipInitialHP = 500
 
 	// SpaceshipInitialEnergy spaceship Energy
 	SpaceshipInitialEnergy = 2000

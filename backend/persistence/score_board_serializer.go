@@ -31,7 +31,7 @@ func (serializer *ScoreBoardSerializer) serializeUserDied(userDied *events.UserD
 	spaceship := userDied.ShotSpaceship
 
 	return &dynamodb.PutItemInput{
-		TableName: aws.String("ScoreBoard"),
+		TableName: aws.String("SuperstellarScoreBoard"),
 		Item: map[string]*dynamodb.AttributeValue{
 			"id":                {S: aws.String(uuid.NewV4().String())},
 			"name":              {S: aws.String(client.UserName())},
