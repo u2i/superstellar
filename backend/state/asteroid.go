@@ -1,6 +1,7 @@
 package state
 
 import (
+	"superstellar/backend/constants"
 	"superstellar/backend/pb"
 	"superstellar/backend/types"
 )
@@ -30,4 +31,12 @@ func (asteroid *Asteroid) ToProto() *pb.Asteroid {
 
 func (asteroid *Asteroid) AddToProtoSpace(space *pb.Space) {
 	space.Asteroids = append(space.Asteroids, asteroid.ToProto())
+}
+
+func (asteroid *Asteroid) CollideWith(other Object) {
+
+}
+
+func (asteroid *Asteroid) DamageValue() uint32 {
+	return constants.AsteroidDamageValue
 }

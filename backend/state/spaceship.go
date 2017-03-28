@@ -156,15 +156,17 @@ func (s *Spaceship) BoostIfPossible() (canBoost bool) {
 }
 
 func (s *Spaceship) CollideWithProjectile(projectile *Projectile) {
-	if s.HP < constants.ProjectileDamage {
-		s.HP = 0
-	} else {
-		s.HP -= constants.ProjectileDamage
-	}
-	s.AutoRepairDelay = constants.AutoRepairDelay
 	s.HitsReceived++
 
-	s.MarkDirty()
+	s.makeDamage(constants.ProjectileDamage)
+}
+
+func (s *Spaceship) CollideWith(other Object) {
+	s.makeDamage(other.DamageValue())
+}
+
+func (s *Spaceship) DamageValue() uint32 {
+	return 0
 }
 
 func (s *Spaceship) ProjectileHitOtherSpaceship(otherSpaceship *Spaceship) {
@@ -180,6 +182,18 @@ func (s *Spaceship) SpaceshipKilled(killedSpaceship *Spaceship) {
 	s.Kills++
 	s.addReward(reward)
 	s.addEnergyReward(energyReward)
+
+	s.MarkDirty()
+}
+
+func (s *Spaceship) makeDamage(damage uint32) {
+	if s.HP < damage {
+		s.HP = 0
+	} else {
+		s.HP -= damage
+	}
+
+	s.AutoRepairDelay = constants.AutoRepairDelay
 
 	s.MarkDirty()
 }

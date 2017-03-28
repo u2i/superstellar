@@ -26,4 +26,7 @@ func (*SimpleCollision) collide(objectA state.Object, objectB state.Object) {
 
 	objectA.MarkDirty()
 	objectB.MarkDirty()
+
+	objectA.CollideWith(objectB)
+	objectB.CollideWith(objectA)
 }

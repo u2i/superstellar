@@ -120,4 +120,7 @@ const (
 
 	// AsteroidCountLimit limits the number of asteroids
 	AsteroidCountLimit = 20
+
+	// Damage made by hitting an asteroid
+	AsteroidDamageValue = 200
 )

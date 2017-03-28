@@ -113,8 +113,3 @@ func (object *ObjectState) DetectCollision(other Object) bool {
 
 	return dist < 2*constants.SpaceshipSize
 }
-
-// Collide transforms colliding ships' parameters.
-func (object *ObjectState) Collide(other Object) {
-
-}

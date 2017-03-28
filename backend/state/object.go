@@ -1,8 +1,8 @@
 package state
 
 import (
-	"superstellar/backend/types"
 	"superstellar/backend/pb"
+	"superstellar/backend/types"
 )
 
 type Object interface {
@@ -23,8 +23,10 @@ type Object interface {
 	MarkClean()
 
 	DetectCollision(other Object) bool
-	Collide(other Object)
 
 	NotifyAboutNewFrame()
 	AddToProtoSpace(*pb.Space)
+
+	CollideWith(other Object)
+	DamageValue() uint32
 }
