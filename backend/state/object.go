@@ -6,11 +6,15 @@ import (
 )
 
 type Object interface {
+	Id() uint32
+
 	Position() *types.Point
 	Velocity() *types.Vector
 	Facing() float64
 	AngularVelocity() float64
 	AngularVelocityDelta() float64
+
+	Hp() uint32
 
 	SetPosition(*types.Point)
 	SetVelocity(*types.Vector)

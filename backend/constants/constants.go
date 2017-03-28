@@ -123,4 +123,7 @@ const (
 
 	// Damage made by hitting an asteroid
 	AsteroidDamageValue = 200
+
+	// Damage made by hitting an asteroid
+	AsteroidInitialHp = 10
 )

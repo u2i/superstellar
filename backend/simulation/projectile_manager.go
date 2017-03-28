@@ -44,7 +44,7 @@ func (manager *ProjectileManager) detectProjectileCollisions() {
 				projectileHitMessage := &events.ProjectileHit{Projectile: projectile}
 				manager.eventDispatcher.FireProjectileHit(projectileHitMessage)
 
-				if spaceship.HP <= 0 {
+				if spaceship.Hp() <= 0 {
 					manager.space.RemoveSpaceship(clientID)
 
 					userDiedMessage := &events.UserDied{

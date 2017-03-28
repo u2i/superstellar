@@ -50,15 +50,21 @@ func (space *Space) AddAsteroid(asteroid *Asteroid) {
 }
 
 // RemoveSpaceship removes spaceship from the space.
-func (space *Space) RemoveSpaceship(clientID uint32) {
-	delete(space.Spaceships, clientID)
-	delete(space.Objects, clientID)
+func (space *Space) RemoveSpaceship(id uint32) {
+	space.RemoveObject(id)
+
 }
 
 // RemoveAsteroid removes spaceship from the space.
-func (space *Space) RemoveAsteroid(clientID uint32) {
-	delete(space.Asteroids, clientID)
-	delete(space.Objects, clientID)
+func (space *Space) RemoveAsteroid(id uint32) {
+	space.RemoveObject(id)
+}
+
+// RemoveAsteroid removes spaceship from the space.
+func (space *Space) RemoveObject(id uint32) {
+	delete(space.Asteroids, id)
+	delete(space.Spaceships, id)
+	delete(space.Objects, id)
 }
 
 // AddProjectile adds projectile to the space.``

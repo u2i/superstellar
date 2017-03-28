@@ -29,7 +29,6 @@ type Spaceship struct {
 	TargetAngle     *float64
 	Fire            bool
 	LastShotTime    time.Time
-	HP              uint32
 	MaxHP           uint32
 	Energy          uint32
 	MaxEnergy       uint32
@@ -42,7 +41,7 @@ type Spaceship struct {
 }
 
 func NewSpaceship(clientId uint32, initialPosition *types.Point) *Spaceship {
-	objectState := NewObjectState(clientId, initialPosition, types.ZeroVector())
+	objectState := NewObjectState(clientId, initialPosition, types.ZeroVector(), constants.SpaceshipInitialHP)
 
 	return &Spaceship{
 		ObjectState:     *objectState,
@@ -50,7 +49,6 @@ func NewSpaceship(clientId uint32, initialPosition *types.Point) *Spaceship {
 		InputDirection:  NONE,
 		Fire:            false,
 		LastShotTime:    time.Now(),
-		HP:              constants.SpaceshipInitialHP,
 		MaxHP:           constants.SpaceshipInitialHP,
 		Energy:          constants.SpaceshipInitialEnergy,
 		MaxEnergy:       constants.SpaceshipInitialEnergy,
@@ -122,7 +120,7 @@ func (s *Spaceship) ToProto() *pb.Spaceship {
 		InputThrust:     s.InputThrust,
 		InputBoost:      s.InputBoost,
 		MaxHp:           s.MaxHP,
-		Hp:              s.HP,
+		Hp:              s.Hp(),
 		MaxEnergy:       s.MaxEnergy,
 		Energy:          s.Energy,
 		AutoRepairDelay: s.AutoRepairDelay,
@@ -187,10 +185,10 @@ func (s *Spaceship) SpaceshipKilled(killedSpaceship *Spaceship) {
 }
 
 func (s *Spaceship) makeDamage(damage uint32) {
-	if s.HP < damage {
-		s.HP = 0
+	if s.Hp() < damage {
+		s.SetHp(0)
 	} else {
-		s.HP -= damage
+		s.SetHp(s.Hp() - damage)
 	}
 
 	s.AutoRepairDelay = constants.AutoRepairDelay
@@ -199,7 +197,7 @@ func (s *Spaceship) makeDamage(damage uint32) {
 }
 
 func (s *Spaceship) addReward(reward uint32) {
-	s.HP += reward
+	s.ObjectState.hp += reward
 	s.MaxHP += reward
 }
 
@@ -210,7 +208,7 @@ func (s *Spaceship) addEnergyReward(reward uint32) {
 
 func (s *Spaceship) handleAutoRepair() {
 	if s.AutoRepairDelay == 0 {
-		s.HP = utils.Min(s.HP+constants.AutoRepairAmount, s.MaxHP)
+		s.SetHp(utils.Min(s.Hp()+constants.AutoRepairAmount, s.MaxHP))
 	} else {
 		s.AutoRepairDelay--
 	}

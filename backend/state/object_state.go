@@ -14,12 +14,14 @@ type ObjectState struct {
 	facing               float64
 	angularVelocity      float64
 	angularVelocityDelta float64
-	dirty                bool
-	dirtyFramesTimeout   uint32
-	spawnTimestamp       time.Time
+	hp                   uint32
+
+	dirty              bool
+	dirtyFramesTimeout uint32
+	spawnTimestamp     time.Time
 }
 
-func NewObjectState(ID uint32, position *types.Point, velocity *types.Vector) *ObjectState {
+func NewObjectState(ID uint32, position *types.Point, velocity *types.Vector, initialHp uint32) *ObjectState {
 	return &ObjectState{
 		id:                   ID,
 		position:             position,
@@ -27,9 +29,11 @@ func NewObjectState(ID uint32, position *types.Point, velocity *types.Vector) *O
 		facing:               0.0,
 		angularVelocity:      0,
 		angularVelocityDelta: 0,
-		dirty:                true,
-		dirtyFramesTimeout:   0,
-		spawnTimestamp:       time.Now(),
+		hp:                   initialHp,
+
+		dirty:              true,
+		dirtyFramesTimeout: 0,
+		spawnTimestamp:     time.Now(),
 	}
 }
 
@@ -75,6 +79,14 @@ func (objectState *ObjectState) AngularVelocityDelta() float64 {
 
 func (objectState *ObjectState) SetAngularVelocityDelta(angularVelocityDelta float64) {
 	objectState.angularVelocityDelta = angularVelocityDelta
+}
+
+func (objectState *ObjectState) Hp() uint32 {
+	return objectState.hp
+}
+
+func (objectState *ObjectState) SetHp(hp uint32) {
+	objectState.hp = hp
 }
 
 func (objectState *ObjectState) Dirty() bool {

@@ -6,17 +6,21 @@ import (
 	"math"
 	"math/rand"
 	"reflect"
+	"superstellar/backend/events"
 	"superstellar/backend/state"
 	"superstellar/backend/types"
+	"time"
 )
 
 type CollisionManager struct {
-	space *state.Space
+	space           *state.Space
+	eventDispatcher *events.EventDispatcher
 }
 
-func NewCollisionManager(space *state.Space) *CollisionManager {
+func NewCollisionManager(space *state.Space, eventDispatcher *events.EventDispatcher) *CollisionManager {
 	return &CollisionManager{
-		space: space,
+		space:           space,
+		eventDispatcher: eventDispatcher,
 	}
 }
 
@@ -118,5 +122,25 @@ func (manager *CollisionManager) collide(objectA state.Object, objectB state.Obj
 
 	if collision != nil {
 		collision.collide(objectA, objectB)
+	}
+
+	manager.checkHp(objectA, objectB)
+	manager.checkHp(objectB, objectA)
+
+}
+
+func (manager *CollisionManager) checkHp(victim state.Object, predator state.Object) {
+	if victim.Hp() <= 0 {
+		manager.space.RemoveObject(victim.Id())
+
+		if reflect.TypeOf(victim) == reflect.TypeOf(&state.Spaceship{}) {
+			userDiedMessage := &events.UserDied{
+				ClientID:      victim.Id(),
+				KilledBy:      predator.Id(),
+				ShotSpaceship: victim.(*state.Spaceship),
+				Timestamp:     time.Now(),
+			}
+			manager.eventDispatcher.FireUserDied(userDiedMessage)
+		}
 	}
 }

@@ -27,7 +27,7 @@ func NewUpdater(space *state.Space, monitor *monitor.Monitor, eventDispatcher *e
 		space:             space,
 		spaceshipManager:  NewSpaceshipManager(space, eventDispatcher),
 		objectManager:     NewObjectManager(space),
-		collisionManager:  NewCollisionManager(space),
+		collisionManager:  NewCollisionManager(space, eventDispatcher),
 		projectileManager: NewProjectileManager(space, eventDispatcher),
 		asteroidManager:   NewAsteroidManager(space, idSequencer),
 		monitor:           monitor,
@@ -87,5 +87,7 @@ func (updater *Updater) HandleUserLeft(userLeftEvent *events.UserLeft) {
 }
 
 func (updater *Updater) HandleUserDied(event *events.UserDied) {
-	event.Shooter.SpaceshipKilled(event.ShotSpaceship)
+	if event.Shooter != nil {
+		event.Shooter.SpaceshipKilled(event.ShotSpaceship)
+	}
 }
