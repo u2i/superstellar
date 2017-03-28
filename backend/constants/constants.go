@@ -126,4 +126,10 @@ const (
 
 	// Damage made by hitting an asteroid
 	AsteroidInitialHp = 10
+
+	// Reward gained on destroying an asteroid
+	AsteroidKillReward = 10
+
+	// Energy reward gained on destroying an asteroid
+	AsteroidKillEnergyReward = 10
 )

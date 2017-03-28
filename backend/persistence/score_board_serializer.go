@@ -35,15 +35,16 @@ func (serializer *ScoreBoardSerializer) serializeObjectDestroyed(objectDestroyed
 	return &dynamodb.PutItemInput{
 		TableName: aws.String("SuperstellarScoreBoard"),
 		Item: map[string]*dynamodb.AttributeValue{
-			"id":                {S: aws.String(uuid.NewV4().String())},
-			"name":              {S: aws.String(client.UserName())},
-			"spawn_time":        {S: aws.String(spaceship.SpawnTimestamp().String())},
-			"death_time":        {S: aws.String(objectDestroyed.Timestamp.String())},
-			"score":             {N: aws.String(fmt.Sprint(spaceship.MaxHP))},
-			"hits":              {N: aws.String(fmt.Sprint(spaceship.Hits))},
-			"hits_received":     {N: aws.String(fmt.Sprint(spaceship.HitsReceived))},
-			"kills":             {N: aws.String(fmt.Sprint(spaceship.Kills))},
-			"projectiles_fired": {N: aws.String(fmt.Sprint(spaceship.ProjectilesFired))},
+			"id":                  {S: aws.String(uuid.NewV4().String())},
+			"name":                {S: aws.String(client.UserName())},
+			"spawn_time":          {S: aws.String(spaceship.SpawnTimestamp().String())},
+			"death_time":          {S: aws.String(objectDestroyed.Timestamp.String())},
+			"score":               {N: aws.String(fmt.Sprint(spaceship.MaxHP))},
+			"hits":                {N: aws.String(fmt.Sprint(spaceship.Hits))},
+			"hits_received":       {N: aws.String(fmt.Sprint(spaceship.HitsReceived))},
+			"kills":               {N: aws.String(fmt.Sprint(spaceship.Kills))},
+			"destroyed_asteroids": {N: aws.String(fmt.Sprint(spaceship.DestroyedAsteroids))},
+			"projectiles_fired":   {N: aws.String(fmt.Sprint(spaceship.ProjectilesFired))},
 		},
 	}
 }

@@ -34,10 +34,11 @@ type Spaceship struct {
 	MaxEnergy       uint32
 	AutoRepairDelay uint32
 
-	Hits             uint32
-	HitsReceived     uint32
-	ProjectilesFired uint32
-	Kills            uint32
+	Hits               uint32
+	HitsReceived       uint32
+	ProjectilesFired   uint32
+	Kills              uint32
+	DestroyedAsteroids uint32
 }
 
 func NewSpaceship(clientId uint32, initialPosition *types.Point) *Spaceship {
@@ -181,9 +182,13 @@ func (s *Spaceship) ObjectDestroyed(destroyedObject Object) {
 		s.Kills++
 		s.addReward(reward)
 		s.addEnergyReward(energyReward)
-
-		s.MarkDirty()
+	} else if _, ok := destroyedObject.(*Asteroid); ok {
+		s.DestroyedAsteroids++
+		s.addReward(constants.AsteroidKillReward)
+		s.addEnergyReward(constants.AsteroidKillEnergyReward)
 	}
+
+	s.MarkDirty()
 }
 
 func (s *Spaceship) makeDamage(damage uint32) {
