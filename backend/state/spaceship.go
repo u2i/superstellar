@@ -167,7 +167,7 @@ func (s *Spaceship) DamageValue() uint32 {
 	return 0
 }
 
-func (s *Spaceship) ProjectileHitOtherSpaceship(otherSpaceship *Spaceship) {
+func (s *Spaceship) ProjectileHitOtherObject(other Object) {
 	s.Hits++
 }
 
@@ -185,11 +185,7 @@ func (s *Spaceship) SpaceshipKilled(killedSpaceship *Spaceship) {
 }
 
 func (s *Spaceship) makeDamage(damage uint32) {
-	if s.Hp() < damage {
-		s.SetHp(0)
-	} else {
-		s.SetHp(s.Hp() - damage)
-	}
+	s.ObjectState.makeDamage(damage)
 
 	s.AutoRepairDelay = constants.AutoRepairDelay
 

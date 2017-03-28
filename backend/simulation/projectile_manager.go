@@ -1,6 +1,7 @@
 package simulation
 
 import (
+	"reflect"
 	"superstellar/backend/constants"
 	"superstellar/backend/events"
 	"superstellar/backend/state"
@@ -33,42 +34,44 @@ func (manager *ProjectileManager) updateProjectiles() {
 
 func (manager *ProjectileManager) detectProjectileCollisions() {
 	for projectile := range manager.space.Projectiles {
-		for clientID, spaceship := range manager.space.Spaceships {
-			collisionOccured, collisionPoint := projectile.DetectCollision(spaceship)
-			if projectile.ClientID != clientID && collisionOccured {
-				spaceship.CollideWithProjectile(projectile)
-				projectile.Spaceship.ProjectileHitOtherSpaceship(spaceship)
-				manager.applyProjectileImpulse(spaceship, projectile, collisionPoint)
+		for id, object := range manager.space.Objects {
+			collisionOccured, collisionPoint := projectile.DetectCollision(object)
+			if projectile.ClientID != id && collisionOccured {
+				object.CollideWithProjectile(projectile)
+				projectile.Spaceship.ProjectileHitOtherObject(object)
+				manager.applyProjectileImpulse(object, projectile, collisionPoint)
 				manager.space.RemoveProjectile(projectile)
 
 				projectileHitMessage := &events.ProjectileHit{Projectile: projectile}
 				manager.eventDispatcher.FireProjectileHit(projectileHitMessage)
 
-				if spaceship.Hp() <= 0 {
-					manager.space.RemoveSpaceship(clientID)
+				if object.Hp() <= 0 {
+					manager.space.RemoveObject(id)
 
-					userDiedMessage := &events.UserDied{
-						ClientID:      clientID,
-						Shooter:       projectile.Spaceship,
-						KilledBy:      projectile.ClientID,
-						ShotSpaceship: spaceship,
-						Timestamp:     time.Now(),
+					if reflect.TypeOf(object) == reflect.TypeOf(&state.Spaceship{}) {
+						userDiedMessage := &events.UserDied{
+							ClientID:      id,
+							Shooter:       projectile.Spaceship,
+							KilledBy:      projectile.ClientID,
+							ShotSpaceship: object.(*state.Spaceship),
+							Timestamp:     time.Now(),
+						}
+						manager.eventDispatcher.FireUserDied(userDiedMessage)
 					}
-					manager.eventDispatcher.FireUserDied(userDiedMessage)
 				}
 			}
 		}
 	}
 }
 
-func (manager *ProjectileManager) applyProjectileImpulse(spaceship *state.Spaceship, projectile *state.Projectile, collisionPoint *types.Point) {
+func (manager *ProjectileManager) applyProjectileImpulse(object state.Object, projectile *state.Projectile, collisionPoint *types.Point) {
 	impulse := projectile.Velocity.Multiply(constants.ProjectileImpulseStrength)
 
 	momentOfInertia := 0.5 * constants.SpaceshipSize * constants.SpaceshipSize * constants.SpaceshipMass
-	r := types.Point{X: collisionPoint.X - spaceship.Position().X, Y: collisionPoint.Y - spaceship.Position().Y}
+	r := types.Point{X: collisionPoint.X - object.Position().X, Y: collisionPoint.Y - object.Position().Y}
 
 	torque := (impulse.X*float64(r.Y) - impulse.Y*float64(r.X)) * constants.ProjectileRotationalImpulse
 
-	spaceship.SetVelocity(spaceship.Velocity().Add(impulse.Multiply(1.0 / constants.SpaceshipMass)))
-	spaceship.SetAngularVelocity(spaceship.AngularVelocity() - (torque / momentOfInertia))
+	object.SetVelocity(object.Velocity().Add(impulse.Multiply(1.0 / constants.SpaceshipMass)))
+	object.SetAngularVelocity(object.AngularVelocity() - (torque / momentOfInertia))
 }

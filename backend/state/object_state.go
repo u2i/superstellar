@@ -106,6 +106,16 @@ func (objectState *ObjectState) MarkClean() {
 	objectState.dirty = false
 }
 
+func (objectState *ObjectState) makeDamage(damage uint32) {
+	if objectState.hp < damage {
+		objectState.hp = 0
+	} else {
+		objectState.hp -= damage
+	}
+
+	objectState.MarkDirty()
+}
+
 func (objectState *ObjectState) HandleDirtyTimeout() {
 	if objectState.dirtyFramesTimeout == 0 {
 		objectState.MarkDirty()

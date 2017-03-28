@@ -27,6 +27,7 @@ type Object interface {
 	MarkClean()
 
 	DetectCollision(other Object) bool
+	CollideWithProjectile(*Projectile)
 
 	NotifyAboutNewFrame()
 	AddToProtoSpace(*pb.Space)

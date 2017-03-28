@@ -40,3 +40,7 @@ func (asteroid *Asteroid) CollideWith(other Object) {
 func (asteroid *Asteroid) DamageValue() uint32 {
 	return constants.AsteroidDamageValue
 }
+
+func (asteroid *Asteroid) CollideWithProjectile(projectile *Projectile) {
+	asteroid.makeDamage(constants.ProjectileDamage)
+}
