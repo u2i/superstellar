@@ -45,7 +45,7 @@ func main() {
 	eventDispatcher.RegisterTimeTickListener(updater)
 	eventDispatcher.RegisterUserJoinedListener(updater)
 	eventDispatcher.RegisterUserLeftListener(updater)
-	eventDispatcher.RegisterUserDiedListener(updater)
+	eventDispatcher.RegisterObjectDestroyedListener(updater)
 	eventDispatcher.RegisterTargetAngleListener(updater)
 
 	server := communication.NewServer("/superstellar", monitor, eventDispatcher, idSequencer)
@@ -57,12 +57,12 @@ func main() {
 	eventDispatcher.RegisterProjectileHitListener(sender)
 	eventDispatcher.RegisterUserLeftListener(sender)
 	eventDispatcher.RegisterUserJoinedListener(sender)
-	eventDispatcher.RegisterUserDiedListener(sender)
+	eventDispatcher.RegisterObjectDestroyedListener(sender)
 
 	if _, found := os.LookupEnv("DYNAMODB_ENDPOINT"); found {
 		adapter := persistence.NewDynamoDbWriter()
 		scoreBoardSerializer := persistence.NewScoreBoardSerializer(server, adapter)
-		eventDispatcher.RegisterUserDiedListener(scoreBoardSerializer)
+		eventDispatcher.RegisterObjectDestroyedListener(scoreBoardSerializer)
 	}
 
 	botManager := ai.NewBotManager(space, idSequencer)

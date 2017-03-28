@@ -2,6 +2,7 @@ package persistence
 
 import (
 	"superstellar/backend/communication"
+	"superstellar/backend/state"
 
 	"superstellar/backend/events"
 
@@ -26,9 +27,10 @@ func NewScoreBoardSerializer(server *communication.Server, adapter *DynamoDbAdap
 	}
 }
 
-func (serializer *ScoreBoardSerializer) serializeUserDied(userDied *events.UserDied,
+func (serializer *ScoreBoardSerializer) serializeObjectDestroyed(objectDestroyed *events.ObjectDestroyed,
 	client *communication.Client) *dynamodb.PutItemInput {
-	spaceship := userDied.ShotSpaceship
+
+	spaceship := objectDestroyed.DestroyedObject.(*state.Spaceship)
 
 	return &dynamodb.PutItemInput{
 		TableName: aws.String("SuperstellarScoreBoard"),
@@ -36,7 +38,7 @@ func (serializer *ScoreBoardSerializer) serializeUserDied(userDied *events.UserD
 			"id":                {S: aws.String(uuid.NewV4().String())},
 			"name":              {S: aws.String(client.UserName())},
 			"spawn_time":        {S: aws.String(spaceship.SpawnTimestamp().String())},
-			"death_time":        {S: aws.String(userDied.Timestamp.String())},
+			"death_time":        {S: aws.String(objectDestroyed.Timestamp.String())},
 			"score":             {N: aws.String(fmt.Sprint(spaceship.MaxHP))},
 			"hits":              {N: aws.String(fmt.Sprint(spaceship.Hits))},
 			"hits_received":     {N: aws.String(fmt.Sprint(spaceship.HitsReceived))},
@@ -46,18 +48,18 @@ func (serializer *ScoreBoardSerializer) serializeUserDied(userDied *events.UserD
 	}
 }
 
-func (serializer *ScoreBoardSerializer) writeScoreBoard(userDied *events.UserDied, client *communication.Client) {
-	putItemInput := serializer.serializeUserDied(userDied, client)
+func (serializer *ScoreBoardSerializer) writeScoreBoard(objectDestroyed *events.ObjectDestroyed, client *communication.Client) {
+	if _, ok := objectDestroyed.DestroyedObject.(*state.Spaceship); ok {
+		putItemInput := serializer.serializeObjectDestroyed(objectDestroyed, client)
 
-	_, error := serializer.adapter.DynamoDb().PutItem(putItemInput)
-	if error != nil {
-		log.Println("Cannot put item to DynamoDB", error)
+		_, error := serializer.adapter.DynamoDb().PutItem(putItemInput)
+		if error != nil {
+			log.Println("Cannot put item to DynamoDB", error)
+		}
 	}
 }
-
-func (serializer *ScoreBoardSerializer) HandleUserDied(userDied *events.UserDied) {
-	client, ok := serializer.server.GetClient(userDied.ClientID)
-	if ok {
-		go serializer.writeScoreBoard(userDied, client)
+func (serializer *ScoreBoardSerializer) HandleObjectDestroyed(objectDestroyed *events.ObjectDestroyed) {
+	if client, ok := serializer.server.GetClient(objectDestroyed.DestroyedObject.Id()); ok {
+		go serializer.writeScoreBoard(objectDestroyed, client)
 	}
 }

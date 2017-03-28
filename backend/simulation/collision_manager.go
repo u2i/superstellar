@@ -134,13 +134,13 @@ func (manager *CollisionManager) checkHp(victim state.Object, predator state.Obj
 		manager.space.RemoveObject(victim.Id())
 
 		if reflect.TypeOf(victim) == reflect.TypeOf(&state.Spaceship{}) {
-			userDiedMessage := &events.UserDied{
-				ClientID:      victim.Id(),
-				KilledBy:      predator.Id(),
-				ShotSpaceship: victim.(*state.Spaceship),
-				Timestamp:     time.Now(),
+			objectDestroyedMessage := &events.ObjectDestroyed{
+				DestroyedObject: victim,
+				DestroyedBy:     predator,
+				//ShotSpaceship: victim.(*state.Spaceship),
+				Timestamp: time.Now(),
 			}
-			manager.eventDispatcher.FireUserDied(userDiedMessage)
+			manager.eventDispatcher.FireObjectDestroyed(objectDestroyedMessage)
 		}
 	}
 }

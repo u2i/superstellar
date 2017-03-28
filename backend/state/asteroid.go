@@ -33,9 +33,7 @@ func (asteroid *Asteroid) AddToProtoSpace(space *pb.Space) {
 	space.Asteroids = append(space.Asteroids, asteroid.ToProto())
 }
 
-func (asteroid *Asteroid) CollideWith(other Object) {
-
-}
+func (asteroid *Asteroid) CollideWith(other Object) {}
 
 func (asteroid *Asteroid) DamageValue() uint32 {
 	return constants.AsteroidDamageValue
@@ -44,3 +42,5 @@ func (asteroid *Asteroid) DamageValue() uint32 {
 func (asteroid *Asteroid) CollideWithProjectile(projectile *Projectile) {
 	asteroid.makeDamage(constants.ProjectileDamage)
 }
+
+func (asteroid *Asteroid) ObjectDestroyed(destroyedObject Object) {}

@@ -86,8 +86,8 @@ func (updater *Updater) HandleUserLeft(userLeftEvent *events.UserLeft) {
 	updater.space.RemoveSpaceship(userLeftEvent.ClientID)
 }
 
-func (updater *Updater) HandleUserDied(event *events.UserDied) {
-	if event.Shooter != nil {
-		event.Shooter.SpaceshipKilled(event.ShotSpaceship)
+func (updater *Updater) HandleObjectDestroyed(event *events.ObjectDestroyed) {
+	if event.DestroyedBy != nil {
+		event.DestroyedBy.ObjectDestroyed(event.DestroyedObject)
 	}
 }

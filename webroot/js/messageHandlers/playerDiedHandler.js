@@ -2,26 +2,31 @@ import GameOverDialog from '../dialogs/gameOverDialog';
 import { globalState } from '../globals';
 
 const playerDiedHandler = (message) => {
-  const killedPlayer = message.id;
-  const killedBy = message.killedBy;
+  const destroyedObjectId = message.id;
+  const destroyedById = message.killedBy;
   const myId = globalState.clientId;
 
-  let spaceship = globalState.spaceshipMap.get(killedPlayer);
-  spaceship.remove();
-  globalState.spaceshipMap.delete(killedPlayer);
+  if (globalState.spaceshipMap.has(destroyedObjectId)) {
+    let spaceship = globalState.spaceshipMap.get(destroyedObjectId);
+    spaceship.remove();
+    globalState.spaceshipMap.delete(destroyedObjectId);
 
-  if (killedPlayer === globalState.killedBy) {
-    globalState.killedBy = null;
+    if (destroyedObjectId === globalState.killedBy) {
+      globalState.killedBy = null;
+    }
+
+    if (destroyedObjectId === myId) {
+      globalState.killedBy = destroyedById;
+
+      const killedByName = globalState.clientIdToName.get(destroyedById);
+      const gameOverDialog = new GameOverDialog(killedByName);
+      gameOverDialog.show();
+    }
+  } else if (globalState.asteroidsMap.has(destroyedObjectId)) {
+    let asteroid = globalState.asteroidsMap.get(destroyedObjectId);
+    asteroid.remove();
+    globalState.asteroidsMap.delete(destroyedObjectId)
   }
-
-  if (killedPlayer === myId) {
-    globalState.killedBy = killedBy;
-
-    const killedByName = globalState.clientIdToName.get(killedBy);
-    const gameOverDialog = new GameOverDialog(killedByName);
-    gameOverDialog.show();
-  }
-
 };
 
 export default playerDiedHandler;

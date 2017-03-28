@@ -1,7 +1,6 @@
 package simulation
 
 import (
-	"reflect"
 	"superstellar/backend/constants"
 	"superstellar/backend/events"
 	"superstellar/backend/state"
@@ -48,16 +47,13 @@ func (manager *ProjectileManager) detectProjectileCollisions() {
 				if object.Hp() <= 0 {
 					manager.space.RemoveObject(id)
 
-					if reflect.TypeOf(object) == reflect.TypeOf(&state.Spaceship{}) {
-						userDiedMessage := &events.UserDied{
-							ClientID:      id,
-							Shooter:       projectile.Spaceship,
-							KilledBy:      projectile.ClientID,
-							ShotSpaceship: object.(*state.Spaceship),
-							Timestamp:     time.Now(),
-						}
-						manager.eventDispatcher.FireUserDied(userDiedMessage)
+					objectDestroyedMessage := &events.ObjectDestroyed{
+						DestroyedObject: object,
+						DestroyedBy:     projectile.Spaceship,
+						Timestamp:       time.Now(),
 					}
+					manager.eventDispatcher.FireObjectDestroyed(objectDestroyedMessage)
+
 				}
 			}
 		}

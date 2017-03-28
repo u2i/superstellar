@@ -171,17 +171,19 @@ func (s *Spaceship) ProjectileHitOtherObject(other Object) {
 	s.Hits++
 }
 
-func (s *Spaceship) SpaceshipKilled(killedSpaceship *Spaceship) {
-	killedSpaceshipMaxHp := killedSpaceship.MaxHP
+func (s *Spaceship) ObjectDestroyed(destroyedObject Object) {
+	if spaceship, ok := destroyedObject.(*Spaceship); ok {
+		killedSpaceshipMaxHp := spaceship.MaxHP
 
-	reward := uint32(float32(killedSpaceshipMaxHp) * constants.KillRewardRatio)
-	energyReward := uint32(float32(killedSpaceshipMaxHp) * constants.KillEnergyRewardRatio)
+		reward := uint32(float32(killedSpaceshipMaxHp) * constants.KillRewardRatio)
+		energyReward := uint32(float32(killedSpaceshipMaxHp) * constants.KillEnergyRewardRatio)
 
-	s.Kills++
-	s.addReward(reward)
-	s.addEnergyReward(energyReward)
+		s.Kills++
+		s.addReward(reward)
+		s.addEnergyReward(energyReward)
 
-	s.MarkDirty()
+		s.MarkDirty()
+	}
 }
 
 func (s *Spaceship) makeDamage(damage uint32) {

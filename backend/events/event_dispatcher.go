@@ -42,8 +42,8 @@ type UserLeftListener interface {
 	HandleUserLeft(*UserLeft)
 }
 
-type UserDiedListener interface {
-	HandleUserDied(*UserDied)
+type ObjectDestroyedListener interface {
+	HandleObjectDestroyed(*ObjectDestroyed)
 }
 
 type UserInputListener interface {
@@ -136,14 +136,14 @@ func (handler *userLeftHandler) handle() {
 	}
 }
 
-type userDiedHandler struct {
-	event          *UserDied
-	eventListeners []UserDiedListener
+type objectDestroyedHandler struct {
+	event          *ObjectDestroyed
+	eventListeners []ObjectDestroyedListener
 }
 
-func (handler *userDiedHandler) handle() {
+func (handler *objectDestroyedHandler) handle() {
 	for _, listener := range handler.eventListeners {
-		listener.HandleUserDied(handler.event)
+		listener.HandleObjectDestroyed(handler.event)
 	}
 }
 
@@ -196,7 +196,7 @@ type EventDispatcher struct {
 
 	userLeftListeners []UserLeftListener
 
-	userDiedListeners []UserDiedListener
+	objectDestroyedListeners []ObjectDestroyedListener
 
 	userInputListeners []UserInputListener
 
@@ -231,7 +231,7 @@ func NewEventDispatcher() *EventDispatcher {
 
 		userLeftListeners: []UserLeftListener{},
 
-		userDiedListeners: []UserDiedListener{},
+		objectDestroyedListeners: []ObjectDestroyedListener{},
 
 		userInputListeners: []UserInputListener{},
 
@@ -389,18 +389,18 @@ func (dispatcher *EventDispatcher) FireUserLeft(event *UserLeft) {
 	dispatcher.priority2EventsQueue <- handler
 }
 
-// UserDied
+// ObjectDestroyed
 
-func (dispatcher *EventDispatcher) RegisterUserDiedListener(listener UserDiedListener) {
+func (dispatcher *EventDispatcher) RegisterObjectDestroyedListener(listener ObjectDestroyedListener) {
 	dispatcher.panicWhenEventLoopRunning()
 
-	dispatcher.userDiedListeners = append(dispatcher.userDiedListeners, listener)
+	dispatcher.objectDestroyedListeners = append(dispatcher.objectDestroyedListeners, listener)
 }
 
-func (dispatcher *EventDispatcher) FireUserDied(event *UserDied) {
-	handler := &userDiedHandler{
+func (dispatcher *EventDispatcher) FireObjectDestroyed(event *ObjectDestroyed) {
+	handler := &objectDestroyedHandler{
 		event:          event,
-		eventListeners: dispatcher.userDiedListeners,
+		eventListeners: dispatcher.objectDestroyedListeners,
 	}
 
 	dispatcher.priority2EventsQueue <- handler

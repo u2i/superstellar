@@ -28,10 +28,10 @@ type Object interface {
 
 	DetectCollision(other Object) bool
 	CollideWithProjectile(*Projectile)
+	CollideWith(other Object)
+	ObjectDestroyed(other Object)
+	DamageValue() uint32
 
 	NotifyAboutNewFrame()
 	AddToProtoSpace(*pb.Space)
-
-	CollideWith(other Object)
-	DamageValue() uint32
 }

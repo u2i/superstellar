@@ -26,7 +26,7 @@ var supportedEvents = []EventType{
 	NewEventType("ProjectileHit", 2),
 	NewEventType("UserJoined", 2),
 	NewEventType("UserLeft", 2),
-	NewEventType("UserDied", 2),
+	NewEventType("ObjectDestroyed", 2),
 	NewEventType("UserInput", 3),
 	NewEventType("TargetAngle", 3),
 }
