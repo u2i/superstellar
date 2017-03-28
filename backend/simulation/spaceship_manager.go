@@ -93,17 +93,13 @@ func (manager *SpaceshipManager) updateSpaceships() {
 
 		// TURNING
 
-		if spaceship.TargetAngle != nil {
-			spaceship.TurnToTarget()
-		} else {
-			switch spaceship.InputDirection {
-			case state.LEFT:
-				spaceship.LeftTurn()
-			case state.RIGHT:
-				spaceship.RightTurn()
-			default:
-				spaceship.ApplyAngularFriction()
-			}
+		switch spaceship.InputDirection {
+		case state.LEFT:
+			spaceship.LeftTurn()
+		case state.RIGHT:
+			spaceship.RightTurn()
+		default:
+			spaceship.ApplyAngularFriction()
 		}
 	}
 }

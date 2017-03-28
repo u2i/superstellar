@@ -1,6 +1,8 @@
-import { sendMessage, UserAction } from './communicationLayer';
+import { sendMessage, UserAction, TargetAngle } from './communicationLayer';
+import { renderer } from './globals';
 
 var mouseDown = false;
+var lastTargetAngle = null;
 
 const KEY_SPACE = 32;
 const KEY_UP    = 38;
@@ -88,17 +90,17 @@ export const initializeControls = () => {
   }, false);
 };
 
-//window.setInterval(function() {
-//  var mousePosition = renderer.plugins.interaction.mouse.global;
-//
-//  let x = mousePosition.x - renderer.width / 2;
-//  let y = mousePosition.y - renderer.height / 2;
-//  let targetAngle = Math.atan2(y, x);
-//
-//  if (lastTargetAngle != targetAngle) {
-//    lastTargetAngle = targetAngle;
-//
-//    let targetAngleMsg = new TargetAngle(targetAngle);
-//    sendMessage(targetAngleMsg);
-//  }
-//}, 100)
+window.setInterval(function() {
+  var mousePosition = renderer.plugins.interaction.mouse.global;
+
+  let x = mousePosition.x - renderer.width / 2;
+  let y = mousePosition.y - renderer.height / 2;
+  let targetAngle = Math.atan2(y, x);
+
+  if (lastTargetAngle != targetAngle) {
+    lastTargetAngle = targetAngle;
+
+    let targetAngleMsg = new TargetAngle(targetAngle);
+    sendMessage(targetAngleMsg);
+  }
+}, 100)

@@ -66,15 +66,12 @@ func (s *Spaceship) UpdateUserInput(userInput pb.UserInput) {
 	switch userInput {
 	case pb.UserInput_CENTER:
 		s.InputDirection = NONE
-		s.TargetAngle = nil
 		s.MarkDirty()
 	case pb.UserInput_LEFT:
 		s.InputDirection = LEFT
-		s.TargetAngle = nil
 		s.MarkDirty()
 	case pb.UserInput_RIGHT:
 		s.InputDirection = RIGHT
-		s.TargetAngle = nil
 		s.MarkDirty()
 	case pb.UserInput_THRUST_ON:
 		s.InputThrust = true
@@ -106,7 +103,6 @@ func (s *Spaceship) NotifyAboutNewFrame() {
 func (s *Spaceship) UpdateTargetAngle(angle float64) {
 	s.MarkDirty()
 	s.TargetAngle = &angle
-	s.InputDirection = NONE
 }
 
 // ToProto returns protobuf representation
