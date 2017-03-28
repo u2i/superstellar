@@ -17,6 +17,7 @@ import (
 type Server struct {
 	pattern          string
 	clients          map[uint32]*Client
+	allClients       map[uint32]*Client
 	monitor          *monitor.Monitor
 	clientID         uint32
 	eventsDispatcher *events.EventDispatcher
@@ -28,6 +29,7 @@ func NewServer(pattern string, monitor *monitor.Monitor, eventDispatcher *events
 	return &Server{
 		pattern:          pattern,
 		clients:          make(map[uint32]*Client),
+		allClients:       make(map[uint32]*Client),
 		monitor:          monitor,
 		clientID:         0,
 		eventsDispatcher: eventDispatcher,
@@ -49,6 +51,7 @@ func (s *Server) Listen() {
 
 		client := NewClient(ws, s.monitor, s.eventsDispatcher, s.clientIdSeq.NextId())
 		s.clients[client.id] = client
+		s.allClients[client.id] = client
 
 		log.Println("Added new client. Now", len(s.clients), "clients connected.")
 		client.Listen()
@@ -90,6 +93,6 @@ func (s *Server) ClientIDs() []uint32 {
 }
 
 func (s *Server) GetClient(clientId uint32) (*Client, bool) {
-	client, ok := s.clients[clientId]
+	client, ok := s.allClients[clientId]
 	return client, ok
 }

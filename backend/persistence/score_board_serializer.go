@@ -56,6 +56,8 @@ func (serializer *ScoreBoardSerializer) writeScoreBoard(objectDestroyed *events.
 		_, error := serializer.adapter.DynamoDb().PutItem(putItemInput)
 		if error != nil {
 			log.Println("Cannot put item to DynamoDB", error)
+		} else {
+			log.Println("ScoreBoard item sent to DynamoDB")
 		}
 	}
 }

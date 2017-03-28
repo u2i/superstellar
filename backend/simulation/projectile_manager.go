@@ -53,7 +53,6 @@ func (manager *ProjectileManager) detectProjectileCollisions() {
 						Timestamp:       time.Now(),
 					}
 					manager.eventDispatcher.FireObjectDestroyed(objectDestroyedMessage)
-
 				}
 			}
 		}
