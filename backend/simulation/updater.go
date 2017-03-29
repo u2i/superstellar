@@ -84,15 +84,18 @@ func (updater *Updater) HandleUserJoined(userJoinedEvent *events.UserJoined) {
 
 func (updater *Updater) HandleUserLeft(userLeftEvent *events.UserLeft) {
 	spaceship := updater.space.Spaceships[userLeftEvent.ClientID]
-	updater.space.RemoveSpaceship(spaceship.Id())
 
-	objectDestroyedMessage := &events.ObjectDestroyed{
-		DestroyedObject: spaceship,
-		DestroyedBy:     spaceship,
-		Timestamp:       time.Now(),
+	if spaceship != nil {
+		updater.space.RemoveSpaceship(spaceship.Id())
+
+		objectDestroyedMessage := &events.ObjectDestroyed{
+			DestroyedObject: spaceship,
+			DestroyedBy:     spaceship,
+			Timestamp:       time.Now(),
+		}
+
+		updater.eventDispatcher.FireObjectDestroyed(objectDestroyedMessage)
 	}
-
-	updater.eventDispatcher.FireObjectDestroyed(objectDestroyedMessage)
 }
 
 func (updater *Updater) HandleObjectDestroyed(event *events.ObjectDestroyed) {

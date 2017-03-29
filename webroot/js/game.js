@@ -4,7 +4,7 @@ import * as PIXI from "pixi.js";
 import Assets from './assets';
 import * as Constants from './constants';
 import * as Utils from './utils';
-import { renderer, stage, globalState, scoreBoardDialog } from './globals';
+import { renderer, stage, globalState } from './globals';
 import { initializeConnection } from './communicationLayer';
 import { initializeHandlers } from './messageHandlers';
 import Hud from './hud';
@@ -61,9 +61,7 @@ function setup() {
 
   const dialog = new UsernameDialog();
   dialog.show()
-
-  scoreBoardDialog.show();
-
+  
   main();
 }
 

@@ -29,8 +29,6 @@ func NewScoreBoardSerializer(userNameRegistry *utils.UserNamesRegistry, adapter 
 func (serializer *ScoreBoardSerializer) serializeObjectDestroyed(objectDestroyed *events.ObjectDestroyed) *dynamodb.PutItemInput {
 	spaceship := objectDestroyed.DestroyedObject.(*state.Spaceship)
 
-	fmt.Println(spaceship.SpawnTimestamp().String())
-
 	return &dynamodb.PutItemInput{
 		TableName: aws.String("SuperstellarScoreBoard"),
 		Item: map[string]*dynamodb.AttributeValue{

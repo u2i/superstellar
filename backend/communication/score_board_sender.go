@@ -23,10 +23,10 @@ func NewScoreBoardSender(server *Server, scoreBoardReader *persistence.ScoreBoar
 }
 
 func (sender *ScoreBoardSender) HandleUserJoined(userJoinedEvent *events.UserJoined) {
-	go sender.sendScoreBoard()
+	go sender.sendScoreBoard(userJoinedEvent.ClientID)
 }
 
-func (sender *ScoreBoardSender) sendScoreBoard() {
+func (sender *ScoreBoardSender) sendScoreBoard(clientId uint32) {
 	protoScoreBoard := sender.scoreBoardReader.ReadScoreBoard()
 	message := &pb.Message{
 		Content: &pb.Message_ScoreBoard{
@@ -34,5 +34,5 @@ func (sender *ScoreBoardSender) sendScoreBoard() {
 		},
 	}
 
-	sender.server.SendToAllClients(message)
+	sender.server.SendToClient(clientId, message)
 }
