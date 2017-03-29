@@ -636,6 +636,34 @@
                     "id": 4
                 }
             ]
+        },
+        {
+            "name": "ScoreBoardItem",
+            "fields": [
+                {
+                    "rule": "optional",
+                    "type": "uint32",
+                    "name": "score",
+                    "id": 1
+                },
+                {
+                    "rule": "optional",
+                    "type": "string",
+                    "name": "name",
+                    "id": 2
+                }
+            ]
+        },
+        {
+            "name": "Scoreboard",
+            "fields": [
+                {
+                    "rule": "repeated",
+                    "type": "ScoreBoardItem",
+                    "name": "items",
+                    "id": 1
+                }
+            ]
         }
     ],
     "enums": [

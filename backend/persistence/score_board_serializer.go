@@ -12,7 +12,6 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
-	"github.com/satori/go.uuid"
 )
 
 type ScoreBoardSerializer struct {
@@ -32,10 +31,12 @@ func (serializer *ScoreBoardSerializer) serializeObjectDestroyed(objectDestroyed
 
 	spaceship := objectDestroyed.DestroyedObject.(*state.Spaceship)
 
+	fmt.Println(spaceship.SpawnTimestamp().String())
+
 	return &dynamodb.PutItemInput{
 		TableName: aws.String("SuperstellarScoreBoard"),
 		Item: map[string]*dynamodb.AttributeValue{
-			"id":                  {S: aws.String(uuid.NewV4().String())},
+			"game":                {S: aws.String("superstellar")},
 			"name":                {S: aws.String(client.UserName())},
 			"spawn_time":          {S: aws.String(spaceship.SpawnTimestamp().String())},
 			"death_time":          {S: aws.String(objectDestroyed.Timestamp.String())},

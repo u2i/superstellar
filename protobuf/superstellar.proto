@@ -170,3 +170,12 @@ message Leaderboard {
   uint32 userScore = 3;
   uint32 userPosition = 4;
 }
+
+message ScoreBoardItem {
+  uint32 score = 1;
+  string name = 2;
+}
+
+message Scoreboard {
+  repeated ScoreBoardItem items = 1;
+}

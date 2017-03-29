@@ -96,7 +96,7 @@ func (updater *Updater) HandleUserLeft(userLeftEvent *events.UserLeft) {
 }
 
 func (updater *Updater) HandleObjectDestroyed(event *events.ObjectDestroyed) {
-	if event.DestroyedBy != nil {
+	if event.DestroyedBy != nil && event.DestroyedBy != event.DestroyedObject {
 		event.DestroyedBy.ObjectDestroyed(event.DestroyedObject)
 	}
 }
