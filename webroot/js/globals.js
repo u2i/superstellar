@@ -23,7 +23,8 @@ export const globalState = {
   worldSizeFilter: new AnnulusFilter(),
   ping: null,
   framesCalculator: new FramesCalculator(),
-  asteroidsMap: new Map()
+  asteroidsMap: new Map(),
+  crosshair: null
 };
 
 export var constants = {};

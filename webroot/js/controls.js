@@ -1,5 +1,5 @@
 import { sendMessage, UserAction, TargetAngle } from './communicationLayer';
-import { renderer } from './globals';
+import { globalState, renderer } from './globals';
 
 var mouseDown = false;
 var lastTargetAngle = null;
@@ -41,6 +41,10 @@ const updateMouseState = (isDown) => {
     mouseDown = isDown;
     sendInput(KEY_SPACE, isDown);
   }
+}
+
+const updateMousePosition = (event) => {
+  globalState.crosshair.update(event.x, event.y);
 }
 
 const sendInput = (keyCode, isPressed) => {
@@ -87,6 +91,10 @@ export const initializeControls = () => {
 
   addEventListener("mouseup", function() {
     updateMouseState(false);
+  }, false);
+
+  addEventListener("mousemove", function(e) {
+    updateMousePosition(e);
   }, false);
 };
 

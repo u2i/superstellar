@@ -10,6 +10,7 @@ import { initializeHandlers } from './messageHandlers';
 import Hud from './hud';
 import UsernameDialog from "./dialogs/usernameDialog";
 import Radar from './radar';
+import Crosshair from './crosshair';
 
 const HOST = window.location.hostname;
 const PORT = BACKEND_PORT;
@@ -28,7 +29,7 @@ PIXI.loader.
   [
     Constants.SHIP_TEXTURE, Constants.BACKGROUND_TEXTURE,
     Constants.FLAME_SPRITESHEET, Constants.PROJECTILE_SPRITESHEET,
-    Constants.BOOST_SPRITESHEET
+    Constants.BOOST_SPRITESHEET, Constants.CROSSHAIR_TEXTURE
   ]).
   on("progress", loadProgressHandler).
   load(setup);
@@ -37,6 +38,7 @@ let tilingSprite;
 let overlay;
 let hud;
 let radar;
+let crosshair;
 
 function setup() {
   initializeHandlers();
@@ -58,6 +60,10 @@ function setup() {
 
   hud = new Hud();
   hud.show();
+
+  crosshair = new Crosshair();
+  crosshair.show();
+  globalState.crosshair = crosshair;
 
   const dialog = new UsernameDialog();
   dialog.show()
