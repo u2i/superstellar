@@ -5,19 +5,22 @@ import (
 	"superstellar/backend/events"
 	"superstellar/backend/leaderboard"
 	"superstellar/backend/pb"
+	"superstellar/backend/persistence"
 	"superstellar/backend/state"
 )
 
 type Sender struct {
 	server             *Server
 	space              *state.Space
+	scoreBoardReader   *persistence.ScoreBoardReader
 	leaderboardCounter int32
 }
 
-func NewSender(server *Server, space *state.Space) *Sender {
+func NewSender(server *Server, space *state.Space, scoreBoardReader *persistence.ScoreBoardReader) *Sender {
 	return &Sender{
 		server:             server,
 		space:              space,
+		scoreBoardReader:   scoreBoardReader,
 		leaderboardCounter: 0,
 	}
 }
@@ -44,6 +47,8 @@ func (sender *Sender) HandleUserJoined(userJoinedEvent *events.UserJoined) {
 	sender.sendHelloMessage(userJoinedEvent.ClientID)
 	sender.sendUserJoinedMessage(userJoinedEvent.ClientID, userJoinedEvent.UserName)
 	sender.server.SendToClient(userJoinedEvent.ClientID, sender.space.ToMessage(true))
+
+	go sender.sendScoreBoard()
 }
 
 func (sender *Sender) HandleUserLeft(userLeftEvent *events.UserLeft) {
@@ -133,6 +138,17 @@ func (sender *Sender) sendObjectDestroyed(clientID uint32, killedBy uint32) {
 				Id:       clientID,
 				KilledBy: killedBy,
 			},
+		},
+	}
+
+	sender.server.SendToAllClients(message)
+}
+
+func (sender *Sender) sendScoreBoard() {
+	protoScoreBoard := sender.scoreBoardReader.ReadScoreBoard()
+	message := &pb.Message{
+		Content: &pb.Message_ScoreBoard{
+			ScoreBoard: protoScoreBoard,
 		},
 	}
 

@@ -3,6 +3,12 @@ package persistence
 import (
 	"log"
 
+	"superstellar/backend/pb"
+
+	"strconv"
+
+	"fmt"
+
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 )
@@ -17,7 +23,7 @@ func NewScoreBoardReader(adapter *DynamoDbAdapter) *ScoreBoardSerializer {
 	}
 }
 
-func (serializer *ScoreBoardSerializer) ReadScoreBoard() {
+func (reader *ScoreBoardReader) ReadScoreBoard() *pb.ScoreBoard {
 	queryInput := &dynamodb.QueryInput{
 		TableName:              aws.String("SuperstellarScoreBoard"),
 		IndexName:              aws.String("game-score-index"),
@@ -30,10 +36,26 @@ func (serializer *ScoreBoardSerializer) ReadScoreBoard() {
 		Limit:            aws.Int64(10),
 	}
 
-	resp, error := serializer.adapter.dynamodb.Query(queryInput)
+	resp, error := reader.adapter.dynamodb.Query(queryInput)
 	if error != nil {
 		log.Println("Cannot get items from DynamoDB", error)
-	} else {
-		log.Println(resp)
+		return nil
 	}
+
+	protoScoreBoardItems := make([]*pb.ScoreBoardItem, 0, *resp.Count)
+	protoScoreBoard := &pb.ScoreBoard{Items: protoScoreBoardItems}
+
+	for i := range resp.Items {
+		item := resp.Items[i]
+
+		score, err := strconv.Atoi(*item["score"].N)
+		if err == nil {
+			scoreBoardItem := &pb.ScoreBoardItem{Name: *item["name"].S, Score: uint32(score)}
+			protoScoreBoard.Items = append(protoScoreBoard.Items, scoreBoardItem)
+		}
+	}
+
+	fmt.Println(protoScoreBoard)
+
+	return protoScoreBoard
 }

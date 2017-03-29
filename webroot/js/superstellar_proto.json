@@ -76,6 +76,13 @@
                     "name": "pong",
                     "id": 10,
                     "oneof": "content"
+                },
+                {
+                    "rule": "optional",
+                    "type": "ScoreBoard",
+                    "name": "scoreBoard",
+                    "id": 11,
+                    "oneof": "content"
                 }
             ],
             "oneofs": {
@@ -89,7 +96,8 @@
                     7,
                     8,
                     9,
-                    10
+                    10,
+                    11
                 ]
             }
         },
@@ -655,7 +663,7 @@
             ]
         },
         {
-            "name": "Scoreboard",
+            "name": "ScoreBoard",
             "fields": [
                 {
                     "rule": "repeated",
