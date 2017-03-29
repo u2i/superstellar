@@ -63,12 +63,13 @@ func main() {
 	if _, found := os.LookupEnv("DYNAMODB_ENDPOINT"); found {
 		adapter := persistence.NewDynamoDbWriter()
 
-		scoreBoardSerializer := persistence.NewScoreBoardSerializer(userNameRegistry, adapter, idManager)
+		scoreBoardSerializer := persistence.NewScoreBoardSerializer(userNameRegistry, adapter, idManager, eventDispatcher)
 		eventDispatcher.RegisterObjectDestroyedListener(scoreBoardSerializer)
 
 		scoreBoardReader := persistence.NewScoreBoardReader(adapter)
 		scoreBoardSender := communication.NewScoreBoardSender(server, scoreBoardReader, userNameRegistry)
 		eventDispatcher.RegisterUserJoinedListener(scoreBoardSender)
+		eventDispatcher.RegisterScoreSentListener(scoreBoardSender)
 	}
 
 	botManager := ai.NewBotManager(space, idManager)

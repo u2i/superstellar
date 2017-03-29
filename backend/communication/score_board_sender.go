@@ -8,9 +8,11 @@ import (
 )
 
 type ScoreBoardSender struct {
-	server           *Server
-	scoreBoardReader *persistence.ScoreBoardReader
-	userNameRegistry *utils.UserNamesRegistry
+	server                 *Server
+	scoreBoardReader       *persistence.ScoreBoardReader
+	userNameRegistry       *utils.UserNamesRegistry
+	protoScoreBoardMessage *pb.Message
+	minScore               uint32
 }
 
 func NewScoreBoardSender(server *Server, scoreBoardReader *persistence.ScoreBoardReader,
@@ -23,16 +25,34 @@ func NewScoreBoardSender(server *Server, scoreBoardReader *persistence.ScoreBoar
 }
 
 func (sender *ScoreBoardSender) HandleUserJoined(userJoinedEvent *events.UserJoined) {
-	go sender.sendScoreBoard(userJoinedEvent.ClientID)
+	go sender.sendToOne(userJoinedEvent.ClientID)
 }
 
-func (sender *ScoreBoardSender) sendScoreBoard(clientId uint32) {
+func (sender *ScoreBoardSender) HandleScoreSent(scoreSent *events.ScoreSent) {
+	if scoreSent.Score >= sender.minScore {
+		go sender.refreshAndSendToAll()
+	}
+}
+
+func (sender *ScoreBoardSender) refreshScoreBoard() {
 	protoScoreBoard := sender.scoreBoardReader.ReadScoreBoard()
-	message := &pb.Message{
+
+	sender.protoScoreBoardMessage = &pb.Message{
 		Content: &pb.Message_ScoreBoard{
 			ScoreBoard: protoScoreBoard,
 		},
 	}
+}
 
-	sender.server.SendToClient(clientId, message)
+func (sender *ScoreBoardSender) sendToOne(clientId uint32) {
+	if sender.protoScoreBoardMessage == nil {
+		sender.refreshScoreBoard()
+	}
+
+	sender.server.SendToClient(clientId, sender.protoScoreBoardMessage)
+}
+
+func (sender *ScoreBoardSender) refreshAndSendToAll() {
+	sender.refreshScoreBoard()
+	sender.server.SendToAllClients(sender.protoScoreBoardMessage)
 }

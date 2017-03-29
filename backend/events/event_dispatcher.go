@@ -54,6 +54,10 @@ type TargetAngleListener interface {
 	HandleTargetAngle(*TargetAngle)
 }
 
+type ScoreSentListener interface {
+	HandleScoreSent(*ScoreSent)
+}
+
 // ##############################
 // END OF INTERFACE DOCUMENTATION
 // ##############################
@@ -169,6 +173,17 @@ func (handler *targetAngleHandler) handle() {
 	}
 }
 
+type scoreSentHandler struct {
+	event          *ScoreSent
+	eventListeners []ScoreSentListener
+}
+
+func (handler *scoreSentHandler) handle() {
+	for _, listener := range handler.eventListeners {
+		listener.HandleScoreSent(handler.event)
+	}
+}
+
 // EVENT DISPATCHER
 
 type EventDispatcher struct {
@@ -201,6 +216,8 @@ type EventDispatcher struct {
 	userInputListeners []UserInputListener
 
 	targetAngleListeners []TargetAngleListener
+
+	scoreSentListeners []ScoreSentListener
 }
 
 // EVENT DISPATCHER CONSTRUCTOR
@@ -236,6 +253,8 @@ func NewEventDispatcher() *EventDispatcher {
 		userInputListeners: []UserInputListener{},
 
 		targetAngleListeners: []TargetAngleListener{},
+
+		scoreSentListeners: []ScoreSentListener{},
 	}
 }
 
@@ -435,6 +454,23 @@ func (dispatcher *EventDispatcher) FireTargetAngle(event *TargetAngle) {
 	handler := &targetAngleHandler{
 		event:          event,
 		eventListeners: dispatcher.targetAngleListeners,
+	}
+
+	dispatcher.priority3EventsQueue <- handler
+}
+
+// ScoreSent
+
+func (dispatcher *EventDispatcher) RegisterScoreSentListener(listener ScoreSentListener) {
+	dispatcher.panicWhenEventLoopRunning()
+
+	dispatcher.scoreSentListeners = append(dispatcher.scoreSentListeners, listener)
+}
+
+func (dispatcher *EventDispatcher) FireScoreSent(event *ScoreSent) {
+	handler := &scoreSentHandler{
+		event:          event,
+		eventListeners: dispatcher.scoreSentListeners,
 	}
 
 	dispatcher.priority3EventsQueue <- handler

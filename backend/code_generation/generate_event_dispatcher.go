@@ -29,6 +29,7 @@ var supportedEvents = []EventType{
 	NewEventType("ObjectDestroyed", 2),
 	NewEventType("UserInput", 3),
 	NewEventType("TargetAngle", 3),
+	NewEventType("ScoreSent", 3),
 }
 
 // END CONFIGURATION
