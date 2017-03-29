@@ -38,6 +38,7 @@ export const PROJECTILE_HIT_MESSAGE    = "projectileHit";
 export const PLAYER_DIED_MESSAGE       = "playerDied";
 export const PING_MESSAGE              = "ping";
 export const PONG_MESSAGE              = "pong";
+export const SCORE_BOARD_MESSAGE       = "scoreBoard";
 
 
 

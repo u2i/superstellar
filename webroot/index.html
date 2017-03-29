@@ -6,12 +6,13 @@
     <link href="https://fonts.googleapis.com/css?family=Roboto+Mono|Roboto:400,700" rel="stylesheet">
 </head>
 <body>
-<div id="leaderboard" class="hud-leaderboard" style="display: none;">
-    <table class="leaderboard head">
+<div id="leaderboard" class="board" style="display: none;">
+    <div id="leaderboard-title" class="board-title">Current game ranks</div>
+    <table id="leaderboard-head" class="board-items board head">
         <tbody>
         </tbody>
     </table>
-    <table class="leaderboard tail" style="display: none;">
+    <table id="leaderboard-tail" class="board-items board tail" style="display: none;">
         <tbody>
             <tr style="display: none;">
                 <td class="rank-position">&hellip;</td>
@@ -42,6 +43,14 @@
         <dd class="debug" data-type="coordinate-y"></dd>
     </dl>
 </div>
+<div id="scoreboard" class="board" style="bottom: 0px; display: none;">
+    <div id="scoreboard-title" class="board-title">Highscores</div>
+    <table id="scoreboard-items" class="board-items">
+        <tbody>
+        </tbody>
+    </table>
+</div>
+
 <div id="game"></div>
 <script src="vendor.js"></script>
 <script src="app.js"></script>

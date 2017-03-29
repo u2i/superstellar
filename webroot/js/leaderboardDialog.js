@@ -1,8 +1,8 @@
 export default class LeaderboardDialog {
   constructor() {
     this.domNode = document.getElementById('leaderboard');
-    this.leaderboard = this.domNode.firstElementChild.firstElementChild;
-    this.tailLeaderboard = this.domNode.lastElementChild;
+    this.leaderboard = document.getElementById('leaderboard-head').firstElementChild;
+    this.tailLeaderboard = document.getElementById('leaderboard-tail');
     this.tailEllipsisRow = this.tailLeaderboard.firstElementChild.firstElementChild;
   }
 

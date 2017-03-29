@@ -11,6 +11,7 @@ import playerJoinedHandler from './messageHandlers/playerJoinedHandler';
 import leaderboardHandler from './messageHandlers/leaderboardHandler';
 import playerDiedHandler from './messageHandlers/playerDiedHandler';
 import pongHandler from './messageHandlers/pongHandler';
+import scoreBoardHandler from './messageHandlers/scoreBoardHandler';
 
 export const initializeHandlers = () => {
   registerMessageHandler(Constants.HELLO_MESSAGE,            helloHandler);
@@ -23,4 +24,5 @@ export const initializeHandlers = () => {
   registerMessageHandler(Constants.LEADERBOARD_MESSAGE,      leaderboardHandler);
   registerMessageHandler(Constants.PLAYER_DIED_MESSAGE,      playerDiedHandler);
   registerMessageHandler(Constants.PONG_MESSAGE,             pongHandler);
+  registerMessageHandler(Constants.SCORE_BOARD_MESSAGE,      scoreBoardHandler);
 };

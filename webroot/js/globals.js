@@ -1,5 +1,6 @@
 import { getCurrentWindowSize } from './utils';
 import LeaderboardDialog from "./leaderboardDialog";
+import ScoreBoardDialog from "./scoreBoardDialog";
 import AnnulusFilter from './annulusFilter';
 import FramesCalculator from './framesCalculator.js'
 
@@ -28,3 +29,4 @@ export const globalState = {
 export var constants = {};
 
 export const leaderboardDialog = new LeaderboardDialog();
+export const scoreBoardDialog = new ScoreBoardDialog();
