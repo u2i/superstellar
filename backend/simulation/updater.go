@@ -18,11 +18,11 @@ type Updater struct {
 	asteroidManager   *AsteroidManager
 	monitor           *monitor.Monitor
 	eventDispatcher   *events.EventDispatcher
-	idSequencer       *utils.IdSequencer
+	idSequencer       *utils.IdManager
 }
 
 func NewUpdater(space *state.Space, monitor *monitor.Monitor, eventDispatcher *events.EventDispatcher,
-	idSequencer *utils.IdSequencer) *Updater {
+	idSequencer *utils.IdManager) *Updater {
 	return &Updater{
 		space:             space,
 		spaceshipManager:  NewSpaceshipManager(space, eventDispatcher),

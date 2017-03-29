@@ -1,34 +1,32 @@
 package persistence
 
 import (
-	"superstellar/backend/communication"
-	"superstellar/backend/state"
-
-	"superstellar/backend/events"
-
-	"log"
-
 	"fmt"
+	"log"
+	"superstellar/backend/events"
+	"superstellar/backend/state"
+	"superstellar/backend/utils"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 )
 
 type ScoreBoardSerializer struct {
-	server  *communication.Server
-	adapter *DynamoDbAdapter
+	userNameRegistry *utils.UserNamesRegistry
+	adapter          *DynamoDbAdapter
+	idManager        *utils.IdManager
 }
 
-func NewScoreBoardSerializer(server *communication.Server, adapter *DynamoDbAdapter) *ScoreBoardSerializer {
+func NewScoreBoardSerializer(userNameRegistry *utils.UserNamesRegistry, adapter *DynamoDbAdapter,
+	idManager *utils.IdManager) *ScoreBoardSerializer {
 	return &ScoreBoardSerializer{
-		server:  server,
-		adapter: adapter,
+		userNameRegistry: userNameRegistry,
+		adapter:          adapter,
+		idManager:        idManager,
 	}
 }
 
-func (serializer *ScoreBoardSerializer) serializeObjectDestroyed(objectDestroyed *events.ObjectDestroyed,
-	client *communication.Client) *dynamodb.PutItemInput {
-
+func (serializer *ScoreBoardSerializer) serializeObjectDestroyed(objectDestroyed *events.ObjectDestroyed) *dynamodb.PutItemInput {
 	spaceship := objectDestroyed.DestroyedObject.(*state.Spaceship)
 
 	fmt.Println(spaceship.SpawnTimestamp().String())
@@ -37,7 +35,7 @@ func (serializer *ScoreBoardSerializer) serializeObjectDestroyed(objectDestroyed
 		TableName: aws.String("SuperstellarScoreBoard"),
 		Item: map[string]*dynamodb.AttributeValue{
 			"game":                {S: aws.String("superstellar")},
-			"name":                {S: aws.String(client.UserName())},
+			"name":                {S: aws.String(serializer.userNameRegistry.GetUserName(spaceship.Id()))},
 			"spawn_time":          {S: aws.String(spaceship.SpawnTimestamp().String())},
 			"death_time":          {S: aws.String(objectDestroyed.Timestamp.String())},
 			"score":               {N: aws.String(fmt.Sprint(spaceship.MaxHP))},
@@ -50,9 +48,9 @@ func (serializer *ScoreBoardSerializer) serializeObjectDestroyed(objectDestroyed
 	}
 }
 
-func (serializer *ScoreBoardSerializer) writeScoreBoard(objectDestroyed *events.ObjectDestroyed, client *communication.Client) {
+func (serializer *ScoreBoardSerializer) writeScoreBoard(objectDestroyed *events.ObjectDestroyed) {
 	if _, ok := objectDestroyed.DestroyedObject.(*state.Spaceship); ok {
-		putItemInput := serializer.serializeObjectDestroyed(objectDestroyed, client)
+		putItemInput := serializer.serializeObjectDestroyed(objectDestroyed)
 
 		_, error := serializer.adapter.DynamoDb().PutItem(putItemInput)
 		if error != nil {
@@ -63,7 +61,7 @@ func (serializer *ScoreBoardSerializer) writeScoreBoard(objectDestroyed *events.
 	}
 }
 func (serializer *ScoreBoardSerializer) HandleObjectDestroyed(objectDestroyed *events.ObjectDestroyed) {
-	if client, ok := serializer.server.GetClient(objectDestroyed.DestroyedObject.Id()); ok {
-		go serializer.writeScoreBoard(objectDestroyed, client)
+	if serializer.idManager.IsPlayerId(objectDestroyed.DestroyedObject.Id()) {
+		go serializer.writeScoreBoard(objectDestroyed)
 	}
 }

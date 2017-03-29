@@ -7,21 +7,21 @@ import (
 )
 
 type BotManager struct {
-	idToBot     map[uint32]Bot
-	space       *state.Space
-	clientIdSeq *utils.IdSequencer
+	idToBot   map[uint32]Bot
+	space     *state.Space
+	idManager *utils.IdManager
 }
 
-func NewBotManager(space *state.Space, clientIdSeq *utils.IdSequencer) *BotManager {
+func NewBotManager(space *state.Space, idManager *utils.IdManager) *BotManager {
 	return &BotManager{
-		idToBot: make(map[uint32]Bot),
-		space: space,
-		clientIdSeq: clientIdSeq,
+		idToBot:   make(map[uint32]Bot),
+		space:     space,
+		idManager: idManager,
 	}
 }
 
 func (m *BotManager) CreateNewBot() {
-	id := m.clientIdSeq.NextId()
+	id := m.idManager.NextBotId()
 	m.space.NewSpaceship(id)
 	m.idToBot[id] = NewCleverBot()
 }

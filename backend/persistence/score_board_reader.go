@@ -7,8 +7,6 @@ import (
 
 	"strconv"
 
-	"fmt"
-
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 )
@@ -17,8 +15,8 @@ type ScoreBoardReader struct {
 	adapter *DynamoDbAdapter
 }
 
-func NewScoreBoardReader(adapter *DynamoDbAdapter) *ScoreBoardSerializer {
-	return &ScoreBoardSerializer{
+func NewScoreBoardReader(adapter *DynamoDbAdapter) *ScoreBoardReader {
+	return &ScoreBoardReader{
 		adapter: adapter,
 	}
 }
@@ -54,8 +52,6 @@ func (reader *ScoreBoardReader) ReadScoreBoard() *pb.ScoreBoard {
 			protoScoreBoard.Items = append(protoScoreBoard.Items, scoreBoardItem)
 		}
 	}
-
-	fmt.Println(protoScoreBoard)
 
 	return protoScoreBoard
 }

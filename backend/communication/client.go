@@ -14,6 +14,8 @@ import (
 
 	"superstellar/backend/monitor"
 
+	"superstellar/backend/utils"
+
 	"golang.org/x/net/websocket"
 )
 
@@ -21,17 +23,18 @@ const channelBufSize = 100
 
 // Client struct holds client-specific variables.
 type Client struct {
-	id              uint32
-	username        string
-	ws              *websocket.Conn
-	ch              chan *[]byte
-	doneCh          chan bool
-	monitor         *monitor.Monitor
-	eventDispatcher *events.EventDispatcher
+	id               uint32
+	ws               *websocket.Conn
+	ch               chan *[]byte
+	doneCh           chan bool
+	monitor          *monitor.Monitor
+	eventDispatcher  *events.EventDispatcher
+	userNameRegistry *utils.UserNamesRegistry
 }
 
 // NewClient initializes a new Client struct with given websocket and Server.
-func NewClient(ws *websocket.Conn, monitor *monitor.Monitor, eventsDispatcher *events.EventDispatcher, clientID uint32) *Client {
+func NewClient(ws *websocket.Conn, monitor *monitor.Monitor, eventsDispatcher *events.EventDispatcher,
+	userNameRegistry *utils.UserNamesRegistry, clientID uint32) *Client {
 	if ws == nil {
 		panic("ws cannot be nil")
 	}
@@ -39,7 +42,7 @@ func NewClient(ws *websocket.Conn, monitor *monitor.Monitor, eventsDispatcher *e
 	ch := make(chan *[]byte, channelBufSize)
 	doneCh := make(chan bool)
 
-	return &Client{clientID, "", ws, ch, doneCh, monitor, eventsDispatcher}
+	return &Client{clientID, ws, ch, doneCh, monitor, eventsDispatcher, userNameRegistry}
 }
 
 // Conn returns client's websocket.Conn struct.
@@ -65,10 +68,6 @@ func (c *Client) Done() {
 func (c *Client) Listen() {
 	go c.listenWrite()
 	c.listenRead()
-}
-
-func (c *Client) UserName() string {
-	return c.username
 }
 
 // Listen write request via chanel
@@ -152,7 +151,7 @@ func (c *Client) tryToJoinGame(joinGameMsg *pb.JoinGame) {
 	ok, err := validateUsername(username)
 
 	if ok {
-		c.username = username
+		c.userNameRegistry.AddUserName(c.id, username)
 		c.sendJoinGameAckMessage(&pb.JoinGameAck{Success: true})
 		c.eventDispatcher.FireUserJoined(&events.UserJoined{ClientID: c.id, UserName: username})
 	} else {

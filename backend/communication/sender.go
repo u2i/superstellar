@@ -5,22 +5,22 @@ import (
 	"superstellar/backend/events"
 	"superstellar/backend/leaderboard"
 	"superstellar/backend/pb"
-	"superstellar/backend/persistence"
 	"superstellar/backend/state"
+	"superstellar/backend/utils"
 )
 
 type Sender struct {
 	server             *Server
 	space              *state.Space
-	scoreBoardReader   *persistence.ScoreBoardReader
+	userNameRegistry   *utils.UserNamesRegistry
 	leaderboardCounter int32
 }
 
-func NewSender(server *Server, space *state.Space, scoreBoardReader *persistence.ScoreBoardReader) *Sender {
+func NewSender(server *Server, space *state.Space, userNameRegistry *utils.UserNamesRegistry) *Sender {
 	return &Sender{
 		server:             server,
 		space:              space,
-		scoreBoardReader:   scoreBoardReader,
+		userNameRegistry:   userNameRegistry,
 		leaderboardCounter: 0,
 	}
 }
@@ -47,8 +47,6 @@ func (sender *Sender) HandleUserJoined(userJoinedEvent *events.UserJoined) {
 	sender.sendHelloMessage(userJoinedEvent.ClientID)
 	sender.sendUserJoinedMessage(userJoinedEvent.ClientID, userJoinedEvent.UserName)
 	sender.server.SendToClient(userJoinedEvent.ClientID, sender.space.ToMessage(true))
-
-	go sender.sendScoreBoard()
 }
 
 func (sender *Sender) HandleUserLeft(userLeftEvent *events.UserLeft) {
@@ -97,8 +95,8 @@ func (sender *Sender) sendUserJoinedMessage(clientID uint32, userName string) {
 func (sender *Sender) sendHelloMessage(clientID uint32) {
 	idToUsername := make(map[uint32]string)
 
-	for id, client := range sender.server.clients {
-		idToUsername[id] = client.username
+	for id, _ := range sender.server.clients {
+		idToUsername[id] = sender.userNameRegistry.GetUserName(id)
 	}
 
 	constantsProto := &pb.Constants{
@@ -138,17 +136,6 @@ func (sender *Sender) sendObjectDestroyed(clientID uint32, killedBy uint32) {
 				Id:       clientID,
 				KilledBy: killedBy,
 			},
-		},
-	}
-
-	sender.server.SendToAllClients(message)
-}
-
-func (sender *Sender) sendScoreBoard() {
-	protoScoreBoard := sender.scoreBoardReader.ReadScoreBoard()
-	message := &pb.Message{
-		Content: &pb.Message_ScoreBoard{
-			ScoreBoard: protoScoreBoard,
 		},
 	}
 

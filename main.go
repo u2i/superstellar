@@ -35,12 +35,13 @@ func main() {
 
 	eventDispatcher := events.NewEventDispatcher()
 	physicsTicker := game.NewPhysicsTicker(eventDispatcher)
+	userNameRegistry := utils.NewUserNameRegistry()
+	idManager := utils.NewIdManager()
 
 	monitor := monitor.NewMonitor(eventDispatcher)
 
-	idSequencer := utils.NewIdSequencer()
 	space := state.NewSpace()
-	updater := simulation.NewUpdater(space, monitor, eventDispatcher, idSequencer)
+	updater := simulation.NewUpdater(space, monitor, eventDispatcher, idManager)
 	eventDispatcher.RegisterUserInputListener(updater)
 	eventDispatcher.RegisterTimeTickListener(updater)
 	eventDispatcher.RegisterUserJoinedListener(updater)
@@ -48,10 +49,10 @@ func main() {
 	eventDispatcher.RegisterObjectDestroyedListener(updater)
 	eventDispatcher.RegisterTargetAngleListener(updater)
 
-	server := communication.NewServer("/superstellar", monitor, eventDispatcher, idSequencer)
+	server := communication.NewServer("/superstellar", monitor, eventDispatcher, idManager, userNameRegistry)
 	eventDispatcher.RegisterUserLeftListener(server)
 
-	sender := communication.NewSender(server, space)
+	sender := communication.NewSender(server, space, userNameRegistry)
 	eventDispatcher.RegisterPhysicsReadyListener(sender)
 	eventDispatcher.RegisterProjectileFiredListener(sender)
 	eventDispatcher.RegisterProjectileHitListener(sender)
@@ -62,14 +63,15 @@ func main() {
 	if _, found := os.LookupEnv("DYNAMODB_ENDPOINT"); found {
 		adapter := persistence.NewDynamoDbWriter()
 
-		scoreBoardSerializer := persistence.NewScoreBoardSerializer(server, adapter)
+		scoreBoardSerializer := persistence.NewScoreBoardSerializer(userNameRegistry, adapter, idManager)
 		eventDispatcher.RegisterObjectDestroyedListener(scoreBoardSerializer)
 
 		scoreBoardReader := persistence.NewScoreBoardReader(adapter)
-		scoreBoardReader.ReadScoreBoard()
+		scoreBoardSender := communication.NewScoreBoardSender(server, scoreBoardReader, userNameRegistry)
+		eventDispatcher.RegisterUserJoinedListener(scoreBoardSender)
 	}
 
-	botManager := ai.NewBotManager(space, idSequencer)
+	botManager := ai.NewBotManager(space, idManager)
 	botManager.CreateNewBot()
 	botManager.CreateNewBot()
 	botManager.CreateNewBot()

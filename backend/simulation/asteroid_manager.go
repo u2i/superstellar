@@ -11,16 +11,16 @@ import (
 )
 
 type AsteroidManager struct {
-	space       *state.Space
-	idSequencer *utils.IdSequencer
-	rand        *rand.Rand
+	space     *state.Space
+	idManager *utils.IdManager
+	rand      *rand.Rand
 }
 
-func NewAsteroidManager(space *state.Space, idSequencer *utils.IdSequencer) *AsteroidManager {
+func NewAsteroidManager(space *state.Space, idManager *utils.IdManager) *AsteroidManager {
 	return &AsteroidManager{
-		space:       space,
-		idSequencer: idSequencer,
-		rand:        rand.New(rand.NewSource(time.Now().UnixNano())),
+		space:     space,
+		idManager: idManager,
+		rand:      rand.New(rand.NewSource(time.Now().UnixNano())),
 	}
 }
 
@@ -44,7 +44,7 @@ func (manager *AsteroidManager) newAsteroid() *state.Asteroid {
 
 	direction := types.NewVector(constants.AsteroidVelocity, 0.0).Rotate(directionAngle)
 
-	return state.NewAsteroid(manager.idSequencer.NextId(), circlePosition, direction)
+	return state.NewAsteroid(manager.idManager.NextAsteroidsId(), circlePosition, direction)
 }
 
 func (manager *AsteroidManager) removeObsoleteAsteroids() {
