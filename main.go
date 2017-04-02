@@ -72,12 +72,13 @@ func main() {
 		eventDispatcher.RegisterScoreSentListener(scoreBoardSender)
 	}
 
-	botManager := ai.NewBotManager(space, idManager)
-	botManager.CreateNewBot()
-	botManager.CreateNewBot()
-	botManager.CreateNewBot()
-	botManager.CreateNewBot()
+	botManager := ai.NewBotManager(eventDispatcher, space, idManager)
 	eventDispatcher.RegisterTimeTickListener(botManager)
+	eventDispatcher.RegisterObjectDestroyedListener(botManager)
+	botManager.CreateNewBot()
+	botManager.CreateNewBot()
+	botManager.CreateNewBot()
+	botManager.CreateNewBot()
 
 	if debug {
 		fileWriter, err := communication.NewFileWriter(space)
