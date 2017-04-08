@@ -7,65 +7,103 @@ import (
 	"math"
 )
 
+const (
+	AverageChangeTargetAfter          = 300
+	ChangeTargetAfterVariance         = 300
+	AverageFireDelay                  = 60
+	FireDelayVariance                 = 40
+	GoCloserIfDistanceBiggerThan      = 40000
+	TargetingAngleDifferenceThreshold = math.Pi / 20
+)
+
 type CleverBot struct {
 	targetSelected    bool
 	targetSpaceshipId uint32
-	changeTargetIn    uint32
-	fireIn            uint32
+	changeTargetIn    int
+	fireIn            int
+	changeDirectionIn int
 }
 
 func NewCleverBot() *CleverBot {
-	return &CleverBot{false, 0, 300, 20}
+	return &CleverBot{
+		targetSelected:    false,
+		targetSpaceshipId: 0,
+		changeTargetIn:    AverageChangeTargetAfter,
+		fireIn:            AverageFireDelay,
+	}
 }
 
 func (b *CleverBot) HandleStateUpdate(space *state.Space, spaceship *state.Spaceship) {
-	target := b.selectTarget(space, spaceship)
-
 	// TODO: fix this hack
 	if spaceship == nil {
 		return
 	}
 
+	target := b.selectTarget(space, spaceship)
+
 	targetPosition := target.ObjectState.Position()
 	botPosition := spaceship.ObjectState.Position()
+	facingAngle := spaceship.ObjectState.Facing()
 
 	targetVector := types.NewVector(
-		float64(targetPosition.X-botPosition.X)+(rand.Float64()-0.5)*10,
-		-float64(targetPosition.Y - botPosition.Y)+(rand.Float64()-0.5)*10,
+		float64(targetPosition.X-botPosition.X),
+		float64(targetPosition.Y-botPosition.Y),
 	)
 
-	newTargetAngle := math.Atan2(targetVector.Y, targetVector.X)
+	targetDirection := targetVector.Radians()
 
-	spaceship.UpdateTargetAngle(newTargetAngle)
-	spaceship.TurnToTarget()
+	angleDifference := targetDirection - facingAngle
+	if angleDifference > math.Pi {
+		angleDifference -= 2 * math.Pi
+	}
 
-	if targetVector.Length() > 40000 {
-		if spaceship.InputThrust != true {
-			spaceship.InputThrust = true
-			spaceship.MarkDirty()
-		}
+	absAngleDifference := math.Abs(angleDifference)
 
-		if spaceship.Fire != false {
-			spaceship.Fire = false
-			spaceship.MarkDirty()
+	if absAngleDifference > TargetingAngleDifferenceThreshold {
+		if angleDifference < 0 {
+			b.changeDirection(spaceship, state.LEFT)
+		} else {
+			b.changeDirection(spaceship, state.RIGHT)
 		}
 	} else {
-		if spaceship.InputThrust != false {
-			spaceship.InputThrust = false
-			spaceship.MarkDirty()
-		}
+		b.changeDirection(spaceship, state.NONE)
+	}
 
-		b.fireIn--
-		if b.fireIn == 0 {
-			if spaceship.Fire != true {
-				spaceship.Fire = true
-				spaceship.MarkDirty()
-			}
-			b.fireIn = uint32(rand.Intn(80)) + 20
+	b.fireIn--
+	if targetVector.Length() > GoCloserIfDistanceBiggerThan {
+		b.changeThrust(spaceship, true)
+
+		b.changeFire(spaceship, false)
+	} else {
+		b.changeThrust(spaceship, false)
+
+		if b.fireIn <= 0 {
+			b.changeFire(spaceship, true)
+			b.fireIn = rand.Intn(FireDelayVariance) - FireDelayVariance/2 + AverageFireDelay
 		} else {
-			spaceship.Fire = false
-			spaceship.MarkDirty()
+			b.changeFire(spaceship, false)
 		}
+	}
+}
+
+func (b*CleverBot) changeDirection(spaceship *state.Spaceship, direction state.Direction) {
+	if spaceship.InputDirection != direction {
+		spaceship.InputDirection = direction
+		spaceship.MarkDirty()
+	}
+}
+
+func (b*CleverBot) changeThrust(spaceship *state.Spaceship, thrustEnabled bool) {
+	if spaceship.InputThrust != thrustEnabled {
+		spaceship.InputThrust = thrustEnabled
+		spaceship.MarkDirty()
+	}
+}
+
+func (b*CleverBot) changeFire(spaceship *state.Spaceship, fireEnabled bool) {
+	if spaceship.Fire != fireEnabled {
+		spaceship.Fire = fireEnabled
+		spaceship.MarkDirty()
 	}
 }
 
@@ -74,7 +112,7 @@ func (b *CleverBot) selectTarget(space *state.Space, botSpaceship *state.Spacesh
 
 	for !targetExists || !b.targetSelected || botSpaceship == target || b.changeTargetIn == 0 {
 		b.changeTargetRandomly(space)
-		b.changeTargetIn = uint32(rand.Intn(300)) + 300
+		b.changeTargetIn = rand.Intn(ChangeTargetAfterVariance) - ChangeTargetAfterVariance/2 + AverageChangeTargetAfter
 		target, targetExists = space.Spaceships[b.targetSpaceshipId]
 	}
 
