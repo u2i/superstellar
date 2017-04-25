@@ -72,6 +72,13 @@ func (c *Client) Listen() {
 
 // Listen write request via chanel
 func (c *Client) listenWrite() {
+	defer func() {
+		err := c.ws.Close()
+		if err != nil {
+			log.Println("Error:", err.Error())
+		}
+	}()
+
 	log.Println("Listening write to client")
 	for {
 		select {
@@ -96,6 +103,13 @@ func (c *Client) listenWrite() {
 }
 
 func (c *Client) listenRead() {
+	defer func() {
+		err := c.ws.Close()
+		if err != nil {
+			log.Println("Error:", err.Error())
+		}
+	}()
+
 	log.Println("Listening read from client")
 	for {
 		select {
