@@ -16,7 +16,7 @@ import (
 
 	"superstellar/backend/utils"
 
-	"golang.org/x/net/websocket"
+	"github.com/gorilla/websocket"
 )
 
 const channelBufSize = 100
@@ -78,7 +78,7 @@ func (c *Client) listenWrite() {
 
 		case bytes := <-c.ch:
 			before := time.Now()
-			err := websocket.Message.Send(c.ws, *bytes)
+			err := c.ws.WriteMessage(websocket.BinaryMessage, *bytes)
 			after := time.Now()
 
 			if err != nil {
@@ -111,13 +111,14 @@ func (c *Client) listenRead() {
 }
 
 func (c *Client) readFromWebSocket() {
-	var data []byte
-	err := websocket.Message.Receive(c.ws, &data)
+	messageType, data, err := c.ws.ReadMessage()
 	if err != nil {
 		log.Println(err)
 
 		c.doneCh <- true
 		c.eventDispatcher.FireUserLeft(&events.UserLeft{ClientID: c.id})
+	} else if messageType != websocket.BinaryMessage {
+		log.Println("Non binary message recived, ignoring")
 	} else {
 		c.unmarshalUserInput(data)
 	}

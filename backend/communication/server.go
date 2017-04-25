@@ -10,7 +10,7 @@ import (
 	"superstellar/backend/monitor"
 	"superstellar/backend/utils"
 
-	"golang.org/x/net/websocket"
+	"github.com/gorilla/websocket"
 )
 
 // Server struct holds server variables.
@@ -22,6 +22,7 @@ type Server struct {
 	eventsDispatcher *events.EventDispatcher
 	idManager        *utils.IdManager
 	userNameRegistry *utils.UserNamesRegistry
+	upgrader         *websocket.Upgrader
 }
 
 // NewServer initializes a new server.
@@ -35,6 +36,12 @@ func NewServer(pattern string, monitor *monitor.Monitor, eventDispatcher *events
 		eventsDispatcher: eventDispatcher,
 		idManager:        idManager,
 		userNameRegistry: userNameRegistry,
+		upgrader: &websocket.Upgrader{
+			ReadBufferSize:  1024,
+			WriteBufferSize: 1024,
+			CheckOrigin: func(r *http.Request) bool {
+				return true
+			}},
 	}
 }
 
@@ -42,22 +49,21 @@ func NewServer(pattern string, monitor *monitor.Monitor, eventDispatcher *events
 func (s *Server) Listen() {
 	log.Println("Listening server...")
 
-	onConnected := func(ws *websocket.Conn) {
-		defer func() {
-			err := ws.Close()
-			if err != nil {
-				log.Println("Error:", err.Error())
-			}
-		}()
+	handler := func(w http.ResponseWriter, r *http.Request) {
+		conn, err := s.upgrader.Upgrade(w, r, nil)
+		if err != nil {
+			log.Println(err)
+			return
+		}
 
-		client := NewClient(ws, s.monitor, s.eventsDispatcher, s.userNameRegistry, s.idManager.NextPlayerId())
+		client := NewClient(conn, s.monitor, s.eventsDispatcher, s.userNameRegistry, s.idManager.NextPlayerId())
 		s.clients[client.id] = client
 
 		log.Println("Added new client. Now", len(s.clients), "clients connected.")
 		client.Listen()
 	}
 
-	http.Handle(s.pattern, websocket.Handler(onConnected))
+	http.HandleFunc(s.pattern, handler)
 }
 
 func (s *Server) SendToAllClients(message proto.Message) {
