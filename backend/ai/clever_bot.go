@@ -41,6 +41,10 @@ func (b *CleverBot) HandleStateUpdate(space *state.Space, spaceship *state.Space
 
 	target := b.selectTarget(space, spaceship)
 
+	if target == nil {
+		return
+	}
+
 	targetPosition := target.ObjectState.Position()
 	botPosition := spaceship.ObjectState.Position()
 	facingAngle := spaceship.ObjectState.Facing()
@@ -108,6 +112,10 @@ func (b*CleverBot) changeFire(spaceship *state.Spaceship, fireEnabled bool) {
 }
 
 func (b *CleverBot) selectTarget(space *state.Space, botSpaceship *state.Spaceship) *state.Spaceship {
+	if (len(space.Spaceships) <= 1) {
+		return nil
+	}
+
 	target, targetExists := space.Spaceships[b.targetSpaceshipId]
 
 	for !targetExists || !b.targetSelected || botSpaceship == target || b.changeTargetIn == 0 {

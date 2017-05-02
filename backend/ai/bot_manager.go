@@ -22,6 +22,12 @@ func NewBotManager(dispatcher *events.EventDispatcher, space *state.Space, idMan
 	}
 }
 
+func (m *BotManager) CreateBots(numberOfBots int) {
+	for i := 0; i < numberOfBots; i++ {
+		m.CreateNewBot()
+	}
+}
+
 func (m *BotManager) CreateNewBot() {
 	id := m.idManager.NextBotId()
 	m.space.NewSpaceship(id)

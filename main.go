@@ -75,10 +75,7 @@ func main() {
 	botManager := ai.NewBotManager(eventDispatcher, space, idManager)
 	eventDispatcher.RegisterTimeTickListener(botManager)
 	eventDispatcher.RegisterObjectDestroyedListener(botManager)
-	botManager.CreateNewBot()
-	botManager.CreateNewBot()
-	botManager.CreateNewBot()
-	botManager.CreateNewBot()
+	botManager.CreateBots(5)
 
 	if debug {
 		fileWriter, err := communication.NewFileWriter(space)
