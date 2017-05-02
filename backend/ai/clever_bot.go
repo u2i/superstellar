@@ -45,6 +45,12 @@ func (b *CleverBot) HandleStateUpdate(space *state.Space, spaceship *state.Space
 		return
 	}
 
+	// it looks like after projectile hit spaceship gets pretty high angular velocity
+	// and it interferes somehow with bot's logic causing 'nietoperzyca' disease
+	if math.Abs(spaceship.AngularVelocity()) > 0.5 {
+		return
+	}
+
 	targetPosition := target.ObjectState.Position()
 	botPosition := spaceship.ObjectState.Position()
 	facingAngle := spaceship.ObjectState.Facing()
