@@ -137,10 +137,11 @@ enum UserInput {
   RIGHT = 2;
   THRUST_ON = 3;
   THRUST_OFF = 4;
-  FIRE_START = 5;
-  FIRE_STOP = 6;
-  BOOST_ON = 7;
-  BOOST_OFF = 8;
+  STRAIGHT_FIRE_START = 5;
+  TURRET_FIRE_START = 6;
+  FIRE_STOP = 7;
+  BOOST_ON = 8;
+  BOOST_OFF = 9;
 }
 
 message UserAction {

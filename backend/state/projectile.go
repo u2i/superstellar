@@ -24,7 +24,7 @@ type Projectile struct {
 func NewProjectile(ID, frameID uint32, spaceship *Spaceship) *Projectile {
 	targetAngle := 0.0
 
-	if spaceship.TargetAngle != nil {
+	if spaceship.TurretFire && spaceship.TargetAngle != nil {
 		targetAngle = *spaceship.TargetAngle
 	} else {
 		targetAngle = spaceship.Facing()

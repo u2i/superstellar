@@ -716,20 +716,24 @@
                     "id": 4
                 },
                 {
-                    "name": "FIRE_START",
+                    "name": "STRAIGHT_FIRE_START",
                     "id": 5
                 },
                 {
-                    "name": "FIRE_STOP",
+                    "name": "TURRET_FIRE_START",
                     "id": 6
                 },
                 {
-                    "name": "BOOST_ON",
+                    "name": "FIRE_STOP",
                     "id": 7
                 },
                 {
-                    "name": "BOOST_OFF",
+                    "name": "BOOST_ON",
                     "id": 8
+                },
+                {
+                    "name": "BOOST_OFF",
+                    "id": 9
                 }
             ]
         }

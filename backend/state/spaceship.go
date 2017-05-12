@@ -27,7 +27,8 @@ type Spaceship struct {
 	InputBoost      bool
 	InputDirection  Direction
 	TargetAngle     *float64
-	Fire            bool
+	StraightFire    bool
+	TurretFire      bool
 	LastShotTime    time.Time
 	MaxHP           uint32
 	Energy          uint32
@@ -48,7 +49,8 @@ func NewSpaceship(clientId uint32, initialPosition *types.Point) *Spaceship {
 		ObjectState:     *objectState,
 		InputThrust:     false,
 		InputDirection:  NONE,
-		Fire:            false,
+		StraightFire:    false,
+		TurretFire:      false,
 		LastShotTime:    time.Now(),
 		MaxHP:           constants.SpaceshipInitialHP,
 		Energy:          constants.SpaceshipInitialEnergy,
@@ -79,11 +81,17 @@ func (s *Spaceship) UpdateUserInput(userInput pb.UserInput) {
 	case pb.UserInput_THRUST_OFF:
 		s.InputThrust = false
 		s.MarkDirty()
-	case pb.UserInput_FIRE_START:
-		s.Fire = true
+	case pb.UserInput_STRAIGHT_FIRE_START:
+		s.StraightFire = true
+		s.TurretFire = false
+		s.MarkDirty()
+	case pb.UserInput_TURRET_FIRE_START:
+		s.TurretFire = true
+		s.StraightFire = false
 		s.MarkDirty()
 	case pb.UserInput_FIRE_STOP:
-		s.Fire = false
+		s.StraightFire = false
+		s.TurretFire = false
 	case pb.UserInput_BOOST_ON:
 		s.InputBoost = true
 		s.MarkDirty()
@@ -185,6 +193,10 @@ func (s *Spaceship) ObjectDestroyed(destroyedObject Object) {
 	}
 
 	s.MarkDirty()
+}
+
+func (s *Spaceship) IsFiring() bool {
+	return s.StraightFire || s.TurretFire
 }
 
 func (s *Spaceship) makeDamage(damage uint32) {

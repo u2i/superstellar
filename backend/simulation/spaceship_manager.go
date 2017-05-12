@@ -27,7 +27,7 @@ func (manager *SpaceshipManager) updateSpaceships() {
 	for _, spaceship := range manager.space.Spaceships {
 		// FIRING
 
-		if spaceship.Fire {
+		if spaceship.IsFiring() {
 			timeSinceLastShot := now.Sub(spaceship.LastShotTime)
 			if timeSinceLastShot >= constants.MinFireInterval {
 				if spaceship.ShootIfPossible() {

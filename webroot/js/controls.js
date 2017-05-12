@@ -39,7 +39,9 @@ const updateKeysState = (keyCode, isPressed) => {
 const updateMouseState = (isDown) => {
   if (mouseDown !== isDown) {
     mouseDown = isDown;
-    sendInput(KEY_SPACE, isDown);
+
+    let userAction = new UserAction(isDown ? "TURRET_FIRE_START" : "FIRE_STOP");
+    sendMessage(userAction);
   }
 }
 
@@ -64,7 +66,7 @@ const sendInput = (keyCode, isPressed) => {
     userInput = isPressed ? "RIGHT" : "CENTER";
     break;
   case KEY_SPACE:
-    userInput = isPressed ? "FIRE_START" : "FIRE_STOP";
+    userInput = isPressed ? "STRAIGHT_FIRE_START" : "FIRE_STOP";
     break;
   case KEY_SHIFT:
     userInput = isPressed ? "BOOST_ON" : "BOOST_OFF";

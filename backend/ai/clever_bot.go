@@ -1,10 +1,10 @@
 package ai
 
 import (
-	"superstellar/backend/state"
-	"math/rand"
-	"superstellar/backend/types"
 	"math"
+	"math/rand"
+	"superstellar/backend/state"
+	"superstellar/backend/types"
 )
 
 const (
@@ -96,29 +96,29 @@ func (b *CleverBot) HandleStateUpdate(space *state.Space, spaceship *state.Space
 	}
 }
 
-func (b*CleverBot) changeDirection(spaceship *state.Spaceship, direction state.Direction) {
+func (b *CleverBot) changeDirection(spaceship *state.Spaceship, direction state.Direction) {
 	if spaceship.InputDirection != direction {
 		spaceship.InputDirection = direction
 		spaceship.MarkDirty()
 	}
 }
 
-func (b*CleverBot) changeThrust(spaceship *state.Spaceship, thrustEnabled bool) {
+func (b *CleverBot) changeThrust(spaceship *state.Spaceship, thrustEnabled bool) {
 	if spaceship.InputThrust != thrustEnabled {
 		spaceship.InputThrust = thrustEnabled
 		spaceship.MarkDirty()
 	}
 }
 
-func (b*CleverBot) changeFire(spaceship *state.Spaceship, fireEnabled bool) {
-	if spaceship.Fire != fireEnabled {
-		spaceship.Fire = fireEnabled
+func (b *CleverBot) changeFire(spaceship *state.Spaceship, fireEnabled bool) {
+	if spaceship.StraightFire != fireEnabled {
+		spaceship.StraightFire = fireEnabled
 		spaceship.MarkDirty()
 	}
 }
 
 func (b *CleverBot) selectTarget(space *state.Space, botSpaceship *state.Spaceship) *state.Spaceship {
-	if (len(space.Spaceships) <= 1) {
+	if len(space.Spaceships) <= 1 {
 		return nil
 	}
 
