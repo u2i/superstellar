@@ -61,7 +61,7 @@ func NewSpaceship(clientId uint32, initialPosition *types.Point) *Spaceship {
 
 // String function returns string representation.
 func (s *Spaceship) String() string {
-	return fmt.Sprintf("(%v, %v, %v)", s.Position, s.Velocity, s.Facing)
+	return fmt.Sprintf("(%v, %v, %v)", s.Position(), s.Velocity(), s.Facing())
 }
 
 func (s *Spaceship) UpdateUserInput(userInput pb.UserInput) {

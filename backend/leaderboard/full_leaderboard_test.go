@@ -11,7 +11,7 @@ var _ = Describe("FullLeaderboard", func() {
 		var ranks []Rank
 		var (
 			fullLeaderboard FullLeaderboard
-			userRank Rank
+			userRank        Rank
 		)
 
 		JustBeforeEach(func() {

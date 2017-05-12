@@ -1,9 +1,9 @@
 package types_test
 
 import (
-	"math"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"math"
 	. "superstellar/backend/types"
 )
 

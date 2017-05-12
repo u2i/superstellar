@@ -7,18 +7,18 @@ import (
 )
 
 type BotManager struct {
-	idToBot     map[uint32]Bot
-	space       *state.Space
-	idManager *utils.IdManager
-	dispatcher  *events.EventDispatcher
+	idToBot    map[uint32]Bot
+	space      *state.Space
+	idManager  *utils.IdManager
+	dispatcher *events.EventDispatcher
 }
 
 func NewBotManager(dispatcher *events.EventDispatcher, space *state.Space, idManager *utils.IdManager) *BotManager {
 	return &BotManager{
-		idToBot:     make(map[uint32]Bot),
-		space:       space,
-		idManager: idManager,
-		dispatcher:  dispatcher,
+		idToBot:    make(map[uint32]Bot),
+		space:      space,
+		idManager:  idManager,
+		dispatcher: dispatcher,
 	}
 }
 

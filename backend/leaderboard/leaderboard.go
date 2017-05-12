@@ -19,9 +19,9 @@ func (leaderboard *Leaderboard) ToProto() *pb.Leaderboard {
 	}
 
 	return &pb.Leaderboard{
-		Ranks: ranks,
-		ClientId: leaderboard.ClientId,
-		UserScore: leaderboard.userScore,
+		Ranks:        ranks,
+		ClientId:     leaderboard.ClientId,
+		UserScore:    leaderboard.userScore,
 		UserPosition: uint32(leaderboard.userPosition),
 	}
 }

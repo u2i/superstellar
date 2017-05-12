@@ -1,9 +1,9 @@
 package game
 
 import (
+	"superstellar/backend/constants"
 	"superstellar/backend/events"
 	"time"
-	"superstellar/backend/constants"
 )
 
 type PhysicsTicker struct {
@@ -13,7 +13,7 @@ type PhysicsTicker struct {
 
 func NewPhysicsTicker(eventDispatcher *events.EventDispatcher) *PhysicsTicker {
 	return &PhysicsTicker{
-		currentFrameId: 1,
+		currentFrameId:  1,
 		eventDispatcher: eventDispatcher,
 	}
 }

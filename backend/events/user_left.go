@@ -1,5 +1,5 @@
 package events
 
 type UserLeft struct {
-	ClientID	uint32
+	ClientID uint32
 }

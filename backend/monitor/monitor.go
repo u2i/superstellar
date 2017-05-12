@@ -158,7 +158,7 @@ func stdDev(durations []time.Duration, avg time.Duration) time.Duration {
 func (m *Monitor) runPrintTicker() {
 	ticker := time.NewTicker(5 * time.Second)
 	go func() {
-		for _ = range ticker.C {
+		for range ticker.C {
 			m.printCh <- true
 		}
 	}()

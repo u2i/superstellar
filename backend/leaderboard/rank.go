@@ -20,7 +20,7 @@ func (a SortableByScore) Swap(i, j int) {
 }
 
 func (a SortableByScore) Less(i, j int) bool {
-	if (a[i].score == a[j].score) {
+	if a[i].score == a[j].score {
 		return a[i].clientId > a[j].clientId
 	}
 	return a[i].score < a[j].score

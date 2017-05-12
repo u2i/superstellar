@@ -95,7 +95,7 @@ func (sender *Sender) sendUserJoinedMessage(clientID uint32, userName string) {
 func (sender *Sender) sendHelloMessage(clientID uint32) {
 	idToUsername := make(map[uint32]string)
 
-	for id, _ := range sender.server.clients {
+	for id := range sender.server.clients {
 		idToUsername[id] = sender.userNameRegistry.GetUserName(id)
 	}
 

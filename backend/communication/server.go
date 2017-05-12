@@ -80,7 +80,7 @@ func (s *Server) SendToClient(clientID uint32, message proto.Message) {
 	if ok {
 		client.SendMessage(bytes)
 	} else {
-		log.Println("Client %i not found", clientID)
+		log.Printf("Client %d not found\n", clientID)
 		return
 	}
 }
