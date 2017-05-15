@@ -1,5 +1,6 @@
 const path = require('path');
 const webpack = require('webpack');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
     entry: {
@@ -7,7 +8,8 @@ module.exports = {
         vendor: ['protobufjs', 'pixi.js']
     },
     output: {
-        filename: "[name].js"
+        filename: "[name].[chunkhash].js",
+        chunkFilename: "[id].[chunkhash].js"
     },
     module: {
         preLoaders: [
@@ -34,7 +36,11 @@ module.exports = {
             }]
     },
     plugins: [
-        new webpack.optimize.CommonsChunkPlugin("vendor", "vendor.js"),
+        new webpack.optimize.CommonsChunkPlugin("vendor", "vendor.[hash].js"),
+        new HtmlWebpackPlugin({
+            title: 'Superstellar',
+            template: 'index.ejs'
+        }),
         new webpack.DefinePlugin({
             'BACKEND_HOST': JSON.stringify(process.env.BACKEND_HOST || 'localhost'),
             'BACKEND_PORT': JSON.stringify(process.env.BACKEND_PORT || '8080'),
