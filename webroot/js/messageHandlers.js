@@ -3,6 +3,7 @@ import { registerMessageHandler } from './communicationLayer';
 
 import playerLeftHandler from './messageHandlers/playerLeftHandler';
 import helloHandler from './messageHandlers/helloHandler';
+import constantsHandler from './messageHandlers/constantsHandler';
 import joinGameAckHandler from './messageHandlers/joinGameAckHandler';
 import spaceHandler from './messageHandlers/spaceHandler';
 import projectileFiredHandler from './messageHandlers/projectileFiredHandler';
@@ -15,6 +16,7 @@ import scoreBoardHandler from './messageHandlers/scoreBoardHandler';
 
 export const initializeHandlers = () => {
   registerMessageHandler(Constants.HELLO_MESSAGE,            helloHandler);
+  registerMessageHandler(Constants.CONSTANTS_MESSAGE,        constantsHandler);
   registerMessageHandler(Constants.JOIN_GAME_ACK_MESSAGE,    joinGameAckHandler);
   registerMessageHandler(Constants.PLAYER_LEFT_MESSAGE,      playerLeftHandler);
   registerMessageHandler(Constants.PLAYER_JOINED_MESSAGE,    playerJoinedHandler);

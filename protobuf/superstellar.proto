@@ -15,6 +15,7 @@ message Message {
     PlayerDied      playerDied        = 9;
     Pong            pong              = 10;
     ScoreBoard      scoreBoard        = 11;
+    Constants       constants         = 12;
   }
 }
 
@@ -102,7 +103,6 @@ message Space {
 message Hello {
   uint32 myId = 1;
   map<uint32, string> idToUsername = 2;
-  Constants constants = 3;
 }
 
 message Constants {

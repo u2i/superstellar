@@ -12,10 +12,6 @@ import (
 
 	"github.com/golang/protobuf/proto"
 
-	"superstellar/backend/monitor"
-
-	"superstellar/backend/utils"
-
 	"github.com/gorilla/websocket"
 )
 
@@ -23,18 +19,15 @@ const channelBufSize = 100
 
 // Client struct holds client-specific variables.
 type Client struct {
-	id               uint32
-	ws               *websocket.Conn
-	ch               chan *[]byte
-	doneCh           chan bool
-	monitor          *monitor.Monitor
-	eventDispatcher  *events.EventDispatcher
-	userNameRegistry *utils.UserNamesRegistry
+	id     uint32
+	ws     *websocket.Conn
+	ch     chan *[]byte
+	doneCh chan bool
+	server *Server
 }
 
-// NewClient initializes a new Client struct with given websocket and Server.
-func NewClient(ws *websocket.Conn, monitor *monitor.Monitor, eventsDispatcher *events.EventDispatcher,
-	userNameRegistry *utils.UserNamesRegistry, clientID uint32) *Client {
+// NewClient initializes a new Client struct with given websocket.
+func NewClient(ws *websocket.Conn, server *Server) *Client {
 	if ws == nil {
 		panic("ws cannot be nil")
 	}
@@ -42,7 +35,7 @@ func NewClient(ws *websocket.Conn, monitor *monitor.Monitor, eventsDispatcher *e
 	ch := make(chan *[]byte, channelBufSize)
 	doneCh := make(chan bool)
 
-	return &Client{clientID, ws, ch, doneCh, monitor, eventsDispatcher, userNameRegistry}
+	return &Client{server.idManager.NextPlayerId(), ws, ch, doneCh, server}
 }
 
 // Conn returns client's websocket.Conn struct.
@@ -55,7 +48,7 @@ func (c *Client) SendMessage(bytes *[]byte) {
 	select {
 	case c.ch <- bytes:
 	default:
-		c.monitor.AddDroppedMessage()
+		c.server.monitor.AddDroppedMessage()
 	}
 }
 
@@ -92,7 +85,7 @@ func (c *Client) listenWrite() {
 				log.Println(err)
 			} else {
 				elapsed := after.Sub(before)
-				c.monitor.AddSendTime(elapsed)
+				c.server.monitor.AddSendTime(elapsed)
 			}
 
 		case <-c.doneCh:
@@ -130,7 +123,7 @@ func (c *Client) readFromWebSocket() {
 		log.Println(err)
 
 		c.doneCh <- true
-		c.eventDispatcher.FireUserLeft(&events.UserLeft{ClientID: c.id})
+		c.server.eventsDispatcher.FireUserLeft(&events.UserLeft{ClientID: c.id})
 	} else if messageType != websocket.BinaryMessage {
 		log.Println("Non binary message recived, ignoring")
 	} else {
@@ -148,10 +141,10 @@ func (c *Client) unmarshalUserInput(data []byte) {
 	switch x := protoUserMessage.Content.(type) {
 	case *pb.UserMessage_UserAction:
 		userInputEvent := events.UserInputFromProto(protoUserMessage.GetUserAction(), c.id)
-		c.eventDispatcher.FireUserInput(userInputEvent)
+		c.server.eventsDispatcher.FireUserInput(userInputEvent)
 	case *pb.UserMessage_TargetAngle:
 		targetAngleEvent := events.TargetAngleFromProto(protoUserMessage.GetTargetAngle(), c.id)
-		c.eventDispatcher.FireTargetAngle(targetAngleEvent)
+		c.server.eventsDispatcher.FireTargetAngle(targetAngleEvent)
 	case *pb.UserMessage_JoinGame:
 		c.tryToJoinGame(protoUserMessage.GetJoinGame())
 	case *pb.UserMessage_Ping:
@@ -163,12 +156,12 @@ func (c *Client) unmarshalUserInput(data []byte) {
 
 func (c *Client) tryToJoinGame(joinGameMsg *pb.JoinGame) {
 	username := strings.TrimSpace(joinGameMsg.Username)
-	ok, err := validateUsername(username)
+	ok, err := c.validateUser(username)
 
 	if ok {
-		c.userNameRegistry.AddUserName(c.id, username)
+		c.server.userNameRegistry.AddUserName(c.id, username)
 		c.sendJoinGameAckMessage(&pb.JoinGameAck{Success: true})
-		c.eventDispatcher.FireUserJoined(&events.UserJoined{ClientID: c.id, UserName: username})
+		c.server.eventsDispatcher.FireUserJoined(&events.UserJoined{ClientID: c.id, UserName: username})
 	} else {
 		c.sendJoinGameAckMessage(
 			&pb.JoinGameAck{Success: false, Error: err.Error()},
@@ -176,7 +169,11 @@ func (c *Client) tryToJoinGame(joinGameMsg *pb.JoinGame) {
 	}
 }
 
-func validateUsername(username string) (bool, error) {
+func (c *Client) validateUser(username string) (bool, error) {
+	if len(c.server.clients) > constants.MaxNumberOfClients {
+		return false, errors.New("We reached the maximum number of users, Captain.")
+	}
+
 	length := len(username)
 
 	if length < constants.MinimumUsernameLength {

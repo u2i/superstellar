@@ -57,6 +57,7 @@ func main() {
 	eventDispatcher.RegisterProjectileFiredListener(sender)
 	eventDispatcher.RegisterProjectileHitListener(sender)
 	eventDispatcher.RegisterUserLeftListener(sender)
+	eventDispatcher.RegisterUserConnectedListener(sender)
 	eventDispatcher.RegisterUserJoinedListener(sender)
 	eventDispatcher.RegisterObjectDestroyedListener(sender)
 

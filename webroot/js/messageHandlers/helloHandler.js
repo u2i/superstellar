@@ -1,4 +1,4 @@
-import { globalState, constants } from '../globals';
+import { globalState } from '../globals';
 
 const helloHandler = (message) => {
   globalState.clientId = message.myId;
@@ -6,11 +6,6 @@ const helloHandler = (message) => {
     globalState.clientIdToName.set(id, username);
   });
 
-  Object.assign(constants, message.constants);
-
-  const anulusBorder = constants.worldRadius + 2 * constants.boundaryAnnulusWidth;
-  globalState.worldSizeFilter.worldBoundarySize = new Float32Array([constants.worldRadius / 100, anulusBorder / 100]);
-  globalState.constants = constants;
 };
 
 export default helloHandler;

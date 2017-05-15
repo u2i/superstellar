@@ -56,8 +56,10 @@ func (s *Server) Listen() {
 			return
 		}
 
-		client := NewClient(conn, s.monitor, s.eventsDispatcher, s.userNameRegistry, s.idManager.NextPlayerId())
+		client := NewClient(conn, s)
 		s.clients[client.id] = client
+
+		s.eventsDispatcher.FireUserConnected(&events.UserConnected{ClientID: client.id})
 
 		log.Println("Added new client. Now", len(s.clients), "clients connected.")
 		client.Listen()

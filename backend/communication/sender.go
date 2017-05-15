@@ -43,6 +43,10 @@ func (sender *Sender) HandleProjectileHit(projectileHitEvent *events.ProjectileH
 	sender.server.SendToAllClients(projectileHitEvent.Projectile.ToHitMessage())
 }
 
+func (sender *Sender) HandleUserConnected(userConnectedEvent *events.UserConnected) {
+	sender.sendConstantMessage(userConnectedEvent.ClientID)
+}
+
 func (sender *Sender) HandleUserJoined(userJoinedEvent *events.UserJoined) {
 	sender.sendHelloMessage(userJoinedEvent.ClientID)
 	sender.sendUserJoinedMessage(userJoinedEvent.ClientID, userJoinedEvent.UserName)
@@ -92,13 +96,7 @@ func (sender *Sender) sendUserJoinedMessage(clientID uint32, userName string) {
 	sender.server.SendToAllClients(message)
 }
 
-func (sender *Sender) sendHelloMessage(clientID uint32) {
-	idToUsername := make(map[uint32]string)
-
-	for id := range sender.server.clients {
-		idToUsername[id] = sender.userNameRegistry.GetUserName(id)
-	}
-
+func (sender *Sender) sendConstantMessage(clientID uint32) {
 	constantsProto := &pb.Constants{
 		WorldRadius:                           constants.WorldRadius,
 		BoundaryAnnulusWidth:                  constants.BoundaryAnnulusWidth,
@@ -117,11 +115,26 @@ func (sender *Sender) sendHelloMessage(clientID uint32) {
 	}
 
 	message := &pb.Message{
+		Content: &pb.Message_Constants{
+			Constants: constantsProto,
+		},
+	}
+
+	sender.server.SendToClient(clientID, message)
+}
+
+func (sender *Sender) sendHelloMessage(clientID uint32) {
+	idToUsername := make(map[uint32]string)
+
+	for id := range sender.server.clients {
+		idToUsername[id] = sender.userNameRegistry.GetUserName(id)
+	}
+
+	message := &pb.Message{
 		Content: &pb.Message_Hello{
 			Hello: &pb.Hello{
 				MyId:         clientID,
 				IdToUsername: idToUsername,
-				Constants:    constantsProto,
 			},
 		},
 	}

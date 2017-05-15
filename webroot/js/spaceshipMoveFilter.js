@@ -8,6 +8,7 @@ export default class SpaceshipMoveFilter {
 
   update(updateFrameId, data) {
     this.simulationFrame = new SpaceshipSimulationFrame(updateFrameId, data);
+    console.log("update")
     this.simulationFrame.predictTo(this.frameId);
   }
 

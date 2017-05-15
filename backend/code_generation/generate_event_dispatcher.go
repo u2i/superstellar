@@ -24,6 +24,7 @@ var supportedEvents = []EventType{
 	NewEventType("PhysicsReady", 1),
 	NewEventType("ProjectileFired", 2),
 	NewEventType("ProjectileHit", 2),
+	NewEventType("UserConnected", 2),
 	NewEventType("UserJoined", 2),
 	NewEventType("UserLeft", 2),
 	NewEventType("ObjectDestroyed", 2),

@@ -29,6 +29,7 @@ export const PING_DEFINITION          = "superstellar.Ping";
 export const PONG_DEFINITION          = "superstellar.Pong";
 
 export const HELLO_MESSAGE             = "hello";
+export const CONSTANTS_MESSAGE         = "constants";
 export const JOIN_GAME_ACK_MESSAGE     = "joinGameAck";
 export const SPACE_MESSAGE             = "space";
 export const LEADERBOARD_MESSAGE       = "leaderboard";

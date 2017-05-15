@@ -132,4 +132,7 @@ const (
 
 	// Energy reward gained on destroying an asteroid
 	AsteroidKillEnergyReward = 10
+
+	// Max number of clients that server will handle
+	MaxNumberOfClients = 50
 )

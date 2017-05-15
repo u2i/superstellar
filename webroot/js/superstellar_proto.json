@@ -83,6 +83,13 @@
                     "name": "scoreBoard",
                     "id": 11,
                     "oneof": "content"
+                },
+                {
+                    "rule": "optional",
+                    "type": "Constants",
+                    "name": "constants",
+                    "id": 12,
+                    "oneof": "content"
                 }
             ],
             "oneofs": {
@@ -97,7 +104,8 @@
                     8,
                     9,
                     10,
-                    11
+                    11,
+                    12
                 ]
             }
         },
@@ -410,12 +418,6 @@
                     "keytype": "uint32",
                     "name": "idToUsername",
                     "id": 2
-                },
-                {
-                    "rule": "optional",
-                    "type": "Constants",
-                    "name": "constants",
-                    "id": 3
                 }
             ]
         },

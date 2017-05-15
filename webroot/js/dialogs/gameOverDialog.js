@@ -3,7 +3,7 @@ import { globalState } from '../globals';
 import * as Utils from "../utils";
 
 const WIDTH = 300;
-const HEIGHT = 130;
+const HEIGHT = 100;
 
 export default class GameOverDialog {
   constructor (killedBy) {
@@ -15,7 +15,6 @@ export default class GameOverDialog {
     this.domNode.innerHTML = `
     <div class="dialog-content">
       <p class="dialog-message">You died, captain!</p>
-      <p class="dialog-message">You were killed by: <span id="killedBy"></span></p>
       <button id="submit" class="action-button" type="button" autofocus>Take revenge!</button>
     </div>
     `;

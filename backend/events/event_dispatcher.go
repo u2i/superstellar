@@ -34,6 +34,10 @@ type ProjectileHitListener interface {
 	HandleProjectileHit(*ProjectileHit)
 }
 
+type UserConnectedListener interface {
+	HandleUserConnected(*UserConnected)
+}
+
 type UserJoinedListener interface {
 	HandleUserJoined(*UserJoined)
 }
@@ -115,6 +119,17 @@ type projectileHitHandler struct {
 func (handler *projectileHitHandler) handle() {
 	for _, listener := range handler.eventListeners {
 		listener.HandleProjectileHit(handler.event)
+	}
+}
+
+type userConnectedHandler struct {
+	event          *UserConnected
+	eventListeners []UserConnectedListener
+}
+
+func (handler *userConnectedHandler) handle() {
+	for _, listener := range handler.eventListeners {
+		listener.HandleUserConnected(handler.event)
 	}
 }
 
@@ -207,6 +222,8 @@ type EventDispatcher struct {
 
 	projectileHitListeners []ProjectileHitListener
 
+	userConnectedListeners []UserConnectedListener
+
 	userJoinedListeners []UserJoinedListener
 
 	userLeftListeners []UserLeftListener
@@ -243,6 +260,8 @@ func NewEventDispatcher() *EventDispatcher {
 		projectileFiredListeners: []ProjectileFiredListener{},
 
 		projectileHitListeners: []ProjectileHitListener{},
+
+		userConnectedListeners: []UserConnectedListener{},
 
 		userJoinedListeners: []UserJoinedListener{},
 
@@ -369,6 +388,23 @@ func (dispatcher *EventDispatcher) FireProjectileHit(event *ProjectileHit) {
 	handler := &projectileHitHandler{
 		event:          event,
 		eventListeners: dispatcher.projectileHitListeners,
+	}
+
+	dispatcher.priority2EventsQueue <- handler
+}
+
+// UserConnected
+
+func (dispatcher *EventDispatcher) RegisterUserConnectedListener(listener UserConnectedListener) {
+	dispatcher.panicWhenEventLoopRunning()
+
+	dispatcher.userConnectedListeners = append(dispatcher.userConnectedListeners, listener)
+}
+
+func (dispatcher *EventDispatcher) FireUserConnected(event *UserConnected) {
+	handler := &userConnectedHandler{
+		event:          event,
+		eventListeners: dispatcher.userConnectedListeners,
 	}
 
 	dispatcher.priority2EventsQueue <- handler
