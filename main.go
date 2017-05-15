@@ -73,7 +73,7 @@ func main() {
 		eventDispatcher.RegisterScoreSentListener(scoreBoardSender)
 	}
 
-	botManager := ai.NewBotManager(eventDispatcher, space, idManager)
+	botManager := ai.NewBotManager(eventDispatcher, space, idManager, userNameRegistry)
 	eventDispatcher.RegisterTimeTickListener(botManager)
 	eventDispatcher.RegisterObjectDestroyedListener(botManager)
 	botManager.CreateBots(5)

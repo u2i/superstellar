@@ -126,7 +126,7 @@ func (sender *Sender) sendConstantMessage(clientID uint32) {
 func (sender *Sender) sendHelloMessage(clientID uint32) {
 	idToUsername := make(map[uint32]string)
 
-	for id := range sender.server.clients {
+	for id := range sender.space.Spaceships {
 		idToUsername[id] = sender.userNameRegistry.GetUserName(id)
 	}
 
