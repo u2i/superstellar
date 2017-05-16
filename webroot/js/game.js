@@ -102,6 +102,7 @@ const render = function () {
     myShip = globalState.spaceshipMap.get(globalState.clientId);
   }
 
+  globalState.score = myShip ? myShip.maxHp : null;
   let viewport = myShip ? myShip.viewport() : defaultViewport;
 
   let backgroundPos = Utils.translateToViewport(0, 0, viewport);

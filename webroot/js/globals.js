@@ -24,7 +24,8 @@ export const globalState = {
   ping: null,
   framesCalculator: new FramesCalculator(),
   asteroidsMap: new Map(),
-  crosshair: null
+  crosshair: null,
+  score: null
 };
 
 export var constants = {};
