@@ -13,7 +13,7 @@ const (
 	DirtyFramesTimeout = 50
 
 	// BoundaryAnnulusWidth is the width of boundary region (in .01 units), i.e. from WorldRadius till when no more movement is possible
-	BoundaryAnnulusWidth = 20000
+	BoundaryAnnulusWidth = 40000
 
 	// FrictionCoefficient is the coefficient saying how fast a spaceship will slow down when not using acceleration
 	FrictionCoefficient = 0.005
