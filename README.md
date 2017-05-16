@@ -3,6 +3,9 @@
 # superstellar
 Massive multiplayer galactic game written in Golang
 
+## Live demo
+[http://superstellar.u2i.is](http://superstellar.u2i.is)
+
 ## Installation & running
 1. Clone this repository to your `$GOPATH/src` directory
 1. `cd` to that directory
