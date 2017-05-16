@@ -3,8 +3,8 @@ import { globalState } from '../globals';
 import Cookie from 'js-cookie';
 import * as Utils from "../utils";
 
-const WIDTH = 300;
-const HEIGHT = 150;
+const WIDTH = 350;
+const HEIGHT = 520;
 
 export default class UsernameDialog {
   constructor () {
@@ -17,7 +17,9 @@ export default class UsernameDialog {
     this._updatePosition();
     this.domNode.innerHTML = `
     <div class="dialog-content">
-      <p class="dialog-message">Welcome Captain... errhm... what was your name again?</p>
+      <img id="intro" src="/images/intro.png" width="300px" />
+      <p class="dialog-message">Welcome Captain!</p>
+      <p class="dialog-message">What is your name?</p>
       <form id="submit-username-form">
 	<input autofocus class="underline-input" id="insert-name-input" type="text" minlength="3" maxlength="25" value="${previousNickname}" required/>
 	<input class="action-button" type="submit" value="Blast'em Off!" />
