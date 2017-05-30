@@ -1,21 +1,31 @@
 [![Build Status](http://jenkins.talkwit.tv/buildStatus/icon?job=u2i/superstellar/master)](http://jenkins.talkwit.tv/job/u2i/job/superstellar/job/master/)
 
 # superstellar
-Massive multiplayer galactic game written in Golang
+
+![Superstellar](http://blog.u2i.com/wp-content/uploads/2017/05/banner.png)
+
+Massive multiplayer galactic game written in Golang. It has been inspired by the old arcade space shooter called Asteroids.
 
 ## Live demo
 [http://superstellar.u2i.is](http://superstellar.u2i.is)
+
+## Rules
+Destroy moving objects and don’t get killed by other players and asteroids. You’ve got two resources – health points and energy points. You lose your health with every hit you get and every contact with the asteroid. Energy points are consumed when shooting and using a boost drive. The more objects you kill, the bigger your health bar grows. Good luck
+
+## Story behind the game
+[http://blog.u2i.com/we-made-a-multiplayer-browser-game-in-go-for-fun/](http://blog.u2i.com/we-made-a-multiplayer-browser-game-in-go-for-fun/)
 
 ## Installation & running
 1. Clone this repository to your `$GOPATH/src` directory
 1. `cd` to that directory
 2. Run `go get`
 3. Run `go build && go install`
-4. Run `$GOPATH/bin/superstellar`
-5. `cd webroot`
-6. `npm install`
-7. `npm run dev`
-8. Go to [http://localhost:8090](http://localhost:8090)
+4. Run `$GOPATH/bin/superstellar` to run a server instance
+5. Open new console and go to the game source directory.
+6. `cd webroot`
+7. `npm install`
+8. `npm run dev`
+9. Go to [http://localhost:8090](http://localhost:8090)
 
 ## Running stress test util
 You can run a stress test util that spawns any number of clients which connect to the server and send ramdomly correct user input messages.
@@ -44,16 +54,4 @@ if (__DEBUG__) {
 
 ## Compiling protobufs
 
-### Golang
-
-1. Go to superstellar src directory.
-1. `brew install protobuf`
-1. `go get -u github.com/golang/protobuf/{proto,protoc-gen-go}`
-1. `protoc -I=protobuf --go_out=backend/pb protobuf/superstellar.proto` (you
-   need to have $GOPATH/bin in your $PATH so `protoc-gen-go` can be found)
-
-### JavaScript
-
-1. `npm install -g protobufjs`
-1. Go to superstellar src directory.
-1. `pbjs protobuf/superstellar.proto > webroot/js/superstellar_proto.json`
+Run `./generateProto.sh` 
