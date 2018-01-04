@@ -1,5 +1,3 @@
-[![Build Status](http://jenkins.talkwit.tv/buildStatus/icon?job=u2i/superstellar/master)](http://jenkins.talkwit.tv/job/u2i/job/superstellar/job/master/)
-
 # superstellar
 
 ![Superstellar](http://blog.u2i.com/wp-content/uploads/2017/05/banner.png)
