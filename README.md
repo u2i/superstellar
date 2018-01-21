@@ -11,7 +11,7 @@ Massive multiplayer galactic game written in Golang. It has been inspired by the
 Destroy moving objects and don’t get killed by other players and asteroids. You’ve got two resources – health points and energy points. You lose your health with every hit you get and every contact with the asteroid. Energy points are consumed when shooting and using a boost drive. The more objects you kill, the bigger your health bar grows. Good luck
 
 ## Story behind the game
-[http://blog.u2i.com/we-made-a-multiplayer-browser-game-in-go-for-fun/](http://blog.u2i.com/we-made-a-multiplayer-browser-game-in-go-for-fun/)
+[https://medium.com/u2i-blogs/we-made-a-multiplayer-browser-game-in-go-for-fun-242a5990ce29/](https://medium.com/u2i-blogs/we-made-a-multiplayer-browser-game-in-go-for-fun-242a5990ce29/)
 
 ## Installation & running
 1. Clone this repository to your `$GOPATH/src` directory
