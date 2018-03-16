@@ -1,0 +1,15 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: superstellar-ingress
+spec:
+  backend:
+    serviceName: superstellar-frontend-service
+    servicePort: 80
+  rules:
+  - http:
+      paths:
+      - path: /superstellar
+        backend:
+          serviceName: superstellar-backend-service
+          servicePort: 8080
