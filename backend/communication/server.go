@@ -65,7 +65,12 @@ func (s *Server) Listen() {
 		client.Listen()
 	}
 
+	healthCheckHandler := func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	}
+
 	http.HandleFunc(s.pattern, handler)
+	http.HandleFunc("/healthz", healthCheckHandler)
 }
 
 func (s *Server) SendToAllClients(message proto.Message) {
