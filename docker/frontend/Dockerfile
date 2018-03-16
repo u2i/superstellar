@@ -1,13 +1,11 @@
 FROM node:6.7
 MAINTAINER Michał Knapik <michal.knapik@u2i.com>
 
-COPY docker/frontend/entrypoint.sh /
-RUN chmod +x /entrypoint.sh
-
-VOLUME /code
-
 WORKDIR /code/webroot
+
+ADD . /code
 
 EXPOSE 8090
 
-ENTRYPOINT /entrypoint.sh
+RUN npm install
+ENTRYPOINT npm run dev
