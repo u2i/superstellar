@@ -29,14 +29,12 @@ stage('Build & Test') {
                 withCleanup {
                     unstash 'source'
 
-                    docker.image('golang:1.7.1').inside("-e HOME=/go -w /go/src/superstellar -v ${pwd()}:/go/src/superstellar") {
+                    docker.build('superstellar-backend-test:latest', '--target builder -f docker/backend/Dockerfile .').inside {
                         sh 'git config --global user.name "Dummy" && git config --global user.email "dummy@example.com"'
                         sh """
-                            go get superstellar github.com/onsi/ginkgo github.com/onsi/gomega
-                            go build superstellar
+                            go get github.com/onsi/ginkgo github.com/onsi/gomega
                             go test superstellar/...
                         """
-                        sh 'cp /go/bin/superstellar .'
                     }
 
                     masterBranchOnly {
@@ -57,20 +55,15 @@ stage('Build & Test') {
                 withCleanup {
                     unstash 'source'
 
-                    dir('webroot') {
-                        docker.image('node:6.7').inside("-e HOME=${pwd()}") {
-                            sh 'npm --quiet install && npm --quiet install babelify'
-                            sh 'PATH=$PATH:node_modules/.bin npm --quiet run build'
-                        }
+                    def frontend_image = docker.build("superstellar-backend:1.0", "-f docker/frontend/Dockerfile.production .")
 
-                        masterBranchOnly {
-                            stage('Package & Publish frontend') {
-                                def image = docker.build('u2i/superstellar_nginx')
+                    masterBranchOnly {
+                        stage('Package & Publish frontend') {
+                            def image = docker.build('u2i/superstellar_nginx')
 
-                                privateRegistry {
-                                    image.push(env.BUILD_NUMBER)
-                                    image.push('latest')
-                                }
+                            privateRegistry {
+                                image.push(env.BUILD_NUMBER)
+                                image.push('latest')
                             }
                         }
                     }

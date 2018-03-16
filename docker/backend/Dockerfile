@@ -1,4 +1,4 @@
-FROM golang:1.6
+FROM golang:1.6 as builder
 MAINTAINER Michał Knapik <michal.knapik@u2i.com>
 
 WORKDIR $GOPATH/src/superstellar
@@ -13,6 +13,6 @@ FROM debian:jessie
 
 EXPOSE 8080
 
-COPY --from=0 /go/bin/superstellar /
+COPY --from=builder /go/bin/superstellar /
 
 CMD /superstellar
