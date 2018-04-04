@@ -1,20 +1,7 @@
-import static Constants.*
-
-class Constants {
-    static final AWS_CREDENTIALS = 'adae9164-3272-49b1-ab0a-6475983d0ed2'
-    static final DOCKER_REGISTRY_URL = 'https://738931564455.dkr.ecr.eu-central-1.amazonaws.com'
-    static final DOCKER_REGISTRY_CREDENTIALS = 'u2i-jenkins-ecr-docker-login'
-}
-
 discardOldBuilds()
 
-@NonCPS
-def jsonParse(def json) {
-    new groovy.json.JsonSlurperClassic().parseText(json)
-}
-
 stage('Checkout') {
-    node {
+    node('superstellar-docker-17.12') {
         withCleanup {
             checkout scm
             stash 'source'
@@ -25,25 +12,21 @@ stage('Checkout') {
 stage('Build & Test') {
     parallel(
         backend: {
-            node('docker') {
+            node('superstellar-docker-17.12') {
                 withCleanup {
                     unstash 'source'
 
-                    docker.build('superstellar-backend-test:latest', '--target builder -f docker/backend/Dockerfile .').inside {
-                        sh 'git config --global user.name "Dummy" && git config --global user.email "dummy@example.com"'
-                        sh """
-                            go get github.com/onsi/ginkgo github.com/onsi/gomega
-                            go test superstellar/...
-                        """
-                    }
+                    sh 'docker build -t superstellar-backend-builder:latest --target builder -f docker/backend/Dockerfile .'
+                    sh 'docker build -t superstellar-backend-test:latest -f docker/backend/Dockerfile.test_image .'
+                    sh 'docker run --rm superstellar-backend-test:latest'
 
                     masterBranchOnly {
-                        stage('Package & Publish backend') {
-                            def image = docker.build('u2i/superstellar')
+                        stage('Build & Publish backend') {
+                            sh 'docker build -t superstellar-backend:latest -f docker/backend/Dockerfile .'
+                            sh "docker tag superstellar-backend:latest gcr.io/kubernetes-playground-195112/superstellar-backend:${env.BUILD_NUMBER}"
 
-                            privateRegistry {
-                                image.push(env.BUILD_NUMBER)
-                                image.push('latest')
+                            withDockerLoggedIntoGCR {
+                                sh "docker push gcr.io/kubernetes-playground-195112/superstellar-backend:${env.BUILD_NUMBER}"
                             }
                         }
                     }
@@ -51,19 +34,18 @@ stage('Build & Test') {
             }
         },
         frontend: {
-            node('docker') {
+            node('superstellar-docker-17.12') {
                 withCleanup {
                     unstash 'source'
 
-                    def frontend_image = docker.build("superstellar-backend:1.0", "-f docker/frontend/Dockerfile.production .")
+                    docker.build("superstellar-frontend:latest", "-f docker/frontend/Dockerfile.production .")
 
                     masterBranchOnly {
-                        stage('Package & Publish frontend') {
-                            def image = docker.build('u2i/superstellar_nginx')
+                        stage('Publish frontend') {
+                            sh "docker tag superstellar-frontend:latest gcr.io/kubernetes-playground-195112/superstellar-frontend:${env.BUILD_NUMBER}"
 
-                            privateRegistry {
-                                image.push(env.BUILD_NUMBER)
-                                image.push('latest')
+                            withDockerLoggedIntoGCR {
+                                sh "docker push gcr.io/kubernetes-playground-195112/superstellar-frontend:${env.BUILD_NUMBER}"
                             }
                         }
                     }
@@ -73,70 +55,15 @@ stage('Build & Test') {
     )
 }
 
-masterBranchOnly {
-    stage(name: 'Deploy') {
-        milestone 1
-
-        node('docker') {
-            withCleanup {
-                String fileName = java.util.UUID.randomUUID().toString()
-
-                aws("--region=eu-central-1 ecs list-tasks --cluster=default > ${fileName}")
-
-                String resultString = readFile(fileName).trim()
-                def result = jsonParse(resultString)
-
-                for (String task in result['taskArns']) {
-                    String taskId = task.split(":task/")[1]
-                    aws("--region=eu-central-1 ecs stop-task --task ${taskId} > /dev/null")
-                }
-            }
-        }
+def withDockerLoggedIntoGCR(Closure cl) {
+    withCredentials([file(credentialsId: '5bc94dd2-0a14-4bba-bfd9-f628512b3158', variable: 'FILE')]) {
+        sh 'cat $FILE | docker login -u _json_key --password-stdin https://gcr.io'
     }
-
-    stage(name: 'Health Check') {
-        sleep 10
-
-        retry(5) {
-            try {
-                node('docker') {
-                    withCleanup {
-                        sh 'docker run --rm appropriate/curl --fail -I http://superstellar.u2i.is'
-                    }
-                }
-            } catch(Exception e) {
-                sleep 10
-                throw e
-            }
-        }
-    }
+    cl()
 }
 
 def masterBranchOnly(Closure cl) {
     if (env.BRANCH_NAME == 'master') {
-        cl()
-    }
-}
-
-def aws(String cmd) {
-    withAwsCredentials(AWS_CREDENTIALS) {
-        sh """
-            docker run --rm -e AWS_ACCESS_KEY_ID=${env.AWS_ACCESS_KEY_ID} -e AWS_SECRET_ACCESS_KEY=${env.AWS_SECRET_ACCESS_KEY} -v ${pwd()}:/tmp -w /tmp \
-                mikesir87/aws-cli:1.11.3 aws $cmd
-       """
-   }
-}
-
-def privateRegistry(Closure cl) {
-    String fileName = java.util.UUID.randomUUID().toString()
-
-    aws("--region eu-central-1 ecr get-login > $fileName")
-
-    String dockerLoginCommand = readFile(fileName).trim()
-
-    sh dockerLoginCommand
-
-    docker.withRegistry(DOCKER_REGISTRY_URL) {
         cl()
     }
 }
