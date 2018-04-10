@@ -11,7 +11,7 @@ spec:
     spec:
       containers:
       - name: superstellar-backend
-        image: gcr.io/kubernetes-playground-195112/superstellar-backend:1.0
+        image: gcr.io/kubernetes-playground-195112/superstellar-backend:38
         ports:
         - containerPort: 8080
         readinessProbe:
@@ -50,7 +50,7 @@ spec:
     spec:
       containers:
       - name: superstellar-frontend
-        image: gcr.io/kubernetes-playground-195112/superstellar-frontend:1.0
+        image: gcr.io/kubernetes-playground-195112/superstellar-frontend:38
         ports:
         - containerPort: 80
 ---
