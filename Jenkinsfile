@@ -62,13 +62,21 @@ masterBranchOnly {
         node('superstellar-docker-17.12') {
             withCleanup {
                 unstash 'source'
-                
+
                 sh 'docker build -t superstellar-deployment:latest -f docker/deployment/Dockerfile .'
                 withCredentials([file(credentialsId: '5bc94dd2-0a14-4bba-bfd9-f628512b3158', variable: 'FILE')]) {
                     sh 'cp $FILE deployment_volume/service_account.json'
                     sh "docker run -v ${pwd()}/deployment_volume:/deployment_volume superstellar-deployment:latest /deployment_volume/script.sh ${env.BUILD_NUMBER}"
                 }
             }
+        }
+    }
+}
+
+stage('Cleanup') {
+    node('superstellar-docker-17.12') {
+        withCleanup {
+            sh 'yes | docker system prune'
         }
     }
 }
