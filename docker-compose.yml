@@ -7,8 +7,6 @@ services:
     image: u2i/superstellar-backend
     ports:
     - "8080:8080"
-    volumes:
-    - .:/go/src/superstellar
   frontend:
     build:
       context: .
@@ -27,5 +25,3 @@ services:
     build:
       context: .
       dockerfile: docker/utils/Dockerfile
-    volumes:
-    - .:/go/src/superstellar
